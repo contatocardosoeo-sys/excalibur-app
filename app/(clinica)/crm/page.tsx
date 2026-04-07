@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useMemo } from 'react'
 import { supabase } from '../../lib/supabase'
-import Sidebar from '../../components/Sidebar'
 
 interface Lead {
   id: string; nome: string; telefone: string; email: string; cpf: string
@@ -107,8 +106,7 @@ export default function CRMPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 flex">
-      <Sidebar />
+    <>
       <div className="flex-1 overflow-auto">
         {/* Header */}
         <header className="sticky top-0 z-30 bg-gray-950/80 backdrop-blur-md border-b border-gray-800 px-6 py-3 flex items-center justify-between">
@@ -429,7 +427,7 @@ export default function CRMPage() {
           </div>
         </div>
       )}
-    </div>
+    </>
   )
 }
 

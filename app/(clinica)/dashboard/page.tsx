@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../../lib/supabase'
-import Sidebar from '../../components/Sidebar'
 
 interface Lead { id: string; nome: string; telefone: string; etapa: string; procedimento: string; created_at: string }
 interface Proposta { id: string; valor_total: number; status: string; created_at: string }
@@ -89,9 +88,7 @@ export default function DashboardPage() {
   const maxChart = Math.max(...chartData.map(d => Math.max(d.receitas, d.despesas, d.lucro)), 1)
 
   return (
-    <div className="min-h-screen bg-gray-950 flex">
-      <Sidebar />
-      <div className="flex-1 overflow-auto">
+    <>
         {/* Header */}
         <header className="sticky top-0 z-30 bg-gray-950/80 backdrop-blur-md border-b border-gray-800 px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm text-gray-400">
@@ -276,8 +273,7 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+    </>
   )
 }
 

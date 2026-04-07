@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../../lib/supabase'
-import Sidebar from '../../components/Sidebar'
 
 type StatusAg = 'agendado' | 'confirmado' | 'compareceu' | 'cancelado' | 'noshow'
 interface Agendamento { id: string; paciente_nome: string; telefone: string | null; data: string; hora: string; procedimento: string | null; status: StatusAg; created_at: string }
@@ -47,8 +46,6 @@ export default function AgendaPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 flex">
-      <Sidebar />
       <div className="flex-1 p-6 overflow-auto">
         <div className="flex items-center justify-between mb-5">
           <div>
@@ -105,6 +102,5 @@ export default function AgendaPage() {
           </div>
         )}
       </div>
-    </div>
   )
 }
