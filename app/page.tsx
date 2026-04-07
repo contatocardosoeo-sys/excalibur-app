@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { supabase } from './lib/supabase'
+import { createSupabaseBrowser } from './lib/supabase-browser'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -13,6 +13,7 @@ export default function LoginPage() {
     e.preventDefault()
     setLoading(true)
     setErro('')
+    const supabase = createSupabaseBrowser()
     const { error } = await supabase.auth.signInWithPassword({ email, password: senha })
     if (error) {
       setErro(error.message)

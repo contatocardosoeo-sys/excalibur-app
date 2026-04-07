@@ -1,6 +1,4 @@
-import { createClient } from '@supabase/supabase-js'
+import { createSupabaseBrowser } from './supabase-browser'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://hluhlsnodndpskrkbjuw.supabase.co'
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-
-export const supabase = createClient(supabaseUrl, supabaseKey)
+// Re-export para compatibilidade com páginas existentes
+export const supabase = createSupabaseBrowser()

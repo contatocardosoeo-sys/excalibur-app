@@ -86,14 +86,12 @@ export async function POST(request: NextRequest) {
 
       case 'lead_nao_atendido': {
         if (lead_id) {
-          await supabase.rpc('decrementar_score', { lead_uuid: lead_id, pontos: 5 })
-            .then(() => {})
-            .catch(() => {
-              // fallback: update direto
-              supabase.from('leads')
-                .update({ lead_score: Math.max(0, (Number(dados?.score_atual) || 50) - 5) })
-                .eq('id', lead_id)
-            })
+          const { error: rpcError } = await supabase.rpc('decrementar_score', { lead_uuid: lead_id, pontos: 5 })
+          if (rpcError) {
+            await supabase.from('leads')
+              .update({ lead_score: Math.max(0, (Number(dados?.score_atual) || 50) - 5) })
+              .eq('id', lead_id)
+          }
         }
         await supabase.from('alertas_sistema').insert({
           tipo: 'lead_nao_atendido',
