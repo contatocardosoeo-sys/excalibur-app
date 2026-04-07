@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { emitEvent } from '@/app/lib/events'
+import { Logger } from '@/app/lib/logger'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://hluhlsnodndpskrkbjuw.supabase.co',
@@ -17,9 +19,21 @@ interface N8NEvent {
 }
 
 export async function POST(request: NextRequest) {
+  const start = Date.now()
   try {
     const body: N8NEvent = await request.json()
     const { tipo, clinica_id, lead_id, dados } = body
+
+    // Emitir evento
+    await emitEvent({
+      event_name: `webhook_n8n_${tipo}`,
+      aggregate_type: tipo.includes('lead') ? 'lead' : tipo.includes('agendamento') ? 'agendamento' : tipo.includes('proposta') ? 'proposta' : 'sistema',
+      aggregate_id: lead_id || body.agendamento_id || body.proposta_id,
+      clinica_id,
+      actor_type: 'n8n',
+      source_system: 'n8n',
+      payload: { tipo, dados },
+    })
 
     switch (tipo) {
       case 'lead_sem_resposta': {
@@ -109,6 +123,11 @@ export async function POST(request: NextRequest) {
     }
   } catch (err) {
     console.error('[webhook/n8n]', err)
+    await Logger.error('/api/webhooks/n8n', 'Erro no webhook N8N', {
+      stack_trace: err instanceof Error ? err.stack : String(err),
+      duracao_ms: Date.now() - start,
+      status_code: 500,
+    })
     return NextResponse.json({ error: 'Erro interno no webhook' }, { status: 500 })
   }
 }
