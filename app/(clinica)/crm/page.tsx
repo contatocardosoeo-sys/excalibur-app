@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useCallback } from 'react'
 import { supabase } from '../../lib/supabase'
 
 interface Lead {
@@ -26,9 +26,9 @@ function fmt(v: number) { return new Intl.NumberFormat('pt-BR', { style: 'curren
 function timeAgo(dt: string) { const h = Math.floor((Date.now() - new Date(dt).getTime()) / 3600000); if (h < 1) return 'agora'; if (h < 24) return `${h}h`; return `${Math.floor(h / 24)}d` }
 
 function scoreColor(s: number) {
-  if (s >= 70) return { bg: 'bg-green-500/20', text: 'text-green-400', label: 'QUENTE' }
-  if (s >= 30) return { bg: 'bg-amber-500/20', text: 'text-amber-400', label: 'MORNO' }
-  return { bg: 'bg-red-500/20', text: 'text-red-400', label: 'FRIO' }
+  if (s >= 70) return { bg: 'bg-green-500/20', text: 'text-green-400', label: 'QUENTE', icon: '🔥' }
+  if (s >= 30) return { bg: 'bg-amber-500/20', text: 'text-amber-400', label: 'MORNO', icon: '' }
+  return { bg: 'bg-red-500/20', text: 'text-red-400', label: 'FRIO', icon: '❄️' }
 }
 
 const EMPTY_LEAD = { nome: '', telefone: '', email: '', cpf: '', whatsapp: '', procedimento: 'Implante', etapa: 'Novo Lead', cidade: '', estado: 'SP', bairro: '', score: 0, origem: 'Outros', vendedor: '' }
@@ -42,6 +42,43 @@ export default function CRMPage() {
   const [modalTab, setModalTab] = useState<'detalhes' | 'atividades' | 'historico'>('detalhes')
   const [busca, setBusca] = useState('')
   const [view, setView] = useState<'kanban' | 'lista'>('kanban')
+  const [dragLeadId, setDragLeadId] = useState<string | null>(null)
+  const [dragOverEtapa, setDragOverEtapa] = useState<string | null>(null)
+
+  const handleDragStart = useCallback((e: React.DragEvent<HTMLDivElement>, leadId: string) => {
+    setDragLeadId(leadId)
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.setData('text/plain', leadId)
+  }, [])
+
+  const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>, etapaNome: string) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+    setDragOverEtapa(etapaNome)
+  }, [])
+
+  const handleDragLeave = useCallback(() => {
+    setDragOverEtapa(null)
+  }, [])
+
+  const handleDrop = useCallback(async (e: React.DragEvent<HTMLDivElement>, newEtapa: string) => {
+    e.preventDefault()
+    const leadId = e.dataTransfer.getData('text/plain')
+    setDragLeadId(null)
+    setDragOverEtapa(null)
+    if (!leadId) return
+    const lead = leads.find(l => l.id === leadId)
+    if (!lead || lead.etapa === newEtapa) return
+    // Optimistic update
+    setLeads(prev => prev.map(l => l.id === leadId ? { ...l, etapa: newEtapa } : l))
+    await supabase.from('leads').update({ etapa: newEtapa }).eq('id', leadId)
+    carregar()
+  }, [leads])
+
+  const handleDragEnd = useCallback(() => {
+    setDragLeadId(null)
+    setDragOverEtapa(null)
+  }, [])
 
   async function carregar() {
     const { data } = await supabase.from('leads').select('*').order('created_at', { ascending: false })
@@ -154,7 +191,11 @@ export default function CRMPage() {
               {ETAPAS.map(etapa => {
                 const etapaLeads = filteredLeads.filter(l => (l.etapa || 'Novo Lead') === etapa.nome || (l.etapa === 'Recebido' && etapa.nome === 'Novo Lead') || (l.etapa === 'Contato feito' && etapa.nome === 'Contato Inicial') || (l.etapa === 'Compareceu' && etapa.nome === 'Pagamento Pendente') || (l.etapa === 'Fechou' && etapa.nome === 'Fechado'))
                 return (
-                  <div key={etapa.nome} className={`min-w-[220px] flex-1 border rounded-xl p-3 ${etapa.cor}`}>
+                  <div key={etapa.nome}
+                    onDragOver={e => handleDragOver(e, etapa.nome)}
+                    onDragLeave={handleDragLeave}
+                    onDrop={e => handleDrop(e, etapa.nome)}
+                    className={`min-w-[220px] flex-1 border rounded-xl p-3 transition-all duration-200 ${etapa.cor} ${dragOverEtapa === etapa.nome ? 'border-amber-500 ring-1 ring-amber-500/50' : ''}`}>
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
                         <div className={`w-2 h-2 rounded-full ${etapa.badge}`} />
@@ -167,7 +208,11 @@ export default function CRMPage() {
                       {etapaLeads.map(lead => {
                         const sc = scoreColor(lead.score || 0)
                         return (
-                          <div key={lead.id} onClick={() => abrirLead(lead)} className="bg-gray-900/80 border border-gray-800 rounded-xl p-3 cursor-pointer hover:border-amber-500/30 transition group">
+                          <div key={lead.id} draggable="true"
+                            onDragStart={e => handleDragStart(e, lead.id)}
+                            onDragEnd={handleDragEnd}
+                            onClick={() => abrirLead(lead)}
+                            className={`bg-gray-900/80 border border-gray-800 rounded-xl p-3 cursor-grab hover:border-amber-500/30 transition group ${dragLeadId === lead.id ? 'opacity-50' : ''}`}>
                             <div className="flex items-start justify-between mb-2">
                               <div className="flex items-center gap-2">
                                 <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center text-white text-xs font-bold">{(lead.nome || '?')[0].toUpperCase()}</div>
@@ -176,7 +221,7 @@ export default function CRMPage() {
                                   {lead.cidade && <p className="text-gray-500 text-[10px]">@ {lead.cidade}</p>}
                                 </div>
                               </div>
-                              <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ${sc.bg} ${sc.text}`}>{lead.score || 0}/100</span>
+                              <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ${sc.bg} ${sc.text}`}>{sc.icon}{sc.icon ? ' ' : ''}{sc.label} {lead.score || 0}/100</span>
                             </div>
                             {lead.procedimento && (
                               <span className="text-[9px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 font-medium">{lead.procedimento}</span>
@@ -231,7 +276,7 @@ export default function CRMPage() {
                         </td>
                         <td className="px-4 py-3"><span className="text-xs text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full">{lead.procedimento}</span></td>
                         <td className="px-4 py-3"><span className="text-xs text-gray-300">{lead.etapa}</span></td>
-                        <td className="px-4 py-3"><span className={`text-xs px-2 py-0.5 rounded-full font-bold ${sc.bg} ${sc.text}`}>{lead.score || 0} · {sc.label}</span></td>
+                        <td className="px-4 py-3"><span className={`text-xs px-2 py-0.5 rounded-full font-bold ${sc.bg} ${sc.text}`}>{sc.icon}{sc.icon ? ' ' : ''}{lead.score || 0} · {sc.label}</span></td>
                         <td className="px-4 py-3 text-xs text-gray-500">{timeAgo(lead.created_at)}</td>
                       </tr>
                     )
