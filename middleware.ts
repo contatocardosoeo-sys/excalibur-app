@@ -30,7 +30,9 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Rotas públicas — não precisa de auth
-  const publicRoutes = ['/', '/login', '/api/webhooks']
+  // NOTA: '/dossiery' está aberto na Fase 0 para preview da estética/navegação.
+  // O gate de auth + RLS do Dossiery entra na fase de billing (ver DOSSIERY.md).
+  const publicRoutes = ['/', '/login', '/api/webhooks', '/dossiery']
   const isPublic = publicRoutes.some(route => pathname === route || pathname.startsWith(route + '/'))
 
   // Se não está logado e tenta acessar rota protegida → redireciona para login
