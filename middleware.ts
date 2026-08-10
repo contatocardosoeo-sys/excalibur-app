@@ -29,10 +29,41 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
+  // ============ DOSSIERY (funil próprio, auth própria) ============
+  if (pathname === '/dossiery' || pathname.startsWith('/dossiery/')) {
+    // DOSSIERY_GATE=off → tudo aberto (preview/dev antes do go-live)
+    const gateOff = process.env.DOSSIERY_GATE === 'off'
+    const publicosDossiery = [
+      '/dossiery',
+      '/dossiery/precos',
+      '/dossiery/entrar',
+      '/dossiery/criar-conta',
+      '/dossiery/bem-vindo',
+    ]
+    const isPublicoDossiery = publicosDossiery.includes(pathname)
+
+    // Logado tentando entrar/criar conta → manda pra Base
+    if (user && (pathname === '/dossiery/entrar' || pathname === '/dossiery/criar-conta')) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/dossiery/base'
+      url.search = ''
+      return NextResponse.redirect(url)
+    }
+
+    // App protegido sem login → login com retorno
+    if (!user && !isPublicoDossiery && !gateOff) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/dossiery/entrar'
+      url.search = `?next=${encodeURIComponent(pathname)}`
+      return NextResponse.redirect(url)
+    }
+
+    return supabaseResponse
+  }
+
+  // ============ CLÍNICA (comportamento original) ============
   // Rotas públicas — não precisa de auth
-  // NOTA: '/dossiery' está aberto na Fase 0 para preview da estética/navegação.
-  // O gate de auth + RLS do Dossiery entra na fase de billing (ver DOSSIERY.md).
-  const publicRoutes = ['/', '/login', '/api/webhooks', '/dossiery']
+  const publicRoutes = ['/', '/login', '/api/webhooks']
   const isPublic = publicRoutes.some(route => pathname === route || pathname.startsWith(route + '/'))
 
   // Se não está logado e tenta acessar rota protegida → redireciona para login

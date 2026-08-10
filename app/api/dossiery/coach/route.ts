@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { anthropicStream, type ChatMessage } from '@/app/lib/dossiery/claude'
 import { COACH_SYSTEM } from '@/app/lib/dossiery/coachPrompt'
+import { createSupabaseServer } from '@/app/lib/supabase-server'
+import { paywallAtivo, temAssinaturaAtiva } from '@/app/lib/dossiery/assinatura'
 
 export const runtime = 'nodejs'
 export const maxDuration = 120
@@ -14,6 +16,23 @@ export async function POST(request: NextRequest) {
       { error: 'IA não configurada. Defina ANTHROPIC_API_KEY no ambiente.' },
       { status: 503 }
     )
+  }
+
+  // Gate: login + assinatura (pulado com DOSSIERY_GATE=off, p/ preview)
+  if (process.env.DOSSIERY_GATE !== 'off') {
+    const supabase = await createSupabaseServer()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Faça login para falar com o Coach.' }, { status: 401 })
+    }
+    if (paywallAtivo() && !(await temAssinaturaAtiva(supabase, user.id))) {
+      return NextResponse.json(
+        { error: 'Assine o Dossiery para destravar o Coach.', url: '/dossiery/precos' },
+        { status: 402 }
+      )
+    }
   }
 
   let body: { messages?: ChatMessage[] }

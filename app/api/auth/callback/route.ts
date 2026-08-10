@@ -10,5 +10,8 @@ export async function GET(request: NextRequest) {
     await supabase.auth.exchangeCodeForSession(code)
   }
 
-  return NextResponse.redirect(`${origin}/dashboard`)
+  // Honra ?next= relativo (usado pelo Dossiery); default mantém a clínica
+  const next = searchParams.get('next')
+  const destino = next && next.startsWith('/') && !next.startsWith('//') ? next : '/dashboard'
+  return NextResponse.redirect(`${origin}${destino}`)
 }

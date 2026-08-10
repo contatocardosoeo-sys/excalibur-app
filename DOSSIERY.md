@@ -73,26 +73,70 @@ disponível no Supabase). Idempotente.
 
 ---
 
-## Estado atual — Fase 0 (Fundação) ✅
+## Estado atual — rumo ao LANÇAMENTO 🚀
 
-- [x] Tema oxblood escopado (`.dossiery`) sem afetar a clínica
-- [x] Layout de tema + shell do app + sidebar
-- [x] Landing/manifesto
-- [x] Todas as 10 telas navegáveis (base completa; demais com spec on-brand)
-- [x] Middleware libera `/dossiery` para preview
-- [x] Migration SQL completa + RLS
+- [x] **S0 · Fundação** — tema oxblood, shell, landing, 10 telas, migration+RLS
+- [x] **S1 · Núcleo de IA** — Coach (streaming) e Analisar (saída estruturada)
+      funcionando com o cânone destilado + guardrails (RAG pgvector fica p/ v2)
+- [x] **S2 · Máquina de dinheiro** — Stripe (checkout + portal + webhook),
+      auth própria (`/dossiery/entrar`, `/criar-conta`), página de preços,
+      gate de acesso no middleware e enforcement de assinatura nas rotas de IA
+- [ ] **S3 · Página de vendas + onboarding** (oferta forte, 1º "aha")
+- [ ] **S4 · Go-live** — domínio, termos/privacidade, pixel, teste de compra real
 
-> **Preview aberto:** na Fase 0, `/dossiery/*` está público (sem gate de auth)
-> para navegar a estética. O gate de auth + enforcement de RLS liga na fase de
-> billing — ver middleware.ts e a coluna abaixo.
+## Runbook de lançamento (checklist de env/config)
 
-## Roadmap
+### Variáveis de ambiente (Vercel → Settings → Environment Variables)
 
-- **Fase 1 — Núcleo de IA:** RAG v1 (ingestão do cânone + pgvector +
-  classificador de ética), Coach, Analisar, Conta/perfil.
-- **Fase 2 — Practice & Campo:** Arena com heat-map, Diário de Campo, CRM,
-  cadência.
-- **Fase 3 — Academia & Evolução:** biblioteca navegável, skill tree/XP,
-  missões.
-- **Fase 4 — Billing & Growth:** Stripe, planos, gate de auth/RLS ligado,
-  painel LGPD, onboarding, analytics.
+| Var | O quê |
+|---|---|
+| `ANTHROPIC_API_KEY` | chave da API Claude (console.anthropic.com) |
+| `DOSSIERY_COACH_MODEL` | opcional; padrão `claude-opus-5` (use `claude-sonnet-5` p/ baratear) |
+| `STRIPE_SECRET_KEY` | Stripe → Developers → API keys (`sk_live_…`) |
+| `STRIPE_WEBHOOK_SECRET` | criado no passo Webhook abaixo (`whsec_…`) |
+| `STRIPE_PRICE_MENSAL` | price ID do Operador mensal (`price_…`) |
+| `STRIPE_PRICE_ANUAL` | price ID do Operador anual (`price_…`) |
+| `DOSSIERY_GATE` | `off` = tudo aberto (preview). **Remover no go-live.** |
+| `DOSSIERY_PAYWALL` | `off` = login exigido mas IA liberada sem assinar. Padrão: on. |
+
+### Stripe — passo a passo (~5 min)
+
+1. **Produto:** Dashboard → Product catalog → *Add product* → nome
+   `Dossiery — Operador`.
+2. **Preços:** no produto, crie 2 recurring prices em BRL:
+   mensal `R$ 97,00` e anual `R$ 697,00`. Copie os dois `price_…` → envs.
+3. **Webhook:** Developers → Webhooks → *Add endpoint* →
+   URL `https://SEU-DOMINIO/api/webhooks/stripe` → eventos:
+   `checkout.session.completed`, `customer.subscription.updated`,
+   `customer.subscription.deleted`. Copie o `whsec_…` → env.
+4. **Portal do cliente:** Settings → Billing → Customer portal → ativar
+   (permitir cancelar/trocar cartão). O botão da conta usa `/api/dossiery/portal`.
+5. **Reembolso (garantia 7 dias):** reembolsar direto no Dashboard do Stripe;
+   o webhook `customer.subscription.deleted` corta o acesso sozinho.
+
+> PIX: recorrência nativa no Stripe BR é cartão; PIX funciona bem para o plano
+> anual via checkout (habilite PIX em Settings → Payment methods). Mensal = cartão.
+
+### Supabase
+
+1. Rodar `supabase/migrations/0001_dossiery_schema.sql` e
+   `0002_dossiery_billing.sql` no SQL Editor (idempotentes).
+2. Auth → Providers → Email: para funil sem fricção, **desligar** “Confirm
+   email” (ou manter ligado — o fluxo de confirmação já é tratado no app).
+3. Auth → URL Configuration: adicionar o domínio de produção em *Site URL* e
+   *Redirect URLs* (`https://SEU-DOMINIO/api/auth/callback`).
+
+### Fluxo do funil (como funciona)
+
+`/dossiery` (landing) → `/dossiery/precos` → cria conta → Stripe Checkout →
+webhook grava `dossiery_assinaturas.status='ativo'` → `/dossiery/bem-vindo` →
+app liberado. Sem assinatura: telas respondem 402 com CTA pro preço.
+Cancelou/reembolsou: webhook derruba o status e o acesso trava sozinho.
+
+## Roadmap pós-lançamento
+
+- **v2 — RAG completo:** ingestão do cânone + pgvector + classificador de
+  ética como camada própria.
+- **Practice & Campo:** Arena com heat-map, Diário de Campo, CRM, cadência.
+- **Academia & Evolução:** biblioteca navegável, skill tree/XP, missões.
+- **Growth:** onboarding guiado, e-mails de ciclo de vida, analytics/pixel.

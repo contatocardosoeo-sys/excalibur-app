@@ -19,6 +19,7 @@ export default function AnalisarPage() {
   const [contexto, setContexto] = useState('')
   const [loading, setLoading] = useState(false)
   const [erro, setErro] = useState<string | null>(null)
+  const [paywall, setPaywall] = useState(false)
   const [resultado, setResultado] = useState<Resultado | null>(null)
   const [copiado, setCopiado] = useState<number | null>(null)
 
@@ -33,6 +34,14 @@ export default function AnalisarPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ conversa, contexto }),
       })
+      if (res.status === 401) {
+        window.location.href = '/dossiery/entrar?next=/dossiery/analisar'
+        return
+      }
+      if (res.status === 402) {
+        setPaywall(true)
+        return
+      }
       const data = await res.json().catch(() => null)
       if (!res.ok) throw new Error(data?.error || `Erro ${res.status}`)
       setResultado(data.resultado as Resultado)
@@ -98,6 +107,20 @@ export default function AnalisarPage() {
         >
           {loading ? 'Analisando…' : 'Analisar →'}
         </button>
+        {paywall && (
+          <div className="rounded-md border border-primary/50 bg-primary/[0.07] px-5 py-5">
+            <p className="font-serif-d text-lg">O Analisador é do arsenal Operador.</p>
+            <p className="text-[13px] text-muted-foreground mt-1">
+              Destrave agora — com 7 dias de garantia incondicional.
+            </p>
+            <a
+              href="/dossiery/precos"
+              className="inline-block mt-3 rounded-[4px] bg-primary text-primary-foreground font-semibold text-[13px] px-4 py-2.5 hover:opacity-90 transition"
+            >
+              Ver plano →
+            </a>
+          </div>
+        )}
         {erro && (
           <div className="rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3 text-[13px] text-destructive">
             {erro}

@@ -47,12 +47,20 @@ export default function DossieryLanding() {
           <div className="hidden sm:block font-mono-d text-[10px] tracking-[0.2em] uppercase text-muted-foreground">
             Dossiê Nº 001 · Projeto Conquista
           </div>
-          <Link
-            href="/dossiery/base"
-            className="text-[13px] font-medium rounded-[4px] border border-border px-3.5 py-1.5 hover:border-primary hover:text-primary transition"
-          >
-            Entrar
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/dossiery/precos"
+              className="text-[13px] text-muted-foreground hover:text-primary transition"
+            >
+              Preços
+            </Link>
+            <Link
+              href="/dossiery/entrar"
+              className="text-[13px] font-medium rounded-[4px] border border-border px-3.5 py-1.5 hover:border-primary hover:text-primary transition"
+            >
+              Entrar
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -90,10 +98,10 @@ export default function DossieryLanding() {
 
           <div className="mt-9 flex flex-wrap items-center gap-3">
             <Link
-              href="/dossiery/base"
+              href="/dossiery/precos"
               className="rounded-[4px] bg-primary text-primary-foreground font-semibold text-sm px-5 py-2.5 hover:opacity-90 transition"
             >
-              Entrar na Base →
+              Entrar no jogo →
             </Link>
             <a
               href="#principios"
@@ -236,10 +244,10 @@ export default function DossieryLanding() {
             Sem muleta. Sem enganação. Só você — melhor, calibrado, no controle do jogo.
           </p>
           <Link
-            href="/dossiery/base"
+            href="/dossiery/precos"
             className="inline-block mt-8 rounded-[4px] bg-primary text-primary-foreground font-semibold text-sm px-6 py-3 hover:opacity-90 transition"
           >
-            Entrar na Base →
+            Entrar no jogo — 7 dias de garantia →
           </Link>
         </div>
       </section>
