@@ -33,7 +33,7 @@ export default function BasePage() {
       {/* missão do dia */}
       <div className="mt-8 rounded-md border border-primary/40 bg-primary/[0.06] p-6 relative overflow-hidden">
         <div className="absolute left-0 inset-y-0 w-1 bg-primary" />
-        <div className="font-mono-d text-[11px] tracking-[0.2em] uppercase text-primary">Missão do dia</div>
+        <div className="font-mono-d text-[11px] tracking-[0.2em] uppercase text-[hsl(var(--brass))]">Missão do dia</div>
         <p className="font-serif-d text-2xl mt-2 max-w-xl">
           Complete seu mapeamento de atleta pra IA te calibrar de verdade.
         </p>
@@ -87,7 +87,7 @@ export default function BasePage() {
                 Últimas conexões
               </span>
             </div>
-            <Link href="/dossiery/conexoes" className="text-[12px] text-primary hover:underline">
+            <Link href="/dossiery/conexoes" className="text-[12px] text-[hsl(var(--brass))] hover:underline">
               ver todas
             </Link>
           </div>

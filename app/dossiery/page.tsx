@@ -147,7 +147,7 @@ function CTA({ children = 'Entrar no Protocolo →', sub }: { children?: React.R
 
 function Kicker({ children }: { children: React.ReactNode }) {
   return (
-    <div className="font-mono-d text-[11px] tracking-[0.24em] uppercase text-primary">{children}</div>
+    <div className="font-mono-d text-[11px] tracking-[0.24em] uppercase text-[hsl(var(--brass))]">{children}</div>
   )
 }
 
@@ -221,7 +221,7 @@ export default function DossierySalesPage() {
           <div className="mt-9 space-y-4">
             {CENAS.map((c) => (
               <div key={c.cena} className="flex gap-4 rounded-md border border-border bg-background p-5">
-                <span className="font-mono-d text-[11px] text-primary tracking-widest shrink-0 pt-1">
+                <span className="font-mono-d text-[11px] text-[hsl(var(--brass))] tracking-widest shrink-0 pt-1">
                   {c.hora}
                 </span>
                 <p className="text-[14.5px] text-muted-foreground leading-relaxed">{c.cena}</p>
@@ -230,7 +230,7 @@ export default function DossierySalesPage() {
           </div>
           <p className="mt-8 text-[15px] text-foreground max-w-2xl leading-relaxed">
             O custo não é só a sexta à noite no sofá. É o que isso está fazendo com a{' '}
-            <span className="text-primary font-medium">imagem que você tem de si mesmo</span> — cada
+            <span className="text-foreground font-medium">imagem que você tem de si mesmo</span> — cada
             vácuo confirmando a história de que “não é pra você”. Daqui a 3 anos, esse padrão não
             muda sozinho. Ele cristaliza.
           </p>
@@ -286,7 +286,7 @@ export default function DossierySalesPage() {
           </div>
           <p className="mt-8 text-[15px] text-foreground max-w-2xl leading-relaxed">
             Tudo isso ataca o sintoma — a frase, a técnica, o truque. Nenhum ataca o vilão: o{' '}
-            <span className="text-primary font-medium">comportamento</span>. É por isso que o mercado
+            <span className="text-foreground font-medium">comportamento</span>. É por isso que o mercado
             inteiro falhou com você. E é exatamente aí que o Dossiery entra.
           </p>
           <div className="mt-8">
@@ -307,7 +307,7 @@ export default function DossierySalesPage() {
               <div key={f.n} className="rounded-md border border-border bg-card p-6 relative overflow-hidden">
                 <div className="absolute left-0 inset-y-0 w-1 bg-primary" />
                 <div className="flex items-baseline gap-3">
-                  <span className="font-mono-d text-[12px] text-primary tracking-widest">FASE {f.n}</span>
+                  <span className="font-mono-d text-[12px] text-[hsl(var(--brass))] tracking-widest">FASE {f.n}</span>
                   <h3 className="font-serif-d text-2xl">{f.nome}</h3>
                 </div>
                 <p className="text-[14.5px] text-muted-foreground mt-3 leading-relaxed max-w-2xl">{f.d}</p>

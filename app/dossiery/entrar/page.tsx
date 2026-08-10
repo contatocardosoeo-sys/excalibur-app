@@ -74,7 +74,7 @@ function EntrarForm() {
         Ainda não tem conta?{' '}
         <Link
           href={`/dossiery/criar-conta?next=${encodeURIComponent(next)}`}
-          className="text-primary hover:underline"
+          className="text-[hsl(var(--brass))] hover:underline"
         >
           Criar conta
         </Link>

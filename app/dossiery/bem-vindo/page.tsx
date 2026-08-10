@@ -8,7 +8,7 @@ export default function BemVindoPage() {
           <span className="absolute inset-[7px] rounded-full border border-dashed border-[hsl(var(--brass)/0.5)]" />
           <span className="font-serif-d text-3xl">♠</span>
         </div>
-        <div className="mt-6 font-mono-d text-[11px] tracking-[0.26em] uppercase text-primary">
+        <div className="mt-6 font-mono-d text-[11px] tracking-[0.26em] uppercase text-[hsl(var(--brass))]">
           Pagamento confirmado
         </div>
         <h1 className="font-serif-d text-4xl mt-3">Bem-vindo ao arsenal, Operador.</h1>

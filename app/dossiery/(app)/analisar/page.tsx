@@ -164,7 +164,7 @@ export default function AnalisarPage() {
           <div className="rounded-md border border-primary/40 bg-primary/[0.05] p-5">
             <div className="flex items-center gap-2.5 mb-4">
               <span className="w-2 h-2 rotate-45 bg-primary" />
-              <span className="font-mono-d text-[11px] tracking-[0.2em] uppercase text-primary">
+              <span className="font-mono-d text-[11px] tracking-[0.2em] uppercase text-[hsl(var(--brass))]">
                 Suas próximas jogadas — edite do seu jeito
               </span>
             </div>

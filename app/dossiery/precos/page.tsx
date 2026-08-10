@@ -58,7 +58,7 @@ export default function PrecosPage() {
 
       <main className="mx-auto max-w-4xl px-6 py-14">
         <div className="text-center">
-          <div className="font-mono-d text-[11px] tracking-[0.26em] uppercase text-primary">
+          <div className="font-mono-d text-[11px] tracking-[0.26em] uppercase text-[hsl(var(--brass))]">
             Protocolo Operador · acesso completo
           </div>
           <h1 className="font-serif-d text-4xl md:text-5xl mt-3">Um plano. Sem pegadinha.</h1>

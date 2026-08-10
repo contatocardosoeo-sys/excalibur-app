@@ -105,7 +105,7 @@ function CriarContaForm() {
         Já tem conta?{' '}
         <Link
           href={`/dossiery/entrar?next=${encodeURIComponent(next)}`}
-          className="text-primary hover:underline"
+          className="text-[hsl(var(--brass))] hover:underline"
         >
           Entrar
         </Link>
