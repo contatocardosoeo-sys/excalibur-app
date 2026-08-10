@@ -15,7 +15,7 @@ export default function CompraTrack() {
 
     const ciclo = params.get('ciclo')
     const cs = params.get('cs') || undefined
-    const value = ciclo === 'anual' ? 697 : 97
+    const value = (ciclo === 'anual' ? 697 : 97) + (params.get('bump') === '1' ? 37 : 0)
 
     window.fbq?.('track', 'Purchase', { value, currency: 'BRL' }, cs ? { eventID: cs } : undefined)
     window.gtag?.('event', 'purchase', { value, currency: 'BRL', transaction_id: cs })

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import type Stripe from 'stripe'
 import { createSupabaseServer } from '@/app/lib/supabase-server'
-import { getStripe, priceId, stripeConfigurado } from '@/app/lib/dossiery/stripe'
+import { getStripe, priceId, priceIdBump, stripeConfigurado } from '@/app/lib/dossiery/stripe'
 
 export const runtime = 'nodejs'
 
@@ -24,14 +25,17 @@ export async function POST(request: NextRequest) {
   }
 
   let ciclo: 'mensal' | 'anual' = 'mensal'
+  let bump = false
   try {
     const body = await request.json()
     if (body?.ciclo === 'anual') ciclo = 'anual'
+    bump = body?.bump === true
   } catch {
-    /* corpo vazio → mensal */
+    /* corpo vazio → mensal, sem bump */
   }
 
   const origin = request.nextUrl.origin
+  const bumpId = priceIdBump()
 
   try {
     const stripe = getStripe()
@@ -43,21 +47,41 @@ export async function POST(request: NextRequest) {
       .eq('user_id', user.id)
       .maybeSingle()
 
-    const session = await stripe.checkout.sessions.create({
-      mode: 'subscription',
-      line_items: [{ price: priceId(ciclo), quantity: 1 }],
-      success_url: `${origin}/dossiery/bem-vindo?cs={CHECKOUT_SESSION_ID}&ciclo=${ciclo}`,
+    const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [
+      { price: priceId(ciclo), quantity: 1 },
+    ]
+    if (bump && bumpId) line_items.push({ price: bumpId, quantity: 1 })
+
+    const clienteExistente = assinatura?.stripe_customer_id
+    // mensal = assinatura recorrente (cartão) · anual = pagamento único (PIX + cartão à vista)
+    const modo: Stripe.Checkout.SessionCreateParams.Mode =
+      ciclo === 'anual' ? 'payment' : 'subscription'
+
+    const params: Stripe.Checkout.SessionCreateParams = {
+      mode: modo,
+      line_items,
+      success_url: `${origin}/dossiery/bem-vindo?cs={CHECKOUT_SESSION_ID}&ciclo=${ciclo}&bump=${bump && bumpId ? 1 : 0}`,
       cancel_url: `${origin}/dossiery/precos`,
       client_reference_id: user.id,
-      ...(assinatura?.stripe_customer_id
-        ? { customer: assinatura.stripe_customer_id }
+      ...(clienteExistente
+        ? { customer: clienteExistente }
         : { customer_email: user.email ?? undefined }),
-      metadata: { user_id: user.id },
-      subscription_data: { metadata: { user_id: user.id } },
+      metadata: { user_id: user.id, ciclo },
       allow_promotion_codes: true,
       locale: 'pt-BR',
-    })
+      // payment_method_types omitido de propósito: o Stripe usa os métodos
+      // ativados no painel (cartão + PIX p/ BRL). PIX só aparece em mode=payment.
+    }
 
+    if (modo === 'subscription') {
+      params.subscription_data = { metadata: { user_id: user.id } }
+    } else {
+      // Recibo por e-mail + guarda o user no payment_intent p/ o webhook
+      params.payment_intent_data = { metadata: { user_id: user.id, ciclo } }
+      if (!clienteExistente) params.customer_creation = 'always'
+    }
+
+    const session = await stripe.checkout.sessions.create(params)
     return NextResponse.json({ url: session.url })
   } catch (err) {
     console.error('[dossiery/checkout]', err instanceof Error ? err.message : err)

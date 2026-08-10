@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import type Stripe from 'stripe'
-import { getStripe, fimDoPeriodo, mapStatus } from '@/app/lib/dossiery/stripe'
+import { getStripe, fimDoPeriodo, mapStatus, daquiAMeses } from '@/app/lib/dossiery/stripe'
 import { getSupabaseAdmin } from '@/app/lib/dossiery/supabaseAdmin'
+import type { SupabaseClient } from '@supabase/supabase-js'
 
 export const runtime = 'nodejs'
 
 // Webhook Stripe → ativa/sincroniza dossiery_assinaturas.
-// Eventos a habilitar no painel: checkout.session.completed,
-// customer.subscription.updated, customer.subscription.deleted
+// Eventos a habilitar no painel:
+//   checkout.session.completed, checkout.session.async_payment_succeeded,
+//   customer.subscription.updated, customer.subscription.deleted
 export async function POST(request: NextRequest) {
   const secret = process.env.STRIPE_WEBHOOK_SECRET
   if (!secret) {
@@ -31,46 +33,23 @@ export async function POST(request: NextRequest) {
 
   try {
     switch (event.type) {
-      // Pagou → acesso liberado
+      // Cartão liberou na hora (mensal ou anual). PIX pendente cai no async abaixo.
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
-        if (session.mode !== 'subscription') break
-
-        const userId = session.client_reference_id || session.metadata?.user_id
-        if (!userId) {
-          console.error('[stripe-webhook] checkout sem user_id', session.id)
-          break
+        if (session.payment_status === 'paid') {
+          await ativarPorSession(admin, session)
         }
-
-        const subId =
-          typeof session.subscription === 'string'
-            ? session.subscription
-            : session.subscription?.id ?? null
-        const customerId =
-          typeof session.customer === 'string' ? session.customer : session.customer?.id ?? null
-
-        let renovaEm: string | null = null
-        if (subId) {
-          const sub = await getStripe().subscriptions.retrieve(subId)
-          renovaEm = fimDoPeriodo(sub)
-        }
-
-        const { error } = await admin.from('dossiery_assinaturas').upsert(
-          {
-            user_id: userId,
-            plano: 'operador',
-            status: 'ativo',
-            stripe_id: subId,
-            stripe_customer_id: customerId,
-            renova_em: renovaEm,
-          },
-          { onConflict: 'user_id' }
-        )
-        if (error) throw new Error(`upsert assinatura: ${error.message}`)
+        // payment_status 'unpaid'/'no_payment_required' (PIX pendente) → espera o async
         break
       }
 
-      // Renovou / falhou / cancelou → sincroniza status
+      // PIX caiu (pagamento assíncrono confirmado) → libera o acesso
+      case 'checkout.session.async_payment_succeeded': {
+        await ativarPorSession(admin, event.data.object as Stripe.Checkout.Session)
+        break
+      }
+
+      // Renovou / falhou / cancelou (só assinatura mensal) → sincroniza status
       case 'customer.subscription.updated':
       case 'customer.subscription.deleted': {
         const sub = event.data.object as Stripe.Subscription
@@ -94,14 +73,56 @@ export async function POST(request: NextRequest) {
       }
 
       default:
-        // evento não tratado — ok
         break
     }
 
     return NextResponse.json({ received: true })
   } catch (err) {
     console.error('[stripe-webhook]', event.type, err instanceof Error ? err.message : err)
-    // 500 → Stripe reenvia (retry automático)
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 })
   }
+}
+
+// Libera o acesso a partir de uma checkout.session paga (cartão ou PIX).
+async function ativarPorSession(admin: SupabaseClient, session: Stripe.Checkout.Session) {
+  const userId = session.client_reference_id || session.metadata?.user_id
+  if (!userId) {
+    console.error('[stripe-webhook] session sem user_id', session.id)
+    return
+  }
+
+  const customerId =
+    typeof session.customer === 'string' ? session.customer : session.customer?.id ?? null
+
+  let stripeId: string | null = null
+  let renovaEm: string | null = null
+
+  if (session.mode === 'subscription') {
+    const subId =
+      typeof session.subscription === 'string'
+        ? session.subscription
+        : session.subscription?.id ?? null
+    stripeId = subId
+    if (subId) {
+      const sub = await getStripe().subscriptions.retrieve(subId)
+      renovaEm = fimDoPeriodo(sub)
+    }
+  } else {
+    // Anual one-time: 12 meses de acesso a partir de agora, sem renovação automática
+    renovaEm = daquiAMeses(12)
+    stripeId = null
+  }
+
+  const { error } = await admin.from('dossiery_assinaturas').upsert(
+    {
+      user_id: userId,
+      plano: 'operador',
+      status: 'ativo',
+      stripe_id: stripeId,
+      stripe_customer_id: customerId,
+      renova_em: renovaEm,
+    },
+    { onConflict: 'user_id' }
+  )
+  if (error) throw new Error(`upsert assinatura: ${error.message}`)
 }

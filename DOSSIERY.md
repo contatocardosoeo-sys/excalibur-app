@@ -94,8 +94,9 @@ disponível no Supabase). Idempotente.
 | `DOSSIERY_COACH_MODEL` | opcional; padrão `claude-opus-5` (use `claude-sonnet-5` p/ baratear) |
 | `STRIPE_SECRET_KEY` | Stripe → Developers → API keys (`sk_live_…`) |
 | `STRIPE_WEBHOOK_SECRET` | criado no passo Webhook abaixo (`whsec_…`) |
-| `STRIPE_PRICE_MENSAL` | price ID do Operador mensal (`price_…`) |
-| `STRIPE_PRICE_ANUAL` | price ID do Operador anual (`price_…`) |
+| `STRIPE_PRICE_MENSAL` | price **recorrente/mês** do Operador (`price_…`) |
+| `STRIPE_PRICE_ANUAL` | price **único (one-time)** R$697 do Operador (`price_…`) |
+| `STRIPE_PRICE_BUMP` | price **único** R$37 do order bump (opcional; sem ele o bump some) |
 | `DOSSIERY_GATE` | `off` = tudo aberto (preview). **Remover no go-live.** |
 | `DOSSIERY_PAYWALL` | `off` = login exigido mas IA liberada sem assinar. Padrão: on. |
 | `NEXT_PUBLIC_META_PIXEL_ID` | ID do Pixel (Meta Events Manager). Sem ele, nenhum script carrega. |
@@ -103,21 +104,35 @@ disponível no Supabase). Idempotente.
 
 ### Stripe — passo a passo (~5 min)
 
-1. **Produto:** Dashboard → Product catalog → *Add product* → nome
-   `Dossiery — Operador`.
-2. **Preços:** no produto, crie 2 recurring prices em BRL:
-   mensal `R$ 97,00` e anual `R$ 697,00`. Copie os dois `price_…` → envs.
-3. **Webhook:** Developers → Webhooks → *Add endpoint* →
-   URL `https://SEU-DOMINIO/api/webhooks/stripe` → eventos:
-   `checkout.session.completed`, `customer.subscription.updated`,
+1. **Produto:** Dashboard → Product catalog → *Add product* → `Dossiery — Operador`.
+2. **Preços** (BRL), no produto:
+   - Mensal: **recurring** `R$ 97,00/mês` → `STRIPE_PRICE_MENSAL`
+   - Anual: **one-time** (pagamento único) `R$ 697,00` → `STRIPE_PRICE_ANUAL`
+     *(pagamento único de propósito: PIX à vista, zero recusa de cartão, caixa
+     no dia 1; concede 12 meses de acesso; renovação por nova compra/e-mail).*
+3. **Order bump** (outro produto): `Kit 50 Aberturas` → price **one-time**
+   `R$ 37,00` → `STRIPE_PRICE_BUMP`.
+4. **PIX:** Settings → Payment methods → ativar **Pix** (aparece no checkout do
+   anual, que é `mode=payment`). O código omite `payment_method_types` de
+   propósito p/ o Stripe surfar cartão + PIX conforme o painel.
+5. **Webhook:** Developers → Webhooks → *Add endpoint* →
+   `https://SEU-DOMINIO/api/webhooks/stripe` → eventos:
+   `checkout.session.completed`, **`checkout.session.async_payment_succeeded`**
+   (PIX cai async!), `customer.subscription.updated`,
    `customer.subscription.deleted`. Copie o `whsec_…` → env.
-4. **Portal do cliente:** Settings → Billing → Customer portal → ativar
-   (permitir cancelar/trocar cartão). O botão da conta usa `/api/dossiery/portal`.
-5. **Reembolso (garantia 7 dias):** reembolsar direto no Dashboard do Stripe;
-   o webhook `customer.subscription.deleted` corta o acesso sozinho.
+6. **Portal do cliente:** Settings → Billing → Customer portal → ativar
+   (cancelar/trocar cartão — só afeta o mensal). Botão em `/api/dossiery/portal`.
+7. **Reembolso (garantia 7 dias):** mensal → reembolsar no Dashboard (o webhook
+   `subscription.deleted` corta o acesso). Anual one-time → reembolsar o
+   pagamento e ajustar `dossiery_assinaturas.status='cancelado'` (ou zerar
+   `renova_em`) manualmente, já que não há assinatura a cancelar.
 
-> PIX: recorrência nativa no Stripe BR é cartão; PIX funciona bem para o plano
-> anual via checkout (habilite PIX em Settings → Payment methods). Mensal = cartão.
+> **Como o acesso é liberado:** cartão → na hora (`checkout.session.completed`
+> com `payment_status=paid`). PIX → quando o cliente paga o QR
+> (`async_payment_succeeded`). Anual one-time grava `renova_em = hoje + 12
+> meses`; o gate (`temAssinaturaAtiva`) exige `status=ativo` **e** `renova_em`
+> no futuro. **Teste os dois no test mode** (cartão `4242…` e o fluxo PIX de
+> teste) antes do tráfego.
 
 ### Supabase
 

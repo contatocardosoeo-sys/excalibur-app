@@ -18,8 +18,9 @@ export default function BemVindoPage() {
         </div>
         <h1 className="font-serif-d text-4xl mt-3">Bem-vindo ao arsenal, Operador.</h1>
         <p className="text-muted-foreground mt-4 text-[14.5px] leading-relaxed">
-          Seu acesso está sendo liberado — leva segundos. A partir de agora, o dossiê é sobre você:
-          seu jogo, sua evolução, seu resultado.
+          Cartão libera na hora; se você pagou no PIX, o acesso abre assim que a transferência cair
+          (costuma ser 1-2 minutos). A partir de agora, o dossiê é sobre você: seu jogo, sua
+          evolução, seu resultado.
         </p>
         <div className="mt-8 flex flex-col gap-3">
           <Link

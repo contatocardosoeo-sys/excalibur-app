@@ -15,6 +15,7 @@ export function getStripe(): Stripe {
 }
 
 // Price IDs (criados no painel do Stripe) — plano único "Operador" no MVP.
+// mensal: price RECORRENTE (mode subscription). anual: price ÚNICO (mode payment).
 export function priceId(ciclo: 'mensal' | 'anual'): string {
   const id =
     ciclo === 'anual'
@@ -22,6 +23,18 @@ export function priceId(ciclo: 'mensal' | 'anual'): string {
       : process.env.STRIPE_PRICE_MENSAL
   if (!id) throw new Error(`STRIPE_PRICE_${ciclo.toUpperCase()} não configurado`)
   return id
+}
+
+// Order bump — price ÚNICO (one-time). Opcional: sem env, o bump não aparece.
+export function priceIdBump(): string | null {
+  return process.env.STRIPE_PRICE_BUMP || null
+}
+
+// ISO de agora + N meses (usado no acesso do plano anual one-time).
+export function daquiAMeses(meses: number): string {
+  const d = new Date()
+  d.setMonth(d.getMonth() + meses)
+  return d.toISOString()
 }
 
 // current_period_end mudou de lugar entre versões da API do Stripe

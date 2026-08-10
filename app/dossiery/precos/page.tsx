@@ -11,23 +11,28 @@ const BENEFICIOS = [
   'Arsenal em expansão: Arena de Treino, Diário de Campo e mais',
 ]
 
+const BUMP_PRECO = 37
+
 export default function PrecosPage() {
   const [ciclo, setCiclo] = useState<'mensal' | 'anual'>('anual')
+  const [bump, setBump] = useState(true)
   const [loading, setLoading] = useState(false)
   const [erro, setErro] = useState<string | null>(null)
+
+  const base = ciclo === 'anual' ? 697 : 97
 
   async function assinar() {
     if (loading) return
     setErro(null)
     setLoading(true)
-    const valor = ciclo === 'anual' ? 697 : 97
+    const valor = base + (bump ? BUMP_PRECO : 0)
     window.fbq?.('track', 'InitiateCheckout', { value: valor, currency: 'BRL' })
     window.gtag?.('event', 'begin_checkout', { value: valor, currency: 'BRL' })
     try {
       const res = await fetch('/api/dossiery/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ciclo }),
+        body: JSON.stringify({ ciclo, bump }),
       })
       const data = await res.json().catch(() => null)
       if (res.status === 401) {
@@ -110,9 +115,13 @@ export default function PrecosPage() {
               </>
             )}
           </div>
-          {ciclo === 'anual' && (
+          {ciclo === 'anual' ? (
             <div className="mt-1 font-mono-d text-[10px] tracking-widest uppercase text-[hsl(145_35%_55%)]">
-              ≈ 40% off vs mensal
+              ≈ 40% off · pagamento único à vista (PIX ou cartão)
+            </div>
+          ) : (
+            <div className="mt-1 font-mono-d text-[10px] tracking-widest uppercase text-muted-foreground/70">
+              assinatura no cartão · cancele quando quiser
             </div>
           )}
 
@@ -125,15 +134,53 @@ export default function PrecosPage() {
             ))}
           </ul>
 
+          {/* order bump */}
+          <button
+            type="button"
+            onClick={() => setBump((v) => !v)}
+            aria-pressed={bump}
+            className={`mt-6 w-full text-left rounded-[5px] border-2 border-dashed p-4 transition ${
+              bump
+                ? 'border-[hsl(var(--brass))] bg-[hsl(var(--brass)/0.07)]'
+                : 'border-border hover:border-[hsl(var(--brass)/0.6)]'
+            }`}
+          >
+            <div className="flex items-start gap-3">
+              <span
+                className={`mt-0.5 grid place-items-center w-5 h-5 rounded-[3px] border-2 shrink-0 text-[12px] font-bold ${
+                  bump
+                    ? 'border-[hsl(var(--brass))] bg-[hsl(var(--brass))] text-background'
+                    : 'border-muted-foreground/50 text-transparent'
+                }`}
+              >
+                ✓
+              </span>
+              <div>
+                <div className="font-mono-d text-[10px] tracking-[0.14em] uppercase text-[hsl(var(--brass))]">
+                  Adicione ao Protocolo · +R$37
+                </div>
+                <div className="font-serif-d text-[15px] mt-1 text-foreground">
+                  Kit “50 Aberturas Que Não Morrem”
+                </div>
+                <p className="text-[12.5px] text-muted-foreground mt-0.5 leading-snug">
+                  As 50 primeiras mensagens testadas que puxam resposta — por situação (match novo,
+                  ela sumiu, reconquista). Cole, adapte na sua voz, mande. Acesso vitalício.
+                </p>
+              </div>
+            </div>
+          </button>
+
           <button
             onClick={assinar}
             disabled={loading}
-            className="mt-8 w-full rounded-[4px] bg-primary text-primary-foreground font-semibold text-[15px] py-3.5 hover:opacity-90 disabled:opacity-50 transition"
+            className="mt-6 w-full rounded-[4px] bg-primary text-primary-foreground font-semibold text-[15px] py-3.5 hover:opacity-90 disabled:opacity-50 transition"
           >
-            {loading ? 'Abrindo checkout…' : 'Assinar agora →'}
+            {loading
+              ? 'Abrindo checkout…'
+              : `${ciclo === 'anual' ? 'Garantir acesso' : 'Assinar agora'} — R$${base + (bump ? BUMP_PRECO : 0)} →`}
           </button>
           <p className="mt-3 text-center font-mono-d text-[10px] tracking-widest uppercase text-muted-foreground/70">
-            Garantia de 7 dias · cancele em 2 cliques
+            Garantia de 7 dias · {ciclo === 'anual' ? 'PIX ou cartão' : 'cancele em 2 cliques'}
           </p>
           {erro && (
             <div className="mt-4 rounded-md border border-destructive/50 bg-destructive/10 px-3 py-2.5 text-[12.5px] text-destructive">
