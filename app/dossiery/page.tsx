@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
 import MobileCTA from './components/MobileCTA'
+import VagasFundador from './components/VagasFundador'
+import { VAGAS_FUNDADOR, PRECO_DEPOIS } from '@/app/lib/dossiery/fundador'
 
 export const metadata: Metadata = {
   title: 'Dossiery — Do vácuo ao "que horas a gente se vê?"',
@@ -18,9 +20,7 @@ export const metadata: Metadata = {
   twitter: { card: 'summary_large_image' },
 }
 
-/* ————— ESCASSEZ (torne REAL: suba o preço de verdade após as vagas) ————— */
-const VAGAS_FUNDADOR = 500
-const PRECO_DEPOIS = 147
+/* ESCASSEZ: números em app/lib/dossiery/fundador.ts — cumpra-os (é o que a torna real) */
 
 /* ————— before/after: conversas simuladas ————— */
 type Bolha = { by: 'ela' | 'ele'; t: string; meta?: string }
@@ -237,7 +237,7 @@ export default function DossierySalesPage() {
       <section className="border-b border-border">
         <div className="mx-auto max-w-5xl px-6 py-14">
           <div className="text-center">
-            <Kicker>Como funciona</Kicker>
+            <Kicker>Como a mesa vira</Kicker>
             <h2 className="font-serif-d text-3xl md:text-[2.4rem] mt-3">3 passos. Zero enrolação.</h2>
           </div>
           <div className="grid md:grid-cols-3 gap-4 mt-9">
@@ -295,6 +295,9 @@ export default function DossierySalesPage() {
               E pensa no detalhe cruel: <b>enquanto você “vai pensar”, outro cara entra</b> — e é
               com ele que ela vai estar conversando.
             </p>
+            <p className="mt-3 pt-3 border-t border-primary/20 text-[13px] text-muted-foreground">
+              <VagasFundador />
+            </p>
           </div>
 
           <div className="mt-8">
@@ -306,20 +309,26 @@ export default function DossierySalesPage() {
       {/* ============ FAQ curto ============ */}
       <section className="border-b border-border">
         <div className="mx-auto max-w-2xl px-6 py-14">
-          <h2 className="font-serif-d text-2xl md:text-3xl text-center">Antes de você perguntar.</h2>
+          <h2 className="font-serif-d text-2xl md:text-3xl text-center text-balance">
+            As desculpas que sua cabeça vai inventar nos próximos 10 segundos.
+          </h2>
           <div className="mt-7 space-y-3">
             {[
               {
-                q: 'Alguém vai saber que eu uso?',
-                a: 'Ninguém. Não conecta nas suas redes, não posta nada. É o seu arquivo privado — e você apaga tudo quando quiser.',
+                q: '“E se alguém descobrir que eu uso?”',
+                a: 'Ninguém descobre. Não conecta nas suas redes, não posta nada, não manda nada. Seus amigos só vão notar o resultado — e perguntar o que mudou. Aí você decide se conta.',
               },
               {
-                q: 'É manipulação / joguinho de PUA?',
-                a: 'O oposto. Nada de cantada decorada nem personagem. Te treinamos a ser o cara de verdade — por isso funciona no encontro, não só no chat.',
+                q: '“Deve ser joguinho de PUA…”',
+                a: 'O oposto — e é por isso que funciona. Cantada decorada e personagem quebram no primeiro encontro. Aqui você é treinado de verdade: quando ela estiver na sua frente, o cara confiante é você, não um script.',
               },
               {
-                q: 'E se não funcionar pra mim?',
-                a: '7 dias de garantia. Não curtiu? Um clique no portal e devolvemos 100%. Sem formulário, sem mimimi.',
+                q: '“Vou deixar pra semana que vem.”',
+                a: 'Você já disse isso — sobre a academia, sobre a conversa que morreu, sobre ela. É exatamente assim que se chega em dezembro igual a janeiro. 7 dias de garantia: o único cenário sem risco é testar. O único com risco é continuar como está.',
+              },
+              {
+                q: '“E se não funcionar pra mim?”',
+                a: 'Devolvemos 100% em até 7 dias, um clique, sem formulário de retenção. A gente só consegue bancar essa garantia porque sabemos o que acontece quando você vê seu jogo de fora pela primeira vez.',
               },
             ].map((f) => (
               <details key={f.q} className="group rounded-md border border-border bg-card p-5">

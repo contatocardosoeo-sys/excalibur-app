@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import VagasFundador from '../components/VagasFundador'
 
 const BENEFICIOS = [
   'RAIO-X ilimitado — cola a conversa, vê o Modo Trouxa de fora',
@@ -77,6 +78,9 @@ export default function PrecosPage() {
           <p className="mt-3 inline-block rounded-[4px] border border-primary/50 bg-primary/[0.07] px-3 py-1.5 font-mono-d text-[10px] tracking-[0.14em] uppercase text-primary">
             ⚠ Preço de fundador — trava pra sempre nas primeiras vagas
           </p>
+          <div className="mt-2.5 text-[12.5px] text-muted-foreground flex justify-center">
+            <VagasFundador />
+          </div>
         </div>
 
         {/* toggle */}

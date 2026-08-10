@@ -33,10 +33,10 @@ export default function MobileCTA() {
         href="/dossiery/precos"
         className="block text-center rounded-[4px] bg-primary text-primary-foreground font-semibold text-[15px] py-3.5 active:opacity-90"
       >
-        Entrar no Protocolo — R$97/mês →
+        Virar o jogo — R$97/mês →
       </Link>
       <p className="mt-1.5 text-center font-mono-d text-[9px] tracking-[0.14em] uppercase text-muted-foreground/70">
-        7 dias de garantia · cancele em 2 cliques
+        Preço de fundador · 7 dias de garantia
       </p>
     </div>
   )
