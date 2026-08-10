@@ -71,9 +71,11 @@ export default function PrecosPage() {
           </div>
           <h1 className="font-serif-d text-4xl md:text-5xl mt-3">Um plano. Sem pegadinha.</h1>
           <p className="text-muted-foreground mt-3 max-w-md mx-auto text-[15px]">
-            Raio-X + Treino + Campo, ilimitados. Enquanto os apps de cantada te prendem em
-            assinatura semanal que anualiza caro, aqui é direto: preço honesto e{' '}
+            Raio-X + Treino + Campo, ilimitados. Preço honesto e{' '}
             <span className="text-foreground">7 dias de garantia incondicional</span>.
+          </p>
+          <p className="mt-3 inline-block rounded-[4px] border border-primary/50 bg-primary/[0.07] px-3 py-1.5 font-mono-d text-[10px] tracking-[0.14em] uppercase text-primary">
+            ⚠ Preço de fundador — trava pra sempre nas primeiras vagas
           </p>
         </div>
 
