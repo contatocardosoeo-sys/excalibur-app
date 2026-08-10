@@ -165,16 +165,16 @@ export default function DossierySalesPage() {
               <div className="flex justify-center md:justify-start">
                 <Kicker>Preço de fundador · {VAGAS_FUNDADOR} primeiras vagas</Kicker>
               </div>
-              <h1 className="font-serif-d font-semibold leading-[0.98] tracking-tight text-[2.6rem] md:text-6xl mt-4 text-balance">
-                Você manda. Ela some.
+              <h1 className="font-serif-d font-semibold leading-[0.98] tracking-tight text-[2.5rem] md:text-6xl mt-4 text-balance">
+                Você relê a mensagem visualizada.
                 <br />
-                <span className="text-primary">Isso acaba hoje.</span>
+                <span className="text-primary">Ele já marcou o encontro.</span>
               </h1>
               <p className="text-[16px] md:text-[17px] text-foreground/90 mt-5 md:max-w-lg leading-relaxed">
-                A IA que <b className="text-foreground">lê suas conversas</b>, mostra onde você se
-                sabota e te treina até virar o cara que{' '}
-                <b className="text-foreground">ela responde na hora</b>. Sem cantada decorada. Sem
-                fingir ser outro.
+                Não é mais bonito, mais rico, nem mais interessante que você. Ele só domina um{' '}
+                <b className="text-foreground">jogo que ninguém te ensinou</b> — e joga contra você
+                todo dia. O Dossiery rouba esse jogo pra você: lê suas conversas, expõe onde você se
+                entrega e te treina até <b className="text-foreground">a mesa virar</b>.
               </p>
               <div className="mt-7" id="cta-hero">
                 <CTA align="md-left" sub="Garantia de 7 dias · PIX ou cartão">
@@ -208,9 +208,10 @@ export default function DossierySalesPage() {
       <section className="border-b border-border bg-card/30">
         <div className="mx-auto max-w-5xl px-6 py-14">
           <div className="text-center">
-            <Kicker>A diferença, na prática</Kicker>
+            <Kicker>Abra o arquivo · veja com seus olhos</Kicker>
             <h2 className="font-serif-d text-3xl md:text-[2.4rem] mt-3 text-balance">
-              O mesmo cara. As mesmas mulheres. Outra postura.
+              O mesmo homem. 30 dias de Protocolo. Ela nem percebeu o que mudou —{' '}
+              <span className="text-primary">só sentiu.</span>
             </h2>
           </div>
           <div className="mt-10 space-y-10">
@@ -241,9 +242,9 @@ export default function DossierySalesPage() {
           </div>
           <div className="grid md:grid-cols-3 gap-4 mt-9">
             {[
-              { n: '01', t: 'RAIO-X', d: 'Cola a conversa. A IA mostra o interesse real dela e onde você secou.' },
-              { n: '02', t: 'TREINO', d: 'Coach de elite 24/7, treinado no cânone. Sempre com o porquê.' },
-              { n: '03', t: 'CAMPO', d: 'Jogadas na sua voz + leitura de sinal. Fim do bolo surpresa.' },
+              { n: '01', t: 'RAIO-X', d: 'Cola a conversa. Em 3 minutos você vê o que ela pensa de você — sem filtro, sem ilusão. Dói. E destrava.' },
+              { n: '02', t: 'TREINO', d: 'O cânone que os caras "naturais" nunca vão te contar — destilado por uma IA que não te poupa. Cada resposta com o porquê.' },
+              { n: '03', t: 'CAMPO', d: 'A jogada certa, na hora certa, na SUA voz. E a leitura fria: quem está a fim, quem está te usando, quando avançar, quando cortar.' },
             ].map((s) => (
               <div key={s.n} className="rounded-md border border-border bg-card p-6 relative overflow-hidden">
                 <div className="absolute left-0 inset-y-0 w-1 bg-primary" />
@@ -259,20 +260,23 @@ export default function DossierySalesPage() {
       {/* ============ OFERTA + ESCASSEZ ============ */}
       <section className="border-b border-border bg-card/30">
         <div className="mx-auto max-w-2xl px-6 py-14 text-center">
-          <Kicker>A oferta</Kicker>
-          <h2 className="font-serif-d text-3xl md:text-4xl mt-3">Coach de elite no bolso, por R$3/dia.</h2>
+          <Kicker>O que está atrás da porta</Kicker>
+          <h2 className="font-serif-d text-3xl md:text-4xl mt-3 text-balance">
+            A vantagem injusta que os outros caras{' '}
+            <span className="text-primary">rezam pra você nunca descobrir.</span>
+          </h2>
           <p className="text-muted-foreground mt-3 text-[15px]">
-            Coach humano custa R$300+ a sessão. Aqui é o Protocolo inteiro, ilimitado.
+            Coach humano cobra R$300 a sessão pra falar a metade. Aqui é o arsenal inteiro, R$3/dia.
           </p>
 
           <ul className="mt-7 grid sm:grid-cols-2 gap-x-6 gap-y-2.5 text-left max-w-lg mx-auto">
             {[
-              'Raio-X ilimitado das suas conversas',
-              'Coach de IA 24/7 no cânone',
-              'Jogadas na SUA voz (nunca por você)',
-              'Leitura de sinal — fim do bolo surpresa',
-              'Arena de Treino + Diário de Campo',
-              'Acesso na hora, PIX ou cartão',
+              'O que ela realmente pensa de você — em 3 minutos',
+              'O erro invisível que te joga na friendzone',
+              'A resposta certa pro vácuo, pro “kkkk”, pro gelo',
+              'Quem está a fim × quem está te usando de reserva',
+              'A hora exata de chamar pro encontro (e a de cortar)',
+              'Acesso na hora · PIX ou cartão · anônimo',
             ].map((b) => (
               <li key={b} className="flex gap-2.5 text-[14px] text-muted-foreground">
                 <span className="text-primary font-bold">✓</span>
@@ -284,16 +288,17 @@ export default function DossierySalesPage() {
           {/* escassez REAL */}
           <div className="mt-8 rounded-md border border-primary/50 bg-primary/[0.07] px-5 py-4 max-w-lg mx-auto">
             <p className="font-mono-d text-[11px] tracking-[0.16em] uppercase text-primary">
-              ⚠ Preço de fundador
+              ⚠ Preço de fundador · {VAGAS_FUNDADOR} vagas
             </p>
             <p className="text-[14px] text-foreground mt-1.5 leading-relaxed">
-              As <b>{VAGAS_FUNDADOR} primeiras vagas</b> travam <b>R$97/mês pra sempre</b>. Depois
-              que fecharem, entra por <b>R$147</b>. Quem chega primeiro, paga menos — pra sempre.
+              Quem entrar agora trava <b>R$97/mês pra sempre</b>. Depois, <b>R${PRECO_DEPOIS}</b>.
+              E pensa no detalhe cruel: <b>enquanto você “vai pensar”, outro cara entra</b> — e é
+              com ele que ela vai estar conversando.
             </p>
           </div>
 
           <div className="mt-8">
-            <CTA sub="R$97/mês ou R$697/ano · 7 dias de garantia">Garantir minha vaga →</CTA>
+            <CTA sub="R$97/mês ou R$697/ano à vista · 7 dias de garantia">Garantir minha vaga →</CTA>
           </div>
         </div>
       </section>
@@ -333,16 +338,18 @@ export default function DossierySalesPage() {
       <section className="border-b border-border">
         <div className="mx-auto max-w-2xl px-6 py-16 text-center">
           <h2 className="font-serif-d text-3xl md:text-5xl leading-tight text-balance">
-            Amanhã ela ainda te ignora.
+            Sábado à noite ela vai sair.
             <br />
-            <span className="text-primary">Ou não.</span>
+            <span className="text-primary">A única dúvida é com quem.</span>
           </h2>
           <p className="text-muted-foreground mt-5 text-[15px] max-w-md mx-auto">
-            O vácuo é grátis e é caríssimo. Sete dias pra provar no seu jogo real — sem risco.
+            Daqui a 7 dias você pode estar do outro lado da conversa — ou relendo esta página como
+            releu aquela mensagem. Você conhece o custo de "deixar pra depois". Vive ele todo fim de
+            semana.
           </p>
           <div className="mt-8">
             <CTA sub={`Preço de fundador · vagas limitadas · sobe pra R$${PRECO_DEPOIS} depois`}>
-              Quero minha vaga agora →
+              Virar o jogo agora →
             </CTA>
           </div>
         </div>
