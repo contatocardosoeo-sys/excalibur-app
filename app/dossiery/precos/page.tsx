@@ -8,7 +8,7 @@ const BENEFICIOS = [
   'TREINO 24/7 — coach de elite no cânone, sempre com o porquê',
   'CAMPO — jogadas na SUA voz, leitura de sinal, fim do bolo surpresa',
   'Zero joguinho: te tornamos o cara de verdade, não um personagem',
-  'Evoluções constantes: Arena de practice, Diário de Campo e mais',
+  'Arsenal em expansão: Arena de Treino, Diário de Campo e mais',
 ]
 
 export default function PrecosPage() {

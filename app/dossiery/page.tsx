@@ -180,6 +180,12 @@ export default function DossierySalesPage() {
       {/* ============ 1 · HERO ============ */}
       <section className="relative border-b border-border">
         <div className="d-grid-bg absolute inset-0 opacity-60" aria-hidden />
+        <div
+          className="d-stamp pointer-events-none absolute top-8 right-4 md:top-14 md:right-10 rotate-[-8deg] rounded-[3px] border-2 border-primary px-2.5 py-1 font-mono-d text-[10px] font-bold tracking-[0.18em] uppercase text-primary hidden sm:block"
+          aria-hidden
+        >
+          Dossiê Nº 001 · Confidencial
+        </div>
         <div className="relative mx-auto max-w-4xl px-6 pt-16 md:pt-24 pb-14 text-center">
           <Kicker>Aviso: isso aqui vai doer antes de resolver</Kicker>
           <h1 className="font-serif-d font-semibold leading-[1.02] tracking-tight text-4xl md:text-6xl mt-5 text-balance">
@@ -233,6 +239,9 @@ export default function DossierySalesPage() {
             <span className="text-foreground font-medium">imagem que você tem de si mesmo</span> — cada
             vácuo confirmando a história de que “não é pra você”. Daqui a 3 anos, esse padrão não
             muda sozinho. Ele cristaliza.
+          </p>
+          <p className="mt-4 font-serif-d text-2xl text-foreground">
+            Nenhum homem nasceu pra ser plano B.
           </p>
         </div>
       </section>

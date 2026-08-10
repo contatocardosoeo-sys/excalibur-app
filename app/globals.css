@@ -107,7 +107,7 @@
   --card-foreground: 40 24% 88%;
   --popover: 264 13% 7%;
   --popover-foreground: 40 24% 88%;
-  --primary: 349 62% 48%;
+  --primary: 352 72% 42%;
   --primary-foreground: 40 40% 96%;
   --secondary: 265 11% 14%;
   --secondary-foreground: 40 24% 88%;
@@ -119,27 +119,38 @@
   --destructive-foreground: 40 40% 96%;
   --border: 265 10% 17%;
   --input: 265 10% 17%;
-  --ring: 349 62% 48%;
+  --ring: 352 72% 42%;
   --radius: 0.375rem;
-  --chart-1: 349 62% 52%;   /* oxblood */
+  --chart-1: 352 65% 45%;   /* oxblood */
   --chart-2: 40 45% 55%;    /* latão */
   --chart-3: 145 25% 52%;   /* sálvia */
   --chart-4: 40 30% 80%;    /* osso */
-  --chart-5: 349 40% 35%;   /* oxblood profundo */
+  --chart-5: 352 50% 28%;   /* oxblood profundo */
   --sidebar: 265 16% 5%;
   --sidebar-foreground: 40 20% 82%;
-  --sidebar-primary: 349 62% 50%;
+  --sidebar-primary: 352 72% 42%;
   --sidebar-primary-foreground: 40 40% 96%;
   --sidebar-accent: 265 12% 12%;
   --sidebar-accent-foreground: 40 24% 90%;
   --sidebar-border: 265 10% 15%;
-  --sidebar-ring: 349 62% 50%;
+  --sidebar-ring: 352 72% 42%;
 
   /* tokens próprios do Dossiery p/ classes utilitárias arbitrárias */
   --brass: 40 46% 57%;
   --bone: 40 30% 90%;
-  --oxblood: 349 62% 48%;
-  --oxblood-deep: 349 45% 30%;
+  --oxblood: 352 72% 42%;
+  --oxblood-deep: 352 55% 26%;
+}
+
+/* Momento "desclassificar" — o carimbo assenta uma única vez no load */
+@keyframes d-stamp-in {
+  0%   { opacity: 0;   transform: rotate(-8deg) scale(1.7); }
+  65%  { opacity: .95; transform: rotate(-8deg) scale(.94); }
+  100% { opacity: .9;  transform: rotate(-8deg) scale(1); }
+}
+.d-stamp { animation: d-stamp-in .5s cubic-bezier(.2, .85, .25, 1) .25s both; }
+@media (prefers-reduced-motion: reduce) {
+  .d-stamp { animation: none; opacity: .9; }
 }
 
 /* Tipografia Dossiery: serifa clássica (display) × mono tática (dados) */

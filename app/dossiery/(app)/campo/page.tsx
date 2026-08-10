@@ -5,7 +5,7 @@ export default function CampoPage() {
     <ModuloStub
       codigo="06 · Diário de Campo"
       titulo="Campo"
-      subtitulo="Fecha o loop practice → vida real"
+      subtitulo="Fecha o ciclo treino → vida real"
       descricao="Teve uma interação real? Registra aqui. A IA faz o debrief: o que foi bem, a lição, a próxima rep. É a ponte entre o treino e a rua — a resposta direta pra crítica de 'déficit de habilidade social' dos apps concorrentes."
       features={[
         'Log rápido: contexto, o que rolou, como você se sentiu, resultado.',

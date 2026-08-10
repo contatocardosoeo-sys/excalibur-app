@@ -10,7 +10,7 @@ const stats = [
 const atalhos = [
   { href: '/dossiery/coach', n: '02', t: 'Falar com o Coach', d: 'tire uma dúvida, treine uma ideia' },
   { href: '/dossiery/analisar', n: '03', t: 'Analisar conversa', d: 'cola o print, recebe o diagnóstico' },
-  { href: '/dossiery/arena', n: '04', t: 'Entrar na Arena', d: 'roleplay com feedback por mensagem' },
+  { href: '/dossiery/arena', n: '04', t: 'Entrar na Arena', d: 'simulação real, feedback por mensagem' },
 ]
 
 export default function BasePage() {
@@ -26,7 +26,7 @@ export default function BasePage() {
         </div>
         <div className="text-right hidden sm:block">
           <div className="font-mono-d text-[11px] tracking-widest uppercase text-muted-foreground">Operador</div>
-          <div className="font-serif-d text-lg">Bem-vindo de volta</div>
+          <div className="font-serif-d text-lg">De volta ao campo.</div>
         </div>
       </div>
 
@@ -35,10 +35,11 @@ export default function BasePage() {
         <div className="absolute left-0 inset-y-0 w-1 bg-primary" />
         <div className="font-mono-d text-[11px] tracking-[0.2em] uppercase text-[hsl(var(--brass))]">Missão do dia</div>
         <p className="font-serif-d text-2xl mt-2 max-w-xl">
-          Complete seu mapeamento de atleta pra IA te calibrar de verdade.
+          Mapeie seu perfil de Operador — a IA calibra o treino em cima de quem você é.
         </p>
         <p className="text-[14px] text-muted-foreground mt-2 max-w-lg">
-          Objetivo, arquétipo, forças e travas. Leva 3 minutos e destrava feedback personalizado em todo o sistema.
+          Objetivo, forças, travas. 3 minutos, sem enrolação — e todo o sistema passa a jogar no seu
+          estilo.
         </p>
         <Link
           href="/dossiery/conta"
