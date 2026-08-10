@@ -4,10 +4,10 @@ import Link from 'next/link'
 import { useState } from 'react'
 
 const BENEFICIOS = [
-  'Coach ilimitado — treinado no cânone, responde com o porquê',
-  'Analisador de conversas — leitura dela + raio-X do seu jogo',
-  'Sugestões na SUA voz, sempre editáveis (nunca falamos por você)',
-  'Guardrails de classe: te tornamos o cara, não um manipulador',
+  'RAIO-X ilimitado — cola a conversa, vê o Modo Trouxa de fora',
+  'TREINO 24/7 — coach de elite no cânone, sempre com o porquê',
+  'CAMPO — jogadas na SUA voz, leitura de sinal, fim do bolo surpresa',
+  'Zero joguinho: te tornamos o cara de verdade, não um personagem',
   'Evoluções constantes: Arena de practice, Diário de Campo e mais',
 ]
 
@@ -59,12 +59,13 @@ export default function PrecosPage() {
       <main className="mx-auto max-w-4xl px-6 py-14">
         <div className="text-center">
           <div className="font-mono-d text-[11px] tracking-[0.26em] uppercase text-primary">
-            Acesso ao arsenal
+            Protocolo Operador · acesso completo
           </div>
           <h1 className="font-serif-d text-4xl md:text-5xl mt-3">Um plano. Sem pegadinha.</h1>
           <p className="text-muted-foreground mt-3 max-w-md mx-auto text-[15px]">
-            Enquanto os "rizz apps" te prendem em assinatura semanal que anualiza caro, aqui é
-            direto: um preço honesto e <span className="text-foreground">7 dias de garantia incondicional</span>.
+            Raio-X + Treino + Campo, ilimitados. Enquanto os apps de cantada te prendem em
+            assinatura semanal que anualiza caro, aqui é direto: preço honesto e{' '}
+            <span className="text-foreground">7 dias de garantia incondicional</span>.
           </p>
         </div>
 
