@@ -57,16 +57,18 @@ export async function POST(request: NextRequest) {
     const modo: Stripe.Checkout.SessionCreateParams.Mode =
       ciclo === 'anual' ? 'payment' : 'subscription'
 
+    const comBump = bump && !!bumpId
     const params: Stripe.Checkout.SessionCreateParams = {
       mode: modo,
       line_items,
-      success_url: `${origin}/dossiery/bem-vindo?cs={CHECKOUT_SESSION_ID}&ciclo=${ciclo}&bump=${bump && bumpId ? 1 : 0}`,
+      // Sucesso cai na OTO (upsell pós-compra) — o funil continua de lá.
+      success_url: `${origin}/dossiery/oferta/encontro?cs={CHECKOUT_SESSION_ID}&ciclo=${ciclo}&bump=${comBump ? 1 : 0}`,
       cancel_url: `${origin}/dossiery/precos`,
       client_reference_id: user.id,
       ...(clienteExistente
         ? { customer: clienteExistente }
         : { customer_email: user.email ?? undefined }),
-      metadata: { user_id: user.id, ciclo },
+      metadata: { user_id: user.id, ciclo, bump: comBump ? '1' : '0' },
       allow_promotion_codes: true,
       locale: 'pt-BR',
       // payment_method_types omitido de propósito: o Stripe usa os métodos
@@ -76,8 +78,11 @@ export async function POST(request: NextRequest) {
     if (modo === 'subscription') {
       params.subscription_data = { metadata: { user_id: user.id } }
     } else {
-      // Recibo por e-mail + guarda o user no payment_intent p/ o webhook
+      // Recibo por e-mail + guarda o user no payment_intent p/ o webhook.
+      // setup_future_usage SÓ no cartão (PIX não suporta): habilita o
+      // upsell de 1 clique pós-compra sem redigitar o cartão.
       params.payment_intent_data = { metadata: { user_id: user.id, ciclo } }
+      params.payment_method_options = { card: { setup_future_usage: 'off_session' } }
       if (!clienteExistente) params.customer_creation = 'always'
     }
 

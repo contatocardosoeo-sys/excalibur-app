@@ -1,10 +1,50 @@
 import Link from 'next/link'
 import { Suspense } from 'react'
+import { createSupabaseServer } from '@/app/lib/supabase-server'
 import CompraTrack from './CompraTrack'
 
-export default function BemVindoPage() {
+export const dynamic = 'force-dynamic'
+
+// ♠ Fim do funil — confirma a compra e mostra o arsenal que ele destravou.
+export default async function BemVindoPage() {
+  let temKit = false
+  let temEncontro = false
+  try {
+    const supabase = await createSupabaseServer()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (user) {
+      const { data } = await supabase
+        .from('dossiery_assinaturas')
+        .select('kit_aberturas, protocolo_encontro')
+        .eq('user_id', user.id)
+        .maybeSingle()
+      temKit = data?.kit_aberturas === true
+      temEncontro = data?.protocolo_encontro === true
+    }
+  } catch {
+    /* sem env/sessão → mostra o padrão */
+  }
+
+  const arsenal = [
+    { ok: true, t: 'Plano Operador', d: 'Raio-X + Coach + Campo, ilimitados', href: '/dossiery/base' },
+    {
+      ok: temKit,
+      t: 'Kit 50 Aberturas',
+      d: temKit ? 'liberado — acesso vitalício' : 'não incluído — destrave dentro do app',
+      href: '/dossiery/kit',
+    },
+    {
+      ok: temEncontro,
+      t: 'Protocolo Encontro',
+      d: temEncontro ? 'liberado — acesso vitalício' : 'não incluído — destrave dentro do app',
+      href: '/dossiery/encontro',
+    },
+  ]
+
   return (
-    <div className="dossiery min-h-screen d-grid-bg grid place-items-center px-6 bg-background text-foreground">
+    <div className="min-h-screen d-grid-bg grid place-items-center px-6 py-12">
       <Suspense fallback={null}>
         <CompraTrack />
       </Suspense>
@@ -22,7 +62,38 @@ export default function BemVindoPage() {
           (costuma ser 1-2 minutos). A partir de agora, o dossiê é sobre você: seu jogo, sua
           evolução, seu resultado.
         </p>
-        <div className="mt-8 flex flex-col gap-3">
+
+        {/* o que ele destravou */}
+        <div className="mt-7 space-y-2 text-left">
+          {arsenal.map((a) => (
+            <Link
+              key={a.t}
+              href={a.href}
+              className={`flex items-center gap-3 rounded-md border p-3.5 transition ${
+                a.ok
+                  ? 'border-border bg-card hover:border-[hsl(var(--brass))]'
+                  : 'border-border/60 bg-card/50 opacity-70 hover:opacity-100 hover:border-border'
+              }`}
+            >
+              <span
+                className={`grid place-items-center w-6 h-6 rounded-[3px] text-[13px] font-bold shrink-0 ${
+                  a.ok
+                    ? 'bg-[hsl(145_35%_28%)] text-[hsl(145_45%_70%)]'
+                    : 'border border-muted-foreground/40 text-muted-foreground/50'
+                }`}
+              >
+                {a.ok ? '✓' : '🔒'}
+              </span>
+              <span className="flex-1 min-w-0">
+                <span className="block text-[14px] text-foreground font-medium">{a.t}</span>
+                <span className="block text-[12px] text-muted-foreground truncate">{a.d}</span>
+              </span>
+              <span className="text-muted-foreground text-sm">→</span>
+            </Link>
+          ))}
+        </div>
+
+        <div className="mt-7 flex flex-col gap-3">
           <Link
             href="/dossiery/coach"
             className="rounded-[4px] bg-primary text-primary-foreground font-semibold text-[15px] py-3.5 hover:opacity-90 transition"

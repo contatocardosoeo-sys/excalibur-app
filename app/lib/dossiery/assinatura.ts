@@ -13,12 +13,27 @@ export async function temAssinaturaAtiva(
 ): Promise<boolean> {
   const { data } = await supabase
     .from('dossiery_assinaturas')
-    .select('status, renova_em')
+    .select('plano, status, renova_em')
     .eq('user_id', userId)
     .maybeSingle()
-  if (data?.status !== 'ativo') return false
+  // 'recruta' é o default da tabela (ex.: linha criada só pela compra do kit) —
+  // não é plano pago. Acesso pago exige plano definido pelo webhook ('operador').
+  if (!data || data.status !== 'ativo' || !data.plano || data.plano === 'recruta') return false
   // Anual one-time expira em renova_em; assinatura mensal tem renova_em no futuro
   // (renovada via webhook) ou pode ficar sem data — nesse caso o status manda.
   if (data.renova_em && new Date(data.renova_em).getTime() < Date.now()) return false
   return true
+}
+
+// Kit 50 Aberturas (order bump) — entitlement vitalício, independe do plano.
+export async function temKitAberturas(
+  supabase: SupabaseClient,
+  userId: string
+): Promise<boolean> {
+  const { data } = await supabase
+    .from('dossiery_assinaturas')
+    .select('kit_aberturas')
+    .eq('user_id', userId)
+    .maybeSingle()
+  return data?.kit_aberturas === true
 }

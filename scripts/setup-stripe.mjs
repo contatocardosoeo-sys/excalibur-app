@@ -62,6 +62,7 @@ async function acharOuCriarPrice({ product, lookup, amount, recurring }) {
 try {
   const prodOperador = await acharOuCriarProduto('Dossiery — Operador', 'operador')
   const prodBump = await acharOuCriarProduto('Dossiery — Kit 50 Aberturas', 'bump')
+  const prodEncontro = await acharOuCriarProduto('Dossiery — Protocolo Encontro', 'encontro')
 
   const mensal = await acharOuCriarPrice({
     product: prodOperador.id, lookup: 'dossiery_mensal', amount: 9700, recurring: true,
@@ -71,6 +72,17 @@ try {
   })
   const bump = await acharOuCriarPrice({
     product: prodBump.id, lookup: 'dossiery_bump', amount: 3700, recurring: false,
+  })
+  // Funil do Protocolo Encontro: OTO pós-compra (R$97, janela 60min),
+  // downsell (R$47, mesma janela) e preço cheio dentro do app (R$147).
+  const encontroOto = await acharOuCriarPrice({
+    product: prodEncontro.id, lookup: 'dossiery_encontro_oto', amount: 9700, recurring: false,
+  })
+  const encontroDown = await acharOuCriarPrice({
+    product: prodEncontro.id, lookup: 'dossiery_encontro_down', amount: 4700, recurring: false,
+  })
+  const encontroApp = await acharOuCriarPrice({
+    product: prodEncontro.id, lookup: 'dossiery_encontro_app', amount: 14700, recurring: false,
   })
 
   let whsec = null
@@ -117,6 +129,9 @@ try {
   console.log(`STRIPE_PRICE_MENSAL=${mensal.id}`)
   console.log(`STRIPE_PRICE_ANUAL=${anual.id}`)
   console.log(`STRIPE_PRICE_BUMP=${bump.id}`)
+  console.log(`STRIPE_PRICE_ENCONTRO_OTO=${encontroOto.id}`)
+  console.log(`STRIPE_PRICE_ENCONTRO_DOWN=${encontroDown.id}`)
+  console.log(`STRIPE_PRICE_ENCONTRO_APP=${encontroApp.id}`)
   if (whsec) console.log(`STRIPE_WEBHOOK_SECRET=${whsec}`)
   console.log('═════════════════════════════════════════════════════════════')
   console.log('\n✅ Stripe pronto. Agora:')

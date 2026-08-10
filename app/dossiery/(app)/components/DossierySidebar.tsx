@@ -11,8 +11,10 @@ const nav = [
   { href: '/dossiery/conexoes', n: '05', label: 'Conexões' },
   { href: '/dossiery/campo', n: '06', label: 'Campo' },
   { href: '/dossiery/academia', n: '07', label: 'Academia' },
-  { href: '/dossiery/evolucao', n: '08', label: 'Evolução' },
-  { href: '/dossiery/conta', n: '09', label: 'Conta' },
+  { href: '/dossiery/kit', n: '08', label: 'Kit Aberturas' },
+  { href: '/dossiery/encontro', n: '09', label: 'Protocolo Encontro' },
+  { href: '/dossiery/evolucao', n: '10', label: 'Evolução' },
+  { href: '/dossiery/conta', n: '11', label: 'Conta' },
 ]
 
 export default function DossierySidebar() {

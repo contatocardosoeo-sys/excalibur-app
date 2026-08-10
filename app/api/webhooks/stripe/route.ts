@@ -94,6 +94,25 @@ async function ativarPorSession(admin: SupabaseClient, session: Stripe.Checkout.
   const customerId =
     typeof session.customer === 'string' ? session.customer : session.customer?.id ?? null
 
+  // ── Oferta avulsa do funil (upsell/downsell/cross-sell pago via checkout/PIX) ──
+  // Libera SÓ o entitlement. Nunca toca plano/status/renova_em: se a linha não
+  // existir, o insert cai nos defaults ('recruta') que NÃO passam no paywall.
+  const tipo = session.metadata?.tipo
+  if (tipo === 'kit' || tipo === 'encontro_oto' || tipo === 'encontro_down' || tipo === 'encontro_app') {
+    const coluna = tipo === 'kit' ? 'kit_aberturas' : 'protocolo_encontro'
+    const { error } = await admin.from('dossiery_assinaturas').upsert(
+      {
+        user_id: userId,
+        [coluna]: true,
+        ...(customerId ? { stripe_customer_id: customerId } : {}),
+      },
+      { onConflict: 'user_id' }
+    )
+    if (error) throw new Error(`upsert oferta ${tipo}: ${error.message}`)
+    return
+  }
+
+  // ── Compra principal (plano Operador, com ou sem order bump) ──
   let stripeId: string | null = null
   let renovaEm: string | null = null
 
@@ -121,6 +140,8 @@ async function ativarPorSession(admin: SupabaseClient, session: Stripe.Checkout.
       stripe_id: stripeId,
       stripe_customer_id: customerId,
       renova_em: renovaEm,
+      // Order bump marcado no checkout → kit liberado junto (nunca volta a false)
+      ...(session.metadata?.bump === '1' ? { kit_aberturas: true } : {}),
     },
     { onConflict: 'user_id' }
   )

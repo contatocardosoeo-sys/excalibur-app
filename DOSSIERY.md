@@ -96,7 +96,10 @@ disponível no Supabase). Idempotente.
 | `STRIPE_WEBHOOK_SECRET` | criado no passo Webhook abaixo (`whsec_…`) |
 | `STRIPE_PRICE_MENSAL` | price **recorrente/mês** do Operador (`price_…`) |
 | `STRIPE_PRICE_ANUAL` | price **único (one-time)** R$697 do Operador (`price_…`) |
-| `STRIPE_PRICE_BUMP` | price **único** R$37 do order bump (opcional; sem ele o bump some) |
+| `STRIPE_PRICE_BUMP` | price **único** R$37 do order bump / kit no app (opcional; sem ele o bump some) |
+| `STRIPE_PRICE_ENCONTRO_OTO` | price único R$97 — upsell pós-compra (janela 60min) |
+| `STRIPE_PRICE_ENCONTRO_DOWN` | price único R$47 — downsell (mesma janela) |
+| `STRIPE_PRICE_ENCONTRO_APP` | price único R$147 — Protocolo Encontro dentro do app |
 | `DOSSIERY_GATE` | `off` = tudo aberto (preview). **Remover no go-live.** |
 | `DOSSIERY_PAYWALL` | `off` = login exigido mas IA liberada sem assinar. Padrão: on. |
 | `NEXT_PUBLIC_META_PIXEL_ID` | ID do Pixel (Meta Events Manager). Sem ele, nenhum script carrega. |
@@ -155,18 +158,46 @@ painel. Se preferir fazer tudo manual, o passo a passo abaixo cobre o mesmo.
 
 ### Supabase
 
-1. Rodar `supabase/migrations/0001_dossiery_schema.sql` e
-   `0002_dossiery_billing.sql` no SQL Editor (idempotentes).
+1. Rodar as migrations no SQL Editor, em ordem (todas idempotentes):
+   `0001_dossiery_schema.sql` → `0002_dossiery_billing.sql` →
+   `0003_dossiery_kit.sql` (coluna `kit_aberturas`) →
+   `0004_dossiery_funil.sql` (coluna `protocolo_encontro` + **RLS: assinaturas
+   viram somente-leitura pro usuário** — correção de segurança, não pule).
 2. Auth → Providers → Email: para funil sem fricção, **desligar** “Confirm
    email” (ou manter ligado — o fluxo de confirmação já é tratado no app).
 3. Auth → URL Configuration: adicionar o domínio de produção em *Site URL* e
    *Redirect URLs* (`https://SEU-DOMINIO/api/auth/callback`).
 
+### O funil completo (mapa)
+
+```
+Landing /dossiery
+  → Preços /dossiery/precos          [ORDER BUMP ✓ default: Kit R$37]
+  → Stripe Checkout                   (anual R$697 one-time PIX/cartão · mensal R$97 cartão)
+  → OTO /dossiery/oferta/encontro    [UPSELL 1-CLIQUE: Protocolo Encontro R$97]
+      recusou → /dossiery/oferta/ultima  [DOWNSELL: R$47 · janela real 60min]
+  → /dossiery/bem-vindo               (mostra o arsenal: ✓ comprado / 🔒 bloqueado)
+  → In-app CROSS-SELL: /dossiery/kit (R$37) · /dossiery/encontro (R$147 fora da janela)
+```
+
+- **1 clique de verdade:** o checkout principal salva o cartão
+  (`setup_future_usage`, só p/ cartão); o upsell cobra off-session sem
+  redigitar. Comprou no PIX? O upsell abre outro QR. Cartão recusou? Cai pro
+  checkout normal — a venda nunca morre.
+- **Janela de 60min é real:** `/api/dossiery/upsell` recusa (410) o preço de
+  funil depois de 60min da ativação. Escassez que sobrevive a Procon/Meta.
+- **Entrega existe:** Kit (50 aberturas) e Protocolo (34 jogadas) são páginas
+  de conteúdo completas — zero risco de reembolso por "produto vazio".
+- **AOV alvo:** 697 + 37 (bump ~40%) + 97 (OTO ~15%) ⇒ ~R$740 no melhor caso;
+  média realista ~R$300+ vs CAC ~R$165 → ROI dia 1.
+
 ### Tracking do funil (já instrumentado)
 
 `PageView` em toda navegação · `InitiateCheckout`/`begin_checkout` no clique de
-assinar (com valor) · `Purchase`/`purchase` em `/dossiery/bem-vindo` (valor por
-ciclo + `eventID` = sessão de checkout p/ dedup). Basta preencher os dois envs.
+assinar e nos botões de oferta (com valor) · `Purchase`/`purchase` dispara na
+**OTO** (primeira tela pós-checkout; `eventID` = sessão de checkout p/ dedup —
+visitar /bem-vindo direto não dispara nada) · upsell 1-clique dispara Purchase
+próprio com `eventID` = payment intent. Basta preencher os dois envs.
 
 ### Checklist final antes do tráfego frio
 

@@ -11,13 +11,15 @@ export default function CompraTrack() {
 
   useEffect(() => {
     if (disparado.current) return
+    const cs = params.get('cs')
+    // Sem cs = visita direta (não veio do checkout) → não dispara compra fantasma
+    if (!cs) return
     disparado.current = true
 
     const ciclo = params.get('ciclo')
-    const cs = params.get('cs') || undefined
     const value = (ciclo === 'anual' ? 697 : 97) + (params.get('bump') === '1' ? 37 : 0)
 
-    window.fbq?.('track', 'Purchase', { value, currency: 'BRL' }, cs ? { eventID: cs } : undefined)
+    window.fbq?.('track', 'Purchase', { value, currency: 'BRL' }, { eventID: cs })
     window.gtag?.('event', 'purchase', { value, currency: 'BRL', transaction_id: cs })
   }, [params])
 
