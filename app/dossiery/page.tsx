@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 const CENAS = [
   {
     hora: '23:47',
-    cena: 'Visualizada às 22:10. Você já releu sua mensagem 6 vezes. Estava boa. Ela viu. E nada.',
+    cena: 'Visualizada às 22:10. Você já releu sua mensagem 6 vezes procurando o erro. Não tem erro. Tem vácuo. E você sabe que vai checar de novo em 10 minutos.',
   },
   {
     hora: 'SÁB',
@@ -31,11 +31,19 @@ const CENAS = [
   },
   {
     hora: '14:32',
-    cena: 'Ela respondeu “kkkk verdade”. Você digitou, apagou, digitou de novo. Mandou uma pergunta. A conversa morreu ali.',
+    cena: 'Ela respondeu “kkkk verdade”. Você digitou, apagou, digitou de novo. Mandou uma pergunta simpática. Foi nesse exato momento que ela te arquivou.',
+  },
+  {
+    hora: 'QUI',
+    cena: '“Vou dormir cedo hoje 😴”, ela te disse. 23:40: stories dela na festa. Você assistiu três vezes. E deu like. Você. Deu. Like.',
   },
   {
     hora: '02:15',
-    cena: '“Você é incrível, sério… queria que os caras fossem como você.” Tradução: você é o conselheiro dela. O outro é o cara.',
+    cena: '“Você é incrível, sério… queria que os caras fossem como você.” Tradução: você virou o diário dela com pernas. O outro é o cara.',
+  },
+  {
+    hora: 'SEX',
+    cena: 'Você ensaiou a frase. Chegou a dar dois passos na direção dela. Voltou. “Hoje não tô no clima.” No Uber pra casa, a verdade: quarta vez no mês que você “não tava no clima”.',
   },
   {
     hora: 'DOM',
@@ -48,6 +56,7 @@ const SINTOMAS = [
   'Agrada, concorda, se molda — e vira “o amigo” em vez de o homem',
   'Puxa papo com medo de incomodar — e a conversa nasce morta',
   'Aceita ser a segunda opção — e chama isso de “ter paciência”',
+  'Paga o jantar, resolve o problema, vira motorista — e a recompensa é um “obg 😊” antes de dormir sozinho',
   'Decora frase pronta de app — e trava quando ela está na sua frente',
 ]
 
@@ -297,9 +306,14 @@ export default function DossierySalesPage() {
           </div>
           <p className="mt-8 text-[15px] text-foreground max-w-2xl leading-relaxed">
             O custo não é só a sexta à noite no sofá. É o que isso está fazendo com a{' '}
-            <span className="text-foreground font-medium">imagem que você tem de si mesmo</span> — cada
-            vácuo confirmando a história de que “não é pra você”. Daqui a 3 anos, esse padrão não
-            muda sozinho. Ele cristaliza.
+            <span className="font-medium">imagem que você tem de si mesmo</span> — cada vácuo
+            confirmando a história de que “não é pra você”. E a parte que mais arde:{' '}
+            <span className="font-medium">
+              o cara que ela responde em 30 segundos não é mais bonito, mais rico nem mais
+              interessante que você.
+            </span>{' '}
+            Ele só opera um jogo que ninguém te ensinou. Daqui a 3 anos, esse padrão não muda
+            sozinho. Ele cristaliza — e vira a sua reputação com você mesmo.
           </p>
           <p className="mt-4 font-serif-d text-2xl text-foreground">
             Nenhum homem nasceu pra ser plano B.
@@ -526,9 +540,10 @@ export default function DossierySalesPage() {
             Daqui a 30 dias você vai estar em um de dois lugares.
           </h2>
           <p className="mt-6 text-[15.5px] text-muted-foreground max-w-xl mx-auto leading-relaxed">
-            No mesmo sofá, relendo mensagem visualizada, esperando a migalha — com o Modo Trouxa um
-            mês mais entranhado. Ou um mês dentro do Protocolo: lendo sinal que antes era invisível,
-            conversando com presença, e sentindo no corpo a diferença entre{' '}
+            No mesmo sofá, com a mesma luz azul na cara às 2 da manhã, relendo a mesma conversa
+            morta — só que com o Modo Trouxa trinta dias mais entranhado e mais uma história de
+            “quase” pra contar pra ninguém. Ou trinta dias dentro do Protocolo: lendo sinal que
+            antes era invisível, conversando com presença, e sentindo no corpo a diferença entre{' '}
             <span className="text-foreground">correr atrás e ser procurado</span>.
           </p>
           <p className="mt-4 text-[15.5px] text-foreground font-medium">O sofá é grátis. E é caríssimo.</p>
