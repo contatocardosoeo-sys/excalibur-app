@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
+import MobileCTA from './components/MobileCTA'
 
 export const metadata: Metadata = {
   title: 'Dossiery — Saia do Modo Trouxa. Vire o homem que escolhe.',
@@ -26,7 +27,7 @@ const CENAS = [
   },
   {
     hora: 'SÁB',
-    cena: '“Confirmado pra hoje?” Enviado. Uma hora depois: “amiga, surgiu um imprevisto 🥺”. Você já sabia. Sempre sabe.',
+    cena: '“Confirmado pra hoje?” Visualizada, sem resposta. Às 21h, você já pronto, chega a dela: “oii desculpa 🥺 surgiu um imprevisto, fica pra próxima?”. Não fica. Você sabe que não fica.',
   },
   {
     hora: '14:32',
@@ -128,6 +129,14 @@ const FAQ = [
     a: 'Foi desenhado pra quem trava. O treino é privado, sem plateia, no seu ritmo. Você erra aqui dentro — com feedback — pra acertar lá fora.',
   },
   {
+    q: 'Alguém vai saber que eu uso?',
+    a: 'Ninguém. O Dossiery não conecta nas suas redes, não posta nada, não manda nada. É o seu arquivo privado: dados isolados por usuário no banco, e você pode apagar tudo quando quiser. O que acontece no dossiê, morre no dossiê.',
+  },
+  {
+    q: 'Em quanto tempo vejo diferença?',
+    a: 'A primeira análise leva 3 minutos — e já muda como você enxerga a conversa que está travada agora. O resto é treino: quem roda o Protocolo toda semana constrói a postura; quem só espia, não. Por isso os 7 dias de garantia: teste no seu jogo real e decida.',
+  },
+  {
     q: 'E se eu não gostar?',
     a: '7 dias de garantia incondicional. Não curtiu? Um clique no portal, devolvemos 100%. Sem formulário de retenção, sem “tem certeza?”, sem mimimi.',
   },
@@ -186,7 +195,10 @@ export default function DossierySalesPage() {
             <span className="font-serif-d text-[17px] tracking-tight">Dossiery</span>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/dossiery/entrar" className="text-[13px] text-muted-foreground hover:text-primary transition">
+            <Link
+              href="/dossiery/entrar"
+              className="hidden sm:block text-[13px] text-muted-foreground hover:text-primary transition"
+            >
               Entrar
             </Link>
             <Link
@@ -203,7 +215,7 @@ export default function DossierySalesPage() {
       <section className="relative border-b border-border overflow-hidden">
         <div className="d-grid-bg absolute inset-0 opacity-60" aria-hidden />
         <div className="relative mx-auto max-w-5xl px-6 pt-14 md:pt-20 pb-14">
-          <div className="grid md:grid-cols-[1fr,320px] lg:grid-cols-[1fr,360px] gap-10 lg:gap-14 items-center">
+          <div className="grid md:grid-cols-[1fr_320px] lg:grid-cols-[1fr_360px] gap-10 lg:gap-14 items-center">
             {/* copy — a figura da foto olha exatamente pra cá */}
             <div className="text-center md:text-left">
               <div className="flex justify-center md:justify-start">
@@ -214,15 +226,14 @@ export default function DossierySalesPage() {
                 <br />
                 <span className="text-primary">É o Modo Trouxa operando por você.</span>
               </h1>
-              <p className="text-muted-foreground mt-6 md:max-w-xl text-[16px] leading-relaxed">
+              <p className="text-muted-foreground mt-5 md:max-w-xl text-[15.5px] md:text-[16px] leading-relaxed">
                 Ninguém te ensinou o jogo — te ensinaram a agradar. O Dossiery instala o{' '}
-                <span className="text-foreground font-medium">Protocolo Operador</span>: a IA que
-                faz o raio-X das suas conversas reais, te treina como um coach de elite e te devolve
-                o que tiraram de você —{' '}
-                <span className="text-foreground font-medium">a postura de homem que escolhe</span>,
+                <span className="text-foreground font-medium">Protocolo Operador</span>: raio-X das
+                suas conversas, treino de coach de elite 24/7 e{' '}
+                <span className="text-foreground font-medium">a postura de homem que escolhe</span> —
                 em vez de esperar ser escolhido.
               </p>
-              <div className="mt-9">
+              <div className="mt-7 md:mt-9" id="cta-hero">
                 <CTA align="md-left">Sair do Modo Trouxa agora →</CTA>
               </div>
             </div>
@@ -237,7 +248,6 @@ export default function DossierySalesPage() {
                     fill
                     sizes="(min-width: 1024px) 360px, (min-width: 768px) 320px, 0px"
                     className="object-cover"
-                    priority
                   />
                 </div>
                 <div className="flex justify-between px-1.5 pt-2 pb-0.5 font-mono-d text-[9px] tracking-[0.18em] uppercase text-muted-foreground">
@@ -385,6 +395,15 @@ export default function DossierySalesPage() {
               Os apps de cantada usaram essa tecnologia pra te dar o peixe. Nós usamos pra te ensinar a pescar.
             </p>
           </div>
+          <div className="mt-10 text-center">
+            <div className="font-mono-d text-[10px] tracking-[0.2em] uppercase text-muted-foreground/70">
+              Treinado no cânone que formou uma geração
+            </div>
+            <p className="font-serif-d text-[15px] md:text-base text-muted-foreground mt-2.5">
+              Manson · Glover · Cabane · Carnegie · Gottman · Perel — e a ciência publicada por trás
+              de cada um.
+            </p>
+          </div>
         </div>
       </section>
 
@@ -514,7 +533,9 @@ export default function DossierySalesPage() {
           </p>
           <p className="mt-4 text-[15.5px] text-foreground font-medium">O sofá é grátis. E é caríssimo.</p>
           <div className="mt-9">
-            <CTA>Sair do Modo Trouxa agora →</CTA>
+            <CTA sub="R$97/mês · 7 dias de garantia · cancele em 2 cliques">
+              Sair do Modo Trouxa agora →
+            </CTA>
           </div>
           <p className="mt-10 text-[13px] text-muted-foreground max-w-lg mx-auto leading-relaxed">
             <span className="font-mono-d text-[10px] tracking-widest uppercase text-[hsl(var(--brass))] mr-2">P.S.</span>
@@ -525,7 +546,9 @@ export default function DossierySalesPage() {
         </div>
       </section>
 
-      <footer className="mx-auto max-w-5xl px-6 py-10">
+      <MobileCTA />
+
+      <footer className="mx-auto max-w-5xl px-6 pt-10 pb-28 md:pb-10">
         <p className="font-mono-d text-[10px] tracking-[0.12em] uppercase text-muted-foreground text-center leading-loose">
           ♠ &nbsp;Dossiery · Projeto Conquista<br />
           Treina o homem. Respeita a autonomia. Vende competência, não dependência.<br />
