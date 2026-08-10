@@ -1,8 +1,13 @@
 import Link from 'next/link'
+import { Suspense } from 'react'
+import CompraTrack from './CompraTrack'
 
 export default function BemVindoPage() {
   return (
     <div className="dossiery min-h-screen d-grid-bg grid place-items-center px-6 bg-background text-foreground">
+      <Suspense fallback={null}>
+        <CompraTrack />
+      </Suspense>
       <div className="w-full max-w-md text-center">
         <div className="mx-auto grid place-items-center w-20 h-20 rounded-full border border-[hsl(var(--brass))] text-[hsl(var(--brass))] relative">
           <span className="absolute inset-[7px] rounded-full border border-dashed border-[hsl(var(--brass)/0.5)]" />

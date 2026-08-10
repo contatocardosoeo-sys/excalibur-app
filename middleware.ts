@@ -39,6 +39,8 @@ export async function middleware(request: NextRequest) {
       '/dossiery/entrar',
       '/dossiery/criar-conta',
       '/dossiery/bem-vindo',
+      '/dossiery/termos',
+      '/dossiery/privacidade',
     ]
     const isPublicoDossiery = publicosDossiery.includes(pathname)
 

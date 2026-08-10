@@ -20,6 +20,9 @@ export default function PrecosPage() {
     if (loading) return
     setErro(null)
     setLoading(true)
+    const valor = ciclo === 'anual' ? 697 : 97
+    window.fbq?.('track', 'InitiateCheckout', { value: valor, currency: 'BRL' })
+    window.gtag?.('event', 'begin_checkout', { value: valor, currency: 'BRL' })
     try {
       const res = await fetch('/api/dossiery/checkout', {
         method: 'POST',
@@ -142,6 +145,11 @@ export default function PrecosPage() {
         <p className="mt-10 text-center text-[12.5px] text-muted-foreground max-w-md mx-auto">
           Pagamento seguro via Stripe. Não curtiu em 7 dias? Devolvemos tudo, sem perguntas — é só
           pedir pelo portal ou suporte.
+        </p>
+        <p className="mt-4 text-center font-mono-d text-[10px] tracking-widest uppercase text-muted-foreground/60">
+          <Link href="/dossiery/termos" className="hover:text-[hsl(var(--brass))]">Termos</Link>
+          {' · '}
+          <Link href="/dossiery/privacidade" className="hover:text-[hsl(var(--brass))]">Privacidade</Link>
         </p>
       </main>
     </div>

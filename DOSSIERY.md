@@ -98,6 +98,8 @@ disponível no Supabase). Idempotente.
 | `STRIPE_PRICE_ANUAL` | price ID do Operador anual (`price_…`) |
 | `DOSSIERY_GATE` | `off` = tudo aberto (preview). **Remover no go-live.** |
 | `DOSSIERY_PAYWALL` | `off` = login exigido mas IA liberada sem assinar. Padrão: on. |
+| `NEXT_PUBLIC_META_PIXEL_ID` | ID do Pixel (Meta Events Manager). Sem ele, nenhum script carrega. |
+| `NEXT_PUBLIC_GA4_ID` | ID do GA4 (`G-…`). Opcional. |
 
 ### Stripe — passo a passo (~5 min)
 
@@ -125,6 +127,27 @@ disponível no Supabase). Idempotente.
    email” (ou manter ligado — o fluxo de confirmação já é tratado no app).
 3. Auth → URL Configuration: adicionar o domínio de produção em *Site URL* e
    *Redirect URLs* (`https://SEU-DOMINIO/api/auth/callback`).
+
+### Tracking do funil (já instrumentado)
+
+`PageView` em toda navegação · `InitiateCheckout`/`begin_checkout` no clique de
+assinar (com valor) · `Purchase`/`purchase` em `/dossiery/bem-vindo` (valor por
+ciclo + `eventID` = sessão de checkout p/ dedup). Basta preencher os dois envs.
+
+### Checklist final antes do tráfego frio
+
+1. Preencher os `[CAMPOS]` de `/dossiery/termos` e `/dossiery/privacidade`
+   (razão social, CNPJ, e-mails, foro, data) e revisar com advogado.
+2. Rodar **compra-teste** no Stripe test mode: cartão `4242 4242 4242 4242`,
+   qualquer validade futura/CVC → conferir: redirect pro `bem-vindo`, status
+   `ativo` em `dossiery_assinaturas`, acesso ao Coach liberado, cancelamento
+   pelo portal derrubando o acesso.
+3. Trocar chaves test → live no Stripe e refazer 1 compra real (pode
+   reembolsar em seguida).
+4. Conferir eventos no Meta Events Manager (Test Events) durante a compra-teste.
+5. Anúncios: enquadrar como autodesenvolvimento; nada de atributo pessoal na
+   copy ("você não consegue…" = rejeição), nada de antes/depois. Criativos e
+   copys prontos entregues no kit (ver conversa do projeto).
 
 ### Fluxo do funil (como funciona)
 

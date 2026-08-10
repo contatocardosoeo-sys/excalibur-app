@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Pixels from './components/Pixels'
 
 export const metadata: Metadata = {
   title: 'Dossiery — O sistema operacional da conquista',
@@ -13,6 +14,7 @@ export default function DossieryLayout({
 }) {
   return (
     <div className="dossiery min-h-screen bg-background text-foreground font-sans antialiased selection:bg-primary/30">
+      <Pixels />
       {children}
     </div>
   )

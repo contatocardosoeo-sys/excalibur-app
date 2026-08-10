@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       line_items: [{ price: priceId(ciclo), quantity: 1 }],
-      success_url: `${origin}/dossiery/bem-vindo?cs={CHECKOUT_SESSION_ID}`,
+      success_url: `${origin}/dossiery/bem-vindo?cs={CHECKOUT_SESSION_ID}&ciclo=${ciclo}`,
       cancel_url: `${origin}/dossiery/precos`,
       client_reference_id: user.id,
       ...(assinatura?.stripe_customer_id

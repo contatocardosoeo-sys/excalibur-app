@@ -1,10 +1,20 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export const metadata: Metadata = {
   title: 'Dossiery — Saia do Modo Trouxa. Vire o homem que escolhe.',
   description:
     'A IA que faz o raio-X das suas conversas, te treina no jogo real e desinstala o Modo Trouxa. Sem decoreba, sem fingir ser outro, sem correr atrás. 7 dias de garantia.',
+  openGraph: {
+    title: 'Dossiery — Saia do Modo Trouxa.',
+    description:
+      'O Protocolo Operador: Raio-X das suas conversas, treino de elite 24/7 e leitura de jogo. 7 dias de garantia.',
+    images: [{ url: '/dossiery/hero.jpg', width: 1440, height: 2560 }],
+    locale: 'pt_BR',
+    type: 'website',
+  },
+  twitter: { card: 'summary_large_image' },
 }
 
 /* ————— blocos de conteúdo ————— */
@@ -129,9 +139,21 @@ const FAQ = [
 
 /* ————— componentes ————— */
 
-function CTA({ children = 'Entrar no Protocolo →', sub }: { children?: React.ReactNode; sub?: string }) {
+function CTA({
+  children = 'Entrar no Protocolo →',
+  sub,
+  align = 'center',
+}: {
+  children?: React.ReactNode
+  sub?: string
+  align?: 'center' | 'md-left'
+}) {
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div
+      className={`flex flex-col gap-2 ${
+        align === 'md-left' ? 'items-center md:items-start' : 'items-center'
+      }`}
+    >
       <Link
         href="/dossiery/precos"
         className="rounded-[4px] bg-primary text-primary-foreground font-semibold text-[15px] px-8 py-4 hover:opacity-90 transition"
@@ -178,32 +200,61 @@ export default function DossierySalesPage() {
       </header>
 
       {/* ============ 1 · HERO ============ */}
-      <section className="relative border-b border-border">
+      <section className="relative border-b border-border overflow-hidden">
         <div className="d-grid-bg absolute inset-0 opacity-60" aria-hidden />
-        <div
-          className="d-stamp pointer-events-none absolute top-8 right-4 md:top-14 md:right-10 rotate-[-8deg] rounded-[3px] border-2 border-primary px-2.5 py-1 font-mono-d text-[10px] font-bold tracking-[0.18em] uppercase text-primary hidden sm:block"
-          aria-hidden
-        >
-          Dossiê Nº 001 · Confidencial
-        </div>
-        <div className="relative mx-auto max-w-4xl px-6 pt-16 md:pt-24 pb-14 text-center">
-          <Kicker>Aviso: isso aqui vai doer antes de resolver</Kicker>
-          <h1 className="font-serif-d font-semibold leading-[1.02] tracking-tight text-4xl md:text-6xl mt-5 text-balance">
-            Ser ignorado, tomar bolo e virar “o amigo” não é azar.
-            <br />
-            <span className="text-primary">É o Modo Trouxa operando por você.</span>
-          </h1>
-          <p className="text-muted-foreground mt-6 max-w-2xl mx-auto text-[16px] leading-relaxed">
-            Ninguém te ensinou o jogo — te ensinaram a agradar. O Dossiery instala o{' '}
-            <span className="text-foreground font-medium">Protocolo Operador</span>: a IA que faz o
-            raio-X das suas conversas reais, te treina como um coach de elite e te devolve o que
-            tiraram de você — <span className="text-foreground font-medium">a postura de homem que escolhe</span>,
-            em vez de esperar ser escolhido.
-          </p>
-          <div className="mt-9">
-            <CTA>Sair do Modo Trouxa agora →</CTA>
+        <div className="relative mx-auto max-w-5xl px-6 pt-14 md:pt-20 pb-14">
+          <div className="grid md:grid-cols-[1fr,320px] lg:grid-cols-[1fr,360px] gap-10 lg:gap-14 items-center">
+            {/* copy — a figura da foto olha exatamente pra cá */}
+            <div className="text-center md:text-left">
+              <div className="flex justify-center md:justify-start">
+                <Kicker>Aviso: isso aqui vai doer antes de resolver</Kicker>
+              </div>
+              <h1 className="font-serif-d font-semibold leading-[1.02] tracking-tight text-4xl md:text-5xl lg:text-6xl mt-5 text-balance">
+                Ser ignorado, tomar bolo e virar “o amigo” não é azar.
+                <br />
+                <span className="text-primary">É o Modo Trouxa operando por você.</span>
+              </h1>
+              <p className="text-muted-foreground mt-6 md:max-w-xl text-[16px] leading-relaxed">
+                Ninguém te ensinou o jogo — te ensinaram a agradar. O Dossiery instala o{' '}
+                <span className="text-foreground font-medium">Protocolo Operador</span>: a IA que
+                faz o raio-X das suas conversas reais, te treina como um coach de elite e te devolve
+                o que tiraram de você —{' '}
+                <span className="text-foreground font-medium">a postura de homem que escolhe</span>,
+                em vez de esperar ser escolhido.
+              </p>
+              <div className="mt-9">
+                <CTA align="md-left">Sair do Modo Trouxa agora →</CTA>
+              </div>
+            </div>
+
+            {/* foto de arquivo — olhar direcionado pro headline */}
+            <div className="relative hidden md:block">
+              <div className="rotate-[2deg] rounded-[4px] border border-border bg-card p-2 shadow-[0_28px_70px_-28px_rgba(0,0,0,.85)]">
+                <div className="relative aspect-[3/4] overflow-hidden rounded-[2px]">
+                  <Image
+                    src="/dossiery/hero.jpg"
+                    alt="Registro de campo: um operador diante da cidade, à noite"
+                    fill
+                    sizes="(min-width: 1024px) 360px, (min-width: 768px) 320px, 0px"
+                    className="object-cover"
+                    priority
+                  />
+                </div>
+                <div className="flex justify-between px-1.5 pt-2 pb-0.5 font-mono-d text-[9px] tracking-[0.18em] uppercase text-muted-foreground">
+                  <span>Arquivo 001-A</span>
+                  <span>Registro de campo</span>
+                </div>
+              </div>
+              <div
+                className="d-stamp absolute -top-3 -right-2 rotate-[-8deg] rounded-[3px] border-2 border-primary px-2.5 py-1 font-mono-d text-[10px] font-bold tracking-[0.18em] uppercase text-primary bg-background/70 backdrop-blur-[2px]"
+                aria-hidden
+              >
+                Dossiê Nº 001 · Confidencial
+              </div>
+            </div>
           </div>
-          <div className="mt-10 flex flex-wrap justify-center gap-x-6 gap-y-2 font-mono-d text-[10px] tracking-[0.14em] uppercase text-muted-foreground/70">
+
+          <div className="mt-12 flex flex-wrap justify-center gap-x-6 gap-y-2 font-mono-d text-[10px] tracking-[0.14em] uppercase text-muted-foreground/70">
             <span>Visualizada sem resposta</span>
             <span>·</span>
             <span>“kkkk” e sumiu</span>
@@ -481,6 +532,10 @@ export default function DossierySalesPage() {
           <Link href="/dossiery/precos" className="hover:text-primary transition">Preços</Link>
           {' · '}
           <Link href="/dossiery/entrar" className="hover:text-primary transition">Entrar</Link>
+          {' · '}
+          <Link href="/dossiery/termos" className="hover:text-primary transition">Termos</Link>
+          {' · '}
+          <Link href="/dossiery/privacidade" className="hover:text-primary transition">Privacidade</Link>
         </p>
       </footer>
     </div>
