@@ -1,0 +1,130 @@
+#!/usr/bin/env node
+/**
+ * ♠ Dossiery — setup automático do Stripe (produtos + preços + webhook)
+ *
+ * Cria tudo que o funil precisa, sem clicar no painel. É idempotente:
+ * pode rodar quantas vezes quiser que não duplica.
+ *
+ * USO (rode LOCAL, sua chave nunca sai da sua máquina):
+ *   STRIPE_SECRET_KEY=sk_test_xxx node scripts/setup-stripe.mjs [URL_DO_WEBHOOK]
+ *
+ * Exemplo:
+ *   STRIPE_SECRET_KEY=sk_test_xxx \
+ *     node scripts/setup-stripe.mjs https://app.dossiery.com.br/api/webhooks/stripe
+ *
+ * Comece com a chave de TESTE (sk_test_...). Depois de validar a compra-teste,
+ * rode de novo com a chave LIVE (sk_live_...) para criar os preços de produção.
+ */
+
+import Stripe from 'stripe'
+
+const key = process.env.STRIPE_SECRET_KEY
+if (!key) {
+  console.error('❌ Defina STRIPE_SECRET_KEY. Comece pela chave de TESTE: sk_test_...')
+  process.exit(1)
+}
+const stripe = new Stripe(key)
+const webhookUrl = process.argv[2] || null
+const modo = key.startsWith('sk_live') ? 'LIVE 🔴 (produção!)' : 'TESTE 🟢'
+
+console.log(`\n♠ Dossiery · setup Stripe — modo ${modo}\n`)
+
+// ── idempotência por metadata (sem depender da Search API) ──
+async function acharOuCriarProduto(nome, tag) {
+  const lista = await stripe.products.list({ limit: 100, active: true })
+  const achado = lista.data.find((p) => p.metadata?.dossiery === tag)
+  if (achado) {
+    console.log(`• produto ok:   ${nome}`)
+    return achado
+  }
+  const p = await stripe.products.create({ name: nome, metadata: { dossiery: tag } })
+  console.log(`• produto criado: ${nome}`)
+  return p
+}
+
+async function acharOuCriarPrice({ product, lookup, amount, recurring }) {
+  const achado = await stripe.prices.list({ lookup_keys: [lookup], limit: 1 })
+  if (achado.data[0]) {
+    console.log(`  price ok:     ${lookup} → ${achado.data[0].id}`)
+    return achado.data[0]
+  }
+  const p = await stripe.prices.create({
+    product,
+    currency: 'brl',
+    unit_amount: amount,
+    lookup_key: lookup,
+    ...(recurring ? { recurring: { interval: 'month' } } : {}),
+  })
+  console.log(`  price criado: ${lookup} → ${p.id}`)
+  return p
+}
+
+try {
+  const prodOperador = await acharOuCriarProduto('Dossiery — Operador', 'operador')
+  const prodBump = await acharOuCriarProduto('Dossiery — Kit 50 Aberturas', 'bump')
+
+  const mensal = await acharOuCriarPrice({
+    product: prodOperador.id, lookup: 'dossiery_mensal', amount: 9700, recurring: true,
+  })
+  const anual = await acharOuCriarPrice({
+    product: prodOperador.id, lookup: 'dossiery_anual', amount: 69700, recurring: false,
+  })
+  const bump = await acharOuCriarPrice({
+    product: prodBump.id, lookup: 'dossiery_bump', amount: 3700, recurring: false,
+  })
+
+  let whsec = null
+  if (webhookUrl) {
+    const eventos = [
+      'checkout.session.completed',
+      'checkout.session.async_payment_succeeded',
+      'customer.subscription.updated',
+      'customer.subscription.deleted',
+    ]
+    const todos = await stripe.webhookEndpoints.list({ limit: 100 })
+    const ja = todos.data.find((w) => w.url === webhookUrl)
+    if (ja) {
+      console.log(`\n• webhook já existe para essa URL (o secret só aparece na criação;`)
+      console.log(`  se precisar do whsec, apague o endpoint no painel e rode de novo)`)
+    } else {
+      const w = await stripe.webhookEndpoints.create({
+        url: webhookUrl, enabled_events: eventos, metadata: { dossiery: 'principal' },
+      })
+      whsec = w.secret
+      console.log(`\n• webhook criado: ${webhookUrl}`)
+    }
+  } else {
+    console.log('\n• (sem webhook — passe a URL como 1º argumento para criá-lo)')
+  }
+
+  // ── Portal do cliente (cancelar/atualizar cartão) ──
+  try {
+    await stripe.billingPortal.configurations.create({
+      business_profile: { headline: 'Dossiery — gerencie seu Protocolo' },
+      features: {
+        customer_update: { enabled: true, allowed_updates: ['email'] },
+        invoice_history: { enabled: true },
+        payment_method_update: { enabled: true },
+        subscription_cancel: { enabled: true, mode: 'at_period_end' },
+      },
+    })
+    console.log('• portal do cliente configurado')
+  } catch {
+    console.log('• portal do cliente: já configurado (ok)')
+  }
+
+  console.log('\n════════════ COLE NAS ENVs (Vercel + .env.local) ════════════')
+  console.log(`STRIPE_PRICE_MENSAL=${mensal.id}`)
+  console.log(`STRIPE_PRICE_ANUAL=${anual.id}`)
+  console.log(`STRIPE_PRICE_BUMP=${bump.id}`)
+  if (whsec) console.log(`STRIPE_WEBHOOK_SECRET=${whsec}`)
+  console.log('═════════════════════════════════════════════════════════════')
+  console.log('\n✅ Stripe pronto. Agora:')
+  console.log('   1. Ative o PIX: painel → Settings → Payment methods → Pix')
+  console.log('   2. Copie as envs acima para a Vercel')
+  console.log('   3. Compra-teste: cartão 4242 4242 4242 4242 (qualquer validade futura/CVC)\n')
+} catch (err) {
+  console.error('\n❌ Erro:', err?.message || err)
+  console.error('   Confira se a chave está correta e tem permissão de escrita.')
+  process.exit(1)
+}

@@ -102,7 +102,26 @@ disponível no Supabase). Idempotente.
 | `NEXT_PUBLIC_META_PIXEL_ID` | ID do Pixel (Meta Events Manager). Sem ele, nenhum script carrega. |
 | `NEXT_PUBLIC_GA4_ID` | ID do GA4 (`G-…`). Opcional. |
 
-### Stripe — passo a passo (~5 min)
+### Stripe — em 1 comando (recomendado)
+
+Cria produtos, os 3 preços e o webhook de uma vez, sem clicar no painel.
+A chave nunca sai da sua máquina:
+
+```sh
+# 1) TESTE primeiro (valide a compra antes de gastar em anúncio)
+STRIPE_SECRET_KEY=sk_test_xxx \
+  node scripts/setup-stripe.mjs https://SEU-DOMINIO/api/webhooks/stripe
+
+# 2) depois de validar, rode de novo com a chave LIVE p/ criar em produção
+STRIPE_SECRET_KEY=sk_live_xxx \
+  node scripts/setup-stripe.mjs https://SEU-DOMINIO/api/webhooks/stripe
+```
+
+O script imprime os `price_…` e o `whsec_…` prontos pra colar nas envs. Depois
+só falta **ativar o PIX** (Settings → Payment methods → Pix) — isso é clique no
+painel. Se preferir fazer tudo manual, o passo a passo abaixo cobre o mesmo.
+
+### Stripe — passo a passo manual (~5 min)
 
 1. **Produto:** Dashboard → Product catalog → *Add product* → `Dossiery — Operador`.
 2. **Preços** (BRL), no produto:
