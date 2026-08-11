@@ -115,15 +115,14 @@ export default function RaioXClient() {
         {tela === 'intro' && (
           <div className="text-center">
             <div className="font-mono-d text-[11px] tracking-[0.26em] uppercase text-primary">
-              Teste gratuito · 10 cenários · resultado na hora
+              Grátis · resultado na hora
             </div>
             <h1 className="font-serif-d text-4xl md:text-5xl leading-[1.05] mt-4">
-              Qual padrão está <span className="text-primary">matando suas conversas?</span>
+              Qual padrão tá <span className="text-primary">matando suas conversas?</span>
             </h1>
             <p className="text-muted-foreground mt-5 text-[15px] leading-relaxed max-w-md mx-auto">
-              Vácuo, bolo, “te vejo como amigo” — nada disso é azar. É <span className="text-foreground">padrão</span>.
-              10 cenários reais, sem resposta certa óbvia, e no final: seu Índice Modo Trouxa (0-100),
-              seu arquétipo dominante e as 3 correções pro SEU caso.
+              O vácuo se repete porque o padrão é seu. Responde 10 cenários e sai com seu
+              Índice Modo Trouxa, arquétipo e 3 correções.
             </p>
             <button
               onClick={iniciar}
@@ -132,7 +131,7 @@ export default function RaioXClient() {
               Começar o Raio-X →
             </button>
             <p className="mt-4 font-mono-d text-[10px] tracking-widest uppercase text-muted-foreground/60">
-              Anônimo até o resultado · sem resposta certa · sem julgamento
+              Anônimo · sem resposta certa
             </p>
           </div>
         )}
@@ -204,11 +203,10 @@ export default function RaioXClient() {
               ✓ Análise concluída
             </div>
             <h2 className="font-serif-d text-3xl md:text-4xl mt-4 leading-tight">
-              Seu dossiê está pronto.
+              Seu dossiê tá pronto.
             </h2>
             <p className="text-muted-foreground mt-4 text-[14.5px] max-w-md mx-auto">
-              Índice calculado, arquétipo identificado, correções montadas. Diz pra onde mando —
-              você vê tudo aqui na tela agora, e recebe a versão completa por e-mail.
+              Diz pra onde mando.
             </p>
             <form onSubmit={liberarResultado} className="mt-7 max-w-sm mx-auto text-left">
               <input
@@ -227,8 +225,8 @@ export default function RaioXClient() {
                   className="mt-0.5 accent-[#B81E33]"
                 />
                 <span className="text-[12px] text-muted-foreground leading-snug">
-                  Topo receber meu resultado e as táticas do Dossiery por e-mail. Zero spam,
-                  cancelo quando quiser.{' '}
+                  Topo receber o resultado e as táticas do Dossiery por e-mail. Cancelo quando
+                  quiser.{' '}
                   <Link href="/dossiery/privacidade" className="underline underline-offset-2">
                     Privacidade
                   </Link>
@@ -239,7 +237,7 @@ export default function RaioXClient() {
                 disabled={enviando}
                 className="mt-5 w-full rounded-[4px] bg-primary text-primary-foreground font-semibold text-[15px] py-3.5 hover:opacity-90 disabled:opacity-50 transition"
               >
-                {enviando ? 'Liberando…' : 'Ver meu resultado agora →'}
+                {enviando ? 'Liberando…' : 'Ver meu resultado →'}
               </button>
               {erro && (
                 <div className="mt-3 rounded-md border border-destructive/50 bg-destructive/10 px-3 py-2.5 text-[12.5px] text-destructive">
