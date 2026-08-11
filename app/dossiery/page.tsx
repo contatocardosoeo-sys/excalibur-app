@@ -2,8 +2,9 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
 import MobileCTA from './components/MobileCTA'
+import Provas from './components/Provas'
 import VagasFundador from './components/VagasFundador'
-import { VAGAS_FUNDADOR, PRECO_DEPOIS } from '@/app/lib/dossiery/fundador'
+import { DEGRAUS, PRECO_DEPOIS } from '@/app/lib/dossiery/fundador'
 
 export const metadata: Metadata = {
   title: 'Dossiery: do vácuo ao encontro marcado',
@@ -162,7 +163,7 @@ export default function DossierySalesPage() {
           <div className="grid md:grid-cols-[1fr_340px] gap-10 lg:gap-14 items-center">
             <div className="text-center md:text-left">
               <div className="flex justify-center md:justify-start">
-                <Kicker>Preço de fundador · {VAGAS_FUNDADOR} primeiras vagas</Kicker>
+                <Kicker>Faixa {DEGRAUS[0].nome} · {DEGRAUS[0].vagas} primeiras vagas</Kicker>
               </div>
               <h1 className="font-serif-d font-semibold leading-[0.98] tracking-tight text-[2.5rem] md:text-6xl mt-4 text-balance">
                 Você relê a mensagem visualizada.
@@ -232,6 +233,8 @@ export default function DossierySalesPage() {
         </div>
       </section>
 
+      <Provas />
+
       {/* ============ MECANISMO: 3 passos ============ */}
       <section className="border-b border-border">
         <div className="mx-auto max-w-5xl px-6 py-14">
@@ -287,11 +290,12 @@ export default function DossierySalesPage() {
           {/* escassez REAL */}
           <div className="mt-8 rounded-md border border-primary/50 bg-primary/[0.07] px-5 py-4 max-w-lg mx-auto">
             <p className="font-mono-d text-[11px] tracking-[0.16em] uppercase text-primary">
-              ⚠ Preço de fundador · {VAGAS_FUNDADOR} vagas
+              ⚠ O preço sobe a cada faixa que fecha
             </p>
             <p className="text-[14px] text-foreground mt-1.5 leading-relaxed">
-              Quem entra agora trava <b>R$97/mês pra sempre</b>. Depois sobe pra{' '}
-              <b>R${PRECO_DEPOIS}</b>. E enquanto você “vai pensar”,{' '}
+              Os {DEGRAUS[0].vagas} primeiros pagam <b>R${DEGRAUS[0].preco}</b> no ano. Fechou a
+              faixa, sobe pra R${DEGRAUS[1].preco}, depois R${DEGRAUS[2].preco}, e no fim só sobra
+              mensal de <b>R${PRECO_DEPOIS}</b>. E enquanto você “vai pensar”,{' '}
               <b>ela responde outro cara</b>.
             </p>
             <p className="mt-3 pt-3 border-t border-primary/20 text-[13px] text-muted-foreground">
@@ -300,7 +304,7 @@ export default function DossierySalesPage() {
           </div>
 
           <div className="mt-8">
-            <CTA sub="R$97/mês ou R$697/ano no PIX · 7 dias de garantia">Garantir minha vaga →</CTA>
+            <CTA sub={`12x de R$${DEGRAUS[0].parcela} ou R$${DEGRAUS[0].preco} no PIX · garantia em dobro`}>Garantir minha faixa →</CTA>
           </div>
         </div>
       </section>

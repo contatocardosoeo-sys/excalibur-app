@@ -127,7 +127,7 @@ function Plano7Bloqueado() {
           oferta="plano7"
           valor={19}
           cta="Começar o Dia 1 por R$19 →"
-          next="/dossiery/plano7"
+          next="/dossiery/oferta/operador"
           nota="PIX ou cartão · menos que um lanche"
         />
       </div>

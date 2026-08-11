@@ -1,7 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import type Stripe from 'stripe'
 import { createSupabaseServer } from '@/app/lib/supabase-server'
-import { getStripe, priceId, priceIdBump, stripeConfigurado } from '@/app/lib/dossiery/stripe'
+import { getSupabaseAdmin } from '@/app/lib/dossiery/supabaseAdmin'
+import {
+  getStripe,
+  priceId,
+  priceIdBump,
+  priceIdAnualDegrau,
+  priceIdComandante,
+  stripeConfigurado,
+  type Tier,
+} from '@/app/lib/dossiery/stripe'
+import { faixaAtual } from '@/app/lib/dossiery/fundador'
 
 export const runtime = 'nodejs'
 
@@ -24,21 +34,25 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  let ciclo: 'mensal' | 'anual' = 'mensal'
+  let tier: Tier = 'operador'
   let bump = false
   try {
     const body = await request.json()
-    if (body?.ciclo === 'anual') ciclo = 'anual'
+    if (body?.tier === 'recruta' || body?.tier === 'comandante') tier = body.tier
+    // compat: chamadas antigas mandavam { ciclo }
+    else if (body?.ciclo === 'mensal') tier = 'recruta'
     bump = body?.bump === true
   } catch {
-    /* corpo vazio → mensal, sem bump */
+    /* corpo vazio → operador, sem bump */
   }
 
   const origin = request.nextUrl.origin
   const bumpId = priceIdBump()
+  const ciclo = tier === 'recruta' ? 'mensal' : 'anual'
 
   try {
     const stripe = getStripe()
+    const admin = getSupabaseAdmin()
 
     // Reaproveita customer existente (se o usuário já tentou/assinou antes)
     const { data: assinatura } = await supabase
@@ -47,17 +61,35 @@ export async function POST(request: NextRequest) {
       .eq('user_id', user.id)
       .maybeSingle()
 
+    // Degrau REAL: o preço do anual sai do contador do banco, no servidor.
+    // O cliente nunca escolhe o preço, só vê o que a faixa vigente oferece.
+    let precoPrincipal: string
+    if (tier === 'recruta') {
+      precoPrincipal = priceId('mensal')
+    } else if (tier === 'comandante') {
+      precoPrincipal = priceIdComandante()
+    } else {
+      const { count } = await admin
+        .from('dossiery_assinaturas')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'ativo')
+      const f = faixaAtual(count ?? 0)
+      // Degraus esgotados: não existe mais anual, cai no mensal cheio.
+      precoPrincipal = f.esgotado ? priceId('mensal') : priceIdAnualDegrau(f.indice)
+      if (f.esgotado) tier = 'recruta'
+    }
+
     const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [
-      { price: priceId(ciclo), quantity: 1 },
+      { price: precoPrincipal, quantity: 1 },
     ]
-    if (bump && bumpId) line_items.push({ price: bumpId, quantity: 1 })
+    // Comandante já leva o Kit dentro: bump só nos outros tiers.
+    const comBump = bump && !!bumpId && tier !== 'comandante'
+    if (comBump) line_items.push({ price: bumpId as string, quantity: 1 })
 
     const clienteExistente = assinatura?.stripe_customer_id
-    // mensal = assinatura recorrente (cartão) · anual = pagamento único (PIX + cartão à vista)
+    // recruta = assinatura recorrente (cartão) · anual/comandante = pagamento único (PIX + cartão)
     const modo: Stripe.Checkout.SessionCreateParams.Mode =
-      ciclo === 'anual' ? 'payment' : 'subscription'
-
-    const comBump = bump && !!bumpId
+      tier === 'recruta' ? 'subscription' : 'payment'
     const params: Stripe.Checkout.SessionCreateParams = {
       mode: modo,
       line_items,
@@ -68,7 +100,7 @@ export async function POST(request: NextRequest) {
       ...(clienteExistente
         ? { customer: clienteExistente }
         : { customer_email: user.email ?? undefined }),
-      metadata: { user_id: user.id, ciclo, bump: comBump ? '1' : '0' },
+      metadata: { user_id: user.id, ciclo, tier, bump: comBump ? '1' : '0' },
       allow_promotion_codes: true,
       locale: 'pt-BR',
       // payment_method_types omitido de propósito: o Stripe usa os métodos

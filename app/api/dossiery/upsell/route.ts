@@ -8,6 +8,8 @@ import {
   priceIdOferta,
   colunaDaOferta,
   ofertaTemJanela,
+  ofertaEhUpgradeDePlano,
+  daquiAMeses,
   JANELA_OFERTA_MS,
   OFERTAS,
   type Oferta,
@@ -65,12 +67,13 @@ export async function POST(request: NextRequest) {
   try {
     const { data: linha } = await admin
       .from('dossiery_assinaturas')
-      .select('stripe_customer_id, kit_aberturas, protocolo_encontro, plano_7d, perfil_magnetico, recomeco, updated_at')
+      .select('stripe_customer_id, plano, kit_aberturas, protocolo_encontro, plano_7d, perfil_magnetico, recomeco, updated_at')
       .eq('user_id', user.id)
       .maybeSingle()
 
-    // Já tem? Não cobra duas vezes.
-    if (linha?.[coluna] === true) {
+    const upgradeDePlano = ofertaEhUpgradeDePlano(oferta)
+    // Já tem? Não cobra duas vezes. (No upgrade, "já tem" = já é operador.)
+    if (upgradeDePlano ? linha?.plano === 'operador' : linha?.[coluna] === true) {
       return NextResponse.json({ ok: true, ja_tinha: true })
     }
 
@@ -119,10 +122,19 @@ export async function POST(request: NextRequest) {
             metadata: { user_id: user.id, tipo: oferta },
           })
           if (pi.status === 'succeeded') {
-            const { error } = await admin.from('dossiery_assinaturas').upsert(
-              { user_id: user.id, [coluna]: true },
-              { onConflict: 'user_id' }
-            )
+            const patch = upgradeDePlano
+              ? {
+                  user_id: user.id,
+                  plano: 'operador',
+                  status: 'ativo',
+                  renova_em: daquiAMeses(12),
+                  kit_aberturas: true,
+                  protocolo_encontro: true,
+                }
+              : { user_id: user.id, [coluna]: true }
+            const { error } = await admin
+              .from('dossiery_assinaturas')
+              .upsert(patch, { onConflict: 'user_id' })
             if (error) throw new Error(`upsert entitlement: ${error.message}`)
             // CAPI server-side (dedup: mesmo event_id do pixel do client = pi.id)
             void enviarCapi({

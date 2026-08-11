@@ -105,6 +105,11 @@ disponível no Supabase). Idempotente.
 | `STRIPE_PRICE_PERFIL_APP` | price único R$67 — Perfil Magnético no app |
 | `STRIPE_PRICE_RECOMECO_OTO` | price único R$97 — Recomeço em oferta (janela 60min) |
 | `STRIPE_PRICE_RECOMECO_APP` | price único R$147 — Recomeço no app |
+| `STRIPE_PRICE_ANUAL_T1` | price único R$497 — faixa Fundador (100 primeiros) |
+| `STRIPE_PRICE_ANUAL_T2` | price único R$597 — faixa Pioneiro (200 seguintes) |
+| `STRIPE_PRICE_ANUAL_T3` | price único R$697 — faixa Vanguarda (200 seguintes) |
+| `STRIPE_PRICE_COMANDANTE` | price único R$1.297 — tier alto com arsenal completo + call |
+| `STRIPE_PRICE_OPERADOR_CREDITO` | price único R$478 — upsell pós-tripwire (R$497 menos os R$19) |
 | `META_CAPI_TOKEN` | token da Conversions API (Events Manager → Configurações). Liga o tracking server-side. |
 | `DOSSIERY_GATE` | `off` = tudo aberto (preview). **Remover no go-live.** |
 | `DOSSIERY_PAYWALL` | `off` = login exigido mas IA liberada sem assinar. Padrão: on. |

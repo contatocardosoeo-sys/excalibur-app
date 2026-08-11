@@ -103,6 +103,24 @@ try {
   const recomecoApp = await acharOuCriarPrice({
     product: prodRecomeco.id, lookup: 'dossiery_recomeco_app', amount: 14700, recurring: false,
   })
+  // Degraus REAIS de fundador (o servidor escolhe pelo contador do banco)
+  const anualT1 = await acharOuCriarPrice({
+    product: prodOperador.id, lookup: 'dossiery_anual_t1', amount: 49700, recurring: false,
+  })
+  const anualT2 = await acharOuCriarPrice({
+    product: prodOperador.id, lookup: 'dossiery_anual_t2', amount: 59700, recurring: false,
+  })
+  const anualT3 = await acharOuCriarPrice({
+    product: prodOperador.id, lookup: 'dossiery_anual_t3', amount: 69700, recurring: false,
+  })
+  // Tier alto + upsell pós-tripwire com os R$19 creditados
+  const prodComandante = await acharOuCriarProduto('Dossiery — Comandante', 'comandante')
+  const comandante = await acharOuCriarPrice({
+    product: prodComandante.id, lookup: 'dossiery_comandante', amount: 129700, recurring: false,
+  })
+  const operadorCredito = await acharOuCriarPrice({
+    product: prodOperador.id, lookup: 'dossiery_operador_credito', amount: 47800, recurring: false,
+  })
 
   let whsec = null
   if (webhookUrl) {
@@ -156,6 +174,11 @@ try {
   console.log(`STRIPE_PRICE_PERFIL_APP=${perfilApp.id}`)
   console.log(`STRIPE_PRICE_RECOMECO_OTO=${recomecoOto.id}`)
   console.log(`STRIPE_PRICE_RECOMECO_APP=${recomecoApp.id}`)
+  console.log(`STRIPE_PRICE_ANUAL_T1=${anualT1.id}`)
+  console.log(`STRIPE_PRICE_ANUAL_T2=${anualT2.id}`)
+  console.log(`STRIPE_PRICE_ANUAL_T3=${anualT3.id}`)
+  console.log(`STRIPE_PRICE_COMANDANTE=${comandante.id}`)
+  console.log(`STRIPE_PRICE_OPERADOR_CREDITO=${operadorCredito.id}`)
   if (whsec) console.log(`STRIPE_WEBHOOK_SECRET=${whsec}`)
   console.log('═════════════════════════════════════════════════════════════')
   console.log('\n✅ Stripe pronto. Agora:')

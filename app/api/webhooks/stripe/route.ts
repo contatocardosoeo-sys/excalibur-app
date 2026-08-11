@@ -7,6 +7,7 @@ import {
   daquiAMeses,
   OFERTAS,
   colunaDaOferta,
+  ofertaEhUpgradeDePlano,
   type Oferta,
 } from '@/app/lib/dossiery/stripe'
 import { getSupabaseAdmin } from '@/app/lib/dossiery/supabaseAdmin'
@@ -107,6 +108,30 @@ async function ativarPorSession(admin: SupabaseClient, session: Stripe.Checkout.
   // Libera SÓ o entitlement. Nunca toca plano/status/renova_em: se a linha não
   // existir, o insert cai nos defaults ('recruta') que NÃO passam no paywall.
   const tipo = session.metadata?.tipo
+  // Upgrade de plano (OTO pós-tripwire com crédito): vira Operador de 12 meses,
+  // com o Kit e o Encontro que o tier carrega.
+  if (tipo && ofertaEhUpgradeDePlano(tipo as Oferta)) {
+    const { error } = await admin.from('dossiery_assinaturas').upsert(
+      {
+        user_id: userId,
+        plano: 'operador',
+        status: 'ativo',
+        renova_em: daquiAMeses(12),
+        kit_aberturas: true,
+        protocolo_encontro: true,
+        ...(customerId ? { stripe_customer_id: customerId } : {}),
+      },
+      { onConflict: 'user_id' }
+    )
+    if (error) throw new Error(`upgrade operador: ${error.message}`)
+    void enviarCapi({
+      event_name: 'Purchase',
+      event_id: session.id,
+      value: (session.amount_total ?? 0) / 100,
+      email: session.customer_details?.email || session.customer_email,
+    })
+    return
+  }
   if (tipo && (OFERTAS as string[]).includes(tipo)) {
     const coluna = colunaDaOferta(tipo as Oferta)
     const { error } = await admin.from('dossiery_assinaturas').upsert(
@@ -158,6 +183,16 @@ async function ativarPorSession(admin: SupabaseClient, session: Stripe.Checkout.
       renova_em: renovaEm,
       // Order bump marcado no checkout → kit liberado junto (nunca volta a false)
       ...(session.metadata?.bump === '1' ? { kit_aberturas: true } : {}),
+      // Comandante leva o arsenal inteiro, vitalício, na hora.
+      ...(session.metadata?.tier === 'comandante'
+        ? {
+            kit_aberturas: true,
+            protocolo_encontro: true,
+            perfil_magnetico: true,
+            recomeco: true,
+            plano_7d: true,
+          }
+        : {}),
     },
     { onConflict: 'user_id' }
   )

@@ -14,7 +14,7 @@ export function getStripe(): Stripe {
   return _stripe
 }
 
-// Price IDs (criados no painel do Stripe) — plano único "Operador" no MVP.
+// Price IDs (criados pelo scripts/setup-stripe.mjs).
 // mensal: price RECORRENTE (mode subscription). anual: price ÚNICO (mode payment).
 export function priceId(ciclo: 'mensal' | 'anual'): string {
   const id =
@@ -23,6 +23,35 @@ export function priceId(ciclo: 'mensal' | 'anual'): string {
       : process.env.STRIPE_PRICE_MENSAL
   if (!id) throw new Error(`STRIPE_PRICE_${ciclo.toUpperCase()} não configurado`)
   return id
+}
+
+// ── Tiers ──────────────────────────────────────────────────────────────
+// recruta    = mensal R$97 (decoy consciente)
+// operador   = anual, preço do DEGRAU vigente (497 / 597 / 697)
+// comandante = R$1.297 único: app + arsenal inteiro + call
+export type Tier = 'recruta' | 'operador' | 'comandante'
+
+// Anual por degrau. O servidor escolhe pelo contador real; o cliente não manda preço.
+export function priceIdAnualDegrau(indice: number): string {
+  const envs = [
+    process.env.STRIPE_PRICE_ANUAL_T1,
+    process.env.STRIPE_PRICE_ANUAL_T2,
+    process.env.STRIPE_PRICE_ANUAL_T3,
+  ]
+  const id = envs[indice] || process.env.STRIPE_PRICE_ANUAL
+  if (!id) throw new Error('STRIPE_PRICE_ANUAL_T* não configurado')
+  return id
+}
+
+export function priceIdComandante(): string {
+  const id = process.env.STRIPE_PRICE_COMANDANTE
+  if (!id) throw new Error('STRIPE_PRICE_COMANDANTE não configurado')
+  return id
+}
+
+// Upsell pós-tripwire: anual com os R$19 do Plano 7 Dias creditados.
+export function priceIdOperadorCredito(): string | null {
+  return process.env.STRIPE_PRICE_OPERADOR_CREDITO || null
 }
 
 // Order bump — price ÚNICO (one-time). Opcional: sem env, o bump não aparece.
@@ -50,6 +79,7 @@ export type Oferta =
   | 'perfil_app'
   | 'recomeco_oto'
   | 'recomeco_app'
+  | 'operador_credito'
 
 export const OFERTAS: Oferta[] = [
   'kit',
@@ -61,6 +91,7 @@ export const OFERTAS: Oferta[] = [
   'perfil_app',
   'recomeco_oto',
   'recomeco_app',
+  'operador_credito',
 ]
 
 const PRICE_ENV: Record<Oferta, string | undefined> = {
@@ -73,6 +104,7 @@ const PRICE_ENV: Record<Oferta, string | undefined> = {
   perfil_app: process.env.STRIPE_PRICE_PERFIL_APP,
   recomeco_oto: process.env.STRIPE_PRICE_RECOMECO_OTO,
   recomeco_app: process.env.STRIPE_PRICE_RECOMECO_APP,
+  operador_credito: process.env.STRIPE_PRICE_OPERADOR_CREDITO,
 }
 
 export function priceIdOferta(oferta: Oferta): string | null {
@@ -86,6 +118,12 @@ export type ColunaEntitlement =
   | 'plano_7d'
   | 'perfil_magnetico'
   | 'recomeco'
+
+// operador_credito não é entitlement de arsenal: é upgrade de PLANO.
+// O webhook trata separado (vira assinatura ativa de 12 meses).
+export function ofertaEhUpgradeDePlano(oferta: Oferta): boolean {
+  return oferta === 'operador_credito'
+}
 
 export const COLUNAS_ENTITLEMENT: ColunaEntitlement[] = [
   'kit_aberturas',
