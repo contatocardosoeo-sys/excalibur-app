@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import OfertaCliente from '../../components/OfertaCliente'
+import PrazoOferta from '../../components/PrazoOferta'
+import { fimDaJanela } from '@/app/lib/dossiery/janela'
 import { TOTAL_JOGADAS } from '@/app/lib/dossiery/protocoloEncontro'
 
 export const metadata: Metadata = {
@@ -9,13 +11,19 @@ export const metadata: Metadata = {
 
 // ♠ Downsell — só aparece pra quem recusou a OTO. Janela real de 60min
 // imposta no servidor (/api/dossiery/upsell devolve 410 depois disso).
-export default function DownsellPage() {
+export const dynamic = 'force-dynamic'
+
+export default async function DownsellPage() {
+  const fim = await fimDaJanela()
   return (
     <div className="min-h-screen d-grid-bg grid place-items-center px-6 py-12">
       <main className="w-full max-w-lg">
         <div className="text-center">
           <div className="font-mono-d text-[11px] tracking-[0.26em] uppercase text-primary">
             Última chamada · janela de 60 minutos
+          </div>
+          <div className="mt-3 flex justify-center">
+            <PrazoOferta fim={fim} />
           </div>
           <h1 className="font-serif-d text-4xl md:text-5xl mt-4 leading-[1.05]">
             Ok. Metade do preço.

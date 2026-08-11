@@ -105,7 +105,7 @@ function CriarContaForm() {
         Já tem conta?{' '}
         <Link
           href={`/dossiery/entrar?next=${encodeURIComponent(next)}`}
-          className="text-[hsl(var(--brass))] hover:underline"
+          className="d-toque text-[hsl(var(--brass))] hover:underline"
         >
           Entrar
         </Link>
@@ -118,7 +118,7 @@ export default function CriarContaPage() {
   return (
     <div className="min-h-screen d-grid-bg grid place-items-center px-6">
       <div className="w-full max-w-sm">
-        <Link href="/dossiery" className="flex items-center justify-center gap-2 mb-8">
+        <Link href="/dossiery" className="flex items-center justify-center gap-2 mb-8 min-h-[44px]">
           <span className="text-primary text-xl leading-none">♠</span>
           <span className="font-serif-d text-2xl tracking-tight">Dossiery</span>
         </Link>

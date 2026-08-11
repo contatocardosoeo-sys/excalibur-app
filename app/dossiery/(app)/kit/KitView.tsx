@@ -28,7 +28,7 @@ export default function KitView() {
           <a
             key={g.grupo}
             href={`#g${i}`}
-            className="rounded-[4px] border border-border bg-card px-3 py-1.5 text-[12px] text-muted-foreground hover:border-[hsl(var(--brass))] hover:text-foreground transition"
+            className="inline-flex items-center rounded-[4px] border border-border bg-card px-3 min-h-[44px] text-[12px] text-muted-foreground hover:border-[hsl(var(--brass))] hover:text-foreground transition"
           >
             {g.grupo.split('—')[0].trim()}
           </a>
@@ -91,7 +91,7 @@ function Abertura({ n, t, p }: { n: number; t: string; p: string }) {
         </div>
         <button
           onClick={copiar}
-          className={`shrink-0 rounded-[4px] border px-2.5 py-1.5 text-[11px] font-mono-d transition ${
+          className={`shrink-0 rounded-[4px] border px-3 min-h-[44px] min-w-[44px] text-[11px] font-mono-d transition ${
             copiado
               ? 'border-[hsl(145_35%_45%)] text-[hsl(145_35%_55%)]'
               : 'border-border text-muted-foreground hover:border-[hsl(var(--brass))] hover:text-foreground'

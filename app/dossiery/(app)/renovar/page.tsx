@@ -87,7 +87,7 @@ export default async function RenovarPage() {
       <p className="mt-6 text-center text-[12.5px] text-muted-foreground">
         Não quer renovar? Sem problema e sem cobrança automática: o acesso simplesmente encerra na
         data.{' '}
-        <Link href="/dossiery/conta" className="underline underline-offset-4">
+        <Link href="/dossiery/conta" className="d-toque underline underline-offset-4">
           Ver minha conta
         </Link>
       </p>

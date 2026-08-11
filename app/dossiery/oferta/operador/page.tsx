@@ -85,7 +85,7 @@ export default function OtoOperadorPage() {
         <p className="mt-6 text-center text-[12.5px] text-muted-foreground">
           Recusar não tira nada de você: o Plano 7 Dias continua seu, vitalício. E se mudar de
           ideia depois, o Operador está em{' '}
-          <Link href="/dossiery/precos" className="underline underline-offset-4">
+          <Link href="/dossiery/precos" className="d-toque underline underline-offset-4">
             preços
           </Link>{' '}
           pela faixa vigente, sem o crédito.

@@ -211,11 +211,11 @@ export default function RaioXClient() {
     <div className="min-h-screen d-grid-bg">
       <header className="border-b border-border/70 sticky top-0 z-30 bg-background/85 backdrop-blur-md">
         <div className="mx-auto max-w-xl px-6 h-14 flex items-center justify-between">
-          <Link href="/dossiery" className="flex items-center gap-2">
+          <Link href="/dossiery" className="flex items-center gap-2 h-11 -ml-1 px-1">
             <span className="text-primary text-lg leading-none">♠</span>
             <span className="font-serif-d text-[17px] tracking-tight">Dossiery</span>
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <span className="font-mono-d text-[10px] tracking-[0.2em] uppercase text-muted-foreground hidden sm:inline">
               Raio-X · 2 min
             </span>
@@ -223,7 +223,7 @@ export default function RaioXClient() {
               onClick={() => setSom(alternarSom())}
               aria-label={som ? 'Desligar som' : 'Ligar som'}
               title={som ? 'Som ligado' : 'Som desligado'}
-              className="grid place-items-center w-8 h-8 rounded-[4px] border border-border text-muted-foreground hover:text-foreground hover:border-[hsl(var(--brass))] transition text-[13px]"
+              className="grid place-items-center w-11 h-11 -mr-2 rounded-[4px] text-muted-foreground hover:text-foreground active:scale-95 transition text-[15px]"
             >
               {som ? '♪' : '✕'}
             </button>
@@ -232,6 +232,8 @@ export default function RaioXClient() {
       </header>
 
       <main className="mx-auto max-w-xl px-6 py-10 pb-24">
+        {/* h1 constante da página: as telas internas usam h2 */}
+        {tela !== 'intro' && <h1 className="sr-only">Raio-X: qual é o seu Modo?</h1>}
         {/* ── INTRO ── */}
         {tela === 'intro' && (
           <div className="text-center d-quiz-in">
@@ -273,14 +275,14 @@ export default function RaioXClient() {
                 {idx + 1}/{PERGUNTAS.length}
               </span>
             </div>
-            <div className="flex items-center justify-between mt-2 h-4">
+            <div className="flex items-center justify-between mt-1 min-h-[44px]">
               <span className="font-mono-d text-[10px] tracking-[0.16em] uppercase text-[hsl(var(--brass))]">
                 {RITMO[idx]}
               </span>
               {idx > 0 && (
                 <button
                   onClick={voltar}
-                  className="font-mono-d text-[10px] tracking-[0.14em] uppercase text-muted-foreground/70 hover:text-foreground transition"
+                  className="d-toque -mr-1 font-mono-d text-[10px] tracking-[0.14em] uppercase text-muted-foreground/70 hover:text-foreground transition"
                 >
                   ← voltar
                 </button>
@@ -288,11 +290,11 @@ export default function RaioXClient() {
             </div>
 
             {/* a pergunta remonta a cada índice: nada de estado preso do botão anterior */}
-            <div key={idx} className="d-quiz-in">
+            <div key={idx} className="d-quiz-in d-quiz-corpo">
               <h2
                 ref={tituloRef}
                 tabIndex={-1}
-                className="font-serif-d text-2xl md:text-[28px] leading-snug mt-7 outline-none text-balance"
+                className="font-serif-d text-2xl md:text-[28px] leading-snug outline-none text-balance"
               >
                 {pergunta.q}
               </h2>
@@ -311,15 +313,19 @@ export default function RaioXClient() {
                     <span className="d-opt-letra font-mono-d text-[hsl(var(--brass))]">
                       {String.fromCharCode(65 + i)}
                     </span>
-                    {op.t}
+                    <span className="d-opt-txt">{op.t}</span>
                   </button>
                 ))}
               </div>
-            </div>
 
-            <p className="mt-6 text-center font-mono-d text-[9.5px] tracking-[0.14em] uppercase text-muted-foreground/40 hidden sm:block">
-              teclado: A a D ou 1 a 4 · backspace volta
-            </p>
+              {/* quanto falta: quiz que mostra o fim tem menos abandono */}
+              <p className="mt-7 text-center font-mono-d text-[10px] tracking-[0.08em] uppercase text-muted-foreground/45">
+                {PERGUNTAS.length - idx === 1
+                  ? 'último cenário · seu dossiê sai a seguir'
+                  : `faltam ${PERGUNTAS.length - idx - 1} cenários · cerca de ${Math.max(1, Math.round((PERGUNTAS.length - idx - 1) * 11 / 60))} min`}
+                <span className="hidden sm:inline"> · teclado A a D</span>
+              </p>
+            </div>
           </div>
         )}
 
@@ -358,7 +364,16 @@ export default function RaioXClient() {
             </h2>
 
             {/* teaser real: o resultado existe, só está lacrado */}
-            <div className="mt-6 rounded-lg border border-border bg-card p-5 text-left relative overflow-hidden">
+            <div className="mt-6 rounded-lg border border-[hsl(var(--brass)/0.4)] bg-card text-left overflow-hidden">
+              <div className="flex items-center justify-between gap-3 border-b border-[hsl(var(--brass)/0.25)] bg-[hsl(var(--brass)/0.07)] px-5 py-2.5">
+                <span className="font-mono-d text-[10px] tracking-[0.18em] uppercase text-muted-foreground">
+                  Dossiê #{r.score % 97 + 3}
+                </span>
+                <span className="font-mono-d text-[10px] tracking-[0.2em] uppercase text-[hsl(var(--brass))]">
+                  lacrado
+                </span>
+              </div>
+              <div className="px-5 py-5">
               <div className="font-mono-d text-[10px] tracking-[0.18em] uppercase text-muted-foreground">
                 Índice Modo Trouxa
               </div>
@@ -373,13 +388,12 @@ export default function RaioXClient() {
               <div className="mt-3 font-mono-d text-[10px] tracking-[0.18em] uppercase text-muted-foreground">
                 Arquétipo dominante
               </div>
-              <div className="font-serif-d text-xl select-none blur-[7px]" aria-hidden>
+              <div className="font-serif-d text-2xl select-none blur-[7px] pb-1" aria-hidden>
                 {res.nome}
               </div>
-              <div className="absolute inset-0 grid place-items-center bg-background/35">
-                <span className="font-mono-d text-[10px] tracking-[0.2em] uppercase text-[hsl(var(--brass))] border border-[hsl(var(--brass))] rounded-[3px] px-3 py-1.5 bg-background/80">
-                  lacrado
-                </span>
+              <div className="mt-4 pt-3 border-t border-border font-mono-d text-[10px] tracking-[0.14em] uppercase text-muted-foreground">
+                3 correções prontas · esperando o seu e-mail
+              </div>
               </div>
             </div>
 
@@ -407,17 +421,17 @@ export default function RaioXClient() {
                 placeholder="WhatsApp com DDD (opcional)"
                 className="mt-3 w-full rounded-[4px] border border-border bg-card px-4 py-3.5 text-[16px] text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none transition"
               />
-              <label className="flex items-start gap-2.5 mt-3.5 cursor-pointer">
+              <label className="flex items-start gap-3 mt-3 py-2.5 cursor-pointer select-none">
                 <input
                   type="checkbox"
                   checked={consent}
                   onChange={(e) => setConsent(e.target.checked)}
-                  className="mt-0.5 w-4 h-4 accent-[#B81E33]"
+                  className="mt-px w-6 h-6 shrink-0 accent-[#B81E33]"
                 />
-                <span className="text-[12px] text-muted-foreground leading-snug">
-                  Topo receber meu resultado e as táticas do Dossiery por e-mail ou WhatsApp. Zero
+                <span className="text-[12.5px] text-muted-foreground leading-snug">
+                  Quero receber meu resultado e as táticas do Dossiery por e-mail ou WhatsApp. Zero
                   spam, cancelo quando quiser.{' '}
-                  <Link href="/dossiery/privacidade" className="underline underline-offset-2">
+                  <Link href="/dossiery/privacidade" className="d-toque underline underline-offset-2">
                     Privacidade
                   </Link>
                 </span>
@@ -434,6 +448,9 @@ export default function RaioXClient() {
                   {erro}
                 </div>
               )}
+              <p className="mt-3.5 text-center text-[12.5px] text-muted-foreground/70 leading-snug">
+                Abre nesta tela, na hora. Sem espera e sem confirmação de e-mail.
+              </p>
             </form>
           </div>
         )}

@@ -173,7 +173,9 @@
 /* Opção do quiz. Hover só onde existe mouse de verdade: no touch o :hover
    fica grudado depois do toque e a próxima pergunta abre com a opção acesa. */
 .d-opt {
-  display: block;
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
   width: 100%;
   text-align: left;
   border: 1px solid hsl(var(--border));
@@ -181,13 +183,15 @@
   color: hsl(var(--foreground));
   border-radius: 6px;
   padding: 14px 16px;
-  min-height: 52px;
+  min-height: 56px;
   font-size: 14.5px;
   line-height: 1.4;
   cursor: pointer;
   transition: border-color .15s ease, background .15s ease, transform .1s ease;
   -webkit-tap-highlight-color: transparent;
 }
+/* Texto em coluna própria: linha quebrada não volta pra baixo da letra. */
+.d-opt-txt { flex: 1; min-width: 0; padding-top: 1px; }
 @media (hover: hover) and (pointer: fine) {
   .d-opt:hover { border-color: hsl(var(--primary)); background: hsl(var(--primary) / .06); }
 }
@@ -205,14 +209,21 @@
   border-color: hsl(var(--primary));
 }
 .d-opt-letra {
-  display: inline-grid;
+  display: grid;
   place-items: center;
-  width: 22px; height: 22px;
+  flex: 0 0 auto;
+  width: 24px; height: 24px;
   border: 1px solid hsl(var(--border));
   border-radius: 4px;
-  margin-right: 11px;
   font-size: 11px;
   transition: background .15s ease, color .15s ease, border-color .15s ease;
+}
+
+/* Corpo da pergunta ocupa a altura útil: as opções caem na zona do polegar
+   em vez de deixar meia tela morta embaixo. */
+.d-quiz-corpo { display: flex; flex-direction: column; justify-content: center; }
+@media (min-height: 660px) {
+  .d-quiz-corpo { min-height: calc(100dvh - 17rem); }
 }
 
 /* Entrada da pergunta: dá a sensação de "virou a página" */
@@ -237,4 +248,29 @@
 @media (prefers-reduced-motion: reduce) {
   .d-quiz-in, .d-pop { animation: none; }
   .d-opt, .d-seg > i, .d-opt-letra { transition: none; }
+}
+
+/* ═══════ Alvos de toque e legibilidade no celular ═══════ */
+/* Auditoria com Playwright a 390px: links de rodapé e de recusa ficavam com
+   13 a 17px de altura, abaixo do mínimo de 44px. O texto continua discreto;
+   só a área de toque cresce. */
+.d-toque {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: 4px;
+}
+.d-toque-sm { display: inline-flex; align-items: center; min-height: 40px; }
+
+/* Kickers mono de 9 a 10px em caixa alta cansam a vista em qualquer tela.
+   Piso de 11.5px no desktop, 11px no celular (onde a densidade já é maior). */
+.dossiery .font-mono-d { font-size: max(11.5px, 1em); }
+
+@media (max-width: 767px) {
+  .dossiery .font-mono-d { font-size: max(11px, 1em); }
+  /* Rodapés e microcopy respiram mais no toque */
+  .dossiery footer a, .dossiery .d-rodape a {
+    display: inline-block;
+    padding-block: 10px;
+  }
 }

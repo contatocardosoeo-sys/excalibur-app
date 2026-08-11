@@ -21,6 +21,10 @@ export default function PrecosPage() {
   const parcela = faixa?.parcela ?? DEGRAUS[0].parcela
   const esgotado = faixa?.esgotado === true
 
+  // Totais explícitos: o que a pessoa lê no card tem que bater com o botão.
+  const totalOperador = precoAnual + (bump ? BUMP_PRECO : 0)
+  const parcelaOperador = Math.round((totalOperador * parcela) / precoAnual)
+
   async function comprar(t: Tier) {
     if (loading) return
     setErro(null)
@@ -52,11 +56,14 @@ export default function PrecosPage() {
     <div className="min-h-screen d-grid-bg">
       <header className="border-b border-border/70 bg-background/80 backdrop-blur-md">
         <div className="mx-auto max-w-5xl px-6 h-14 flex items-center justify-between">
-          <Link href="/dossiery" className="flex items-center gap-2">
+          <Link href="/dossiery" className="flex items-center gap-2 h-11 -ml-1 px-1">
             <span className="text-primary text-lg leading-none">♠</span>
             <span className="font-serif-d text-[17px] tracking-tight">Dossiery</span>
           </Link>
-          <Link href="/dossiery/entrar" className="text-[13px] text-muted-foreground hover:text-primary transition">
+          <Link
+            href="/dossiery/entrar"
+            className="d-toque -mr-1 text-[13px] text-muted-foreground hover:text-primary transition"
+          >
             Já tenho conta
           </Link>
         </div>
@@ -95,7 +102,7 @@ export default function PrecosPage() {
             </span>
             <div>
               <div className="font-mono-d text-[10px] tracking-[0.14em] uppercase text-[hsl(var(--brass))]">
-                Adicione ao Protocolo · +R${BUMP_PRECO}
+                Some ao plano que você escolher abaixo · +R${BUMP_PRECO}
               </div>
               <div className="font-serif-d text-[15px] mt-1 text-foreground">
                 Kit “50 Aberturas Que Não Morrem”
@@ -103,6 +110,9 @@ export default function PrecosPage() {
               <p className="text-[12.5px] text-muted-foreground mt-0.5 leading-snug">
                 As 50 primeiras mensagens que puxam resposta, por situação. Cole, adapte, mande.
                 Acesso vitalício. Já vem incluso no Comandante.
+              </p>
+              <p className="text-[12px] mt-1.5 text-muted-foreground/70">
+                {bump ? 'Marcado. Toque pra tirar.' : 'Fora do pedido. Toque pra incluir.'}
               </p>
             </div>
           </div>
@@ -131,10 +141,15 @@ export default function PrecosPage() {
             <button
               onClick={() => comprar('recruta')}
               disabled={!!loading}
-              className="mt-6 w-full rounded-[4px] border border-border text-[14px] py-3 hover:border-primary hover:text-primary disabled:opacity-50 transition"
+              className="mt-6 w-full rounded-[4px] border border-border text-[14px] py-3 hover:border-primary hover:text-primary active:scale-[0.99] disabled:opacity-50 transition"
             >
-              {loading === 'recruta' ? 'Abrindo…' : `Assinar mensal${bump ? ` + Kit · R$${97 + BUMP_PRECO}` : ' · R$97'}`}
+              {loading === 'recruta' ? 'Abrindo…' : 'Assinar mensal →'}
             </button>
+            <p className="mt-2.5 text-center font-mono-d text-[10px] tracking-widest uppercase text-muted-foreground/60">
+              {bump
+                ? `Hoje R$${97 + BUMP_PRECO} · depois R$97/mês`
+                : 'Hoje R$97 · depois R$97/mês'}
+            </p>
           </div>
 
           {/* OPERADOR (o alvo) */}
@@ -174,17 +189,36 @@ export default function PrecosPage() {
               ))}
             </ul>
             <p className="mt-4 text-[12px] text-muted-foreground">
-              Valor separado: R$1.348. Você paga R${precoAnual}.
+              Comprado separado dá R$1.348.
             </p>
+
+            {/* resumo do pedido: nenhum número novo aparece no checkout */}
+            <div className="mt-3 rounded-[4px] border border-border bg-secondary/40 px-3.5 py-3 space-y-1.5">
+              <div className="flex justify-between gap-3 text-[12.5px]">
+                <span className="text-muted-foreground">Protocolo Operador · 12 meses</span>
+                <span className="text-foreground tabular-nums">R${precoAnual}</span>
+              </div>
+              {bump && (
+                <div className="flex justify-between gap-3 text-[12.5px]">
+                  <span className="text-muted-foreground">Kit 50 Aberturas</span>
+                  <span className="text-foreground tabular-nums">R${BUMP_PRECO}</span>
+                </div>
+              )}
+              <div className="flex justify-between gap-3 pt-1.5 border-t border-border text-[13px] font-semibold">
+                <span className="text-foreground">Total hoje</span>
+                <span className="text-primary tabular-nums">R${totalOperador}</span>
+              </div>
+            </div>
+
             <button
               onClick={() => comprar('operador')}
               disabled={!!loading}
-              className="mt-5 w-full rounded-[4px] bg-primary text-primary-foreground font-semibold text-[15px] py-3.5 hover:opacity-90 disabled:opacity-50 transition"
+              className="mt-4 w-full rounded-[4px] bg-primary text-primary-foreground font-semibold text-[15px] py-3.5 hover:opacity-90 active:scale-[0.99] disabled:opacity-50 transition"
             >
-              {loading === 'operador' ? 'Abrindo checkout…' : `Garantir minha faixa · R$${precoAnual + (bump ? BUMP_PRECO : 0)} →`}
+              {loading === 'operador' ? 'Abrindo checkout…' : `Garantir minha faixa · R$${totalOperador} →`}
             </button>
             <p className="mt-2.5 text-center font-mono-d text-[10px] tracking-widest uppercase text-muted-foreground/70">
-              PIX ou 12x no cartão
+              PIX à vista ou 12x R${parcelaOperador} no cartão
             </p>
           </div>
 
@@ -214,10 +248,13 @@ export default function PrecosPage() {
             <button
               onClick={() => comprar('comandante')}
               disabled={!!loading}
-              className="mt-6 w-full rounded-[4px] border border-[hsl(var(--brass))] text-[hsl(var(--brass))] font-semibold text-[14px] py-3 hover:bg-[hsl(var(--brass)/0.1)] disabled:opacity-50 transition"
+              className="mt-6 w-full rounded-[4px] border border-[hsl(var(--brass))] text-[hsl(var(--brass))] font-semibold text-[14px] py-3 hover:bg-[hsl(var(--brass)/0.1)] active:scale-[0.99] disabled:opacity-50 transition"
             >
               {loading === 'comandante' ? 'Abrindo…' : 'Subir pra Comandante →'}
             </button>
+            <p className="mt-2.5 text-center font-mono-d text-[10px] tracking-widest uppercase text-muted-foreground/60">
+              Kit já incluso · pagamento único
+            </p>
           </div>
         </div>
 
@@ -245,12 +282,12 @@ export default function PrecosPage() {
           </p>
         </div>
 
-        <p className="mt-8 text-center font-mono-d text-[10px] tracking-widest uppercase text-muted-foreground/60">
-          <Link href="/dossiery/termos" className="hover:text-[hsl(var(--brass))]">Termos</Link>
-          {' · '}
-          <Link href="/dossiery/privacidade" className="hover:text-[hsl(var(--brass))]">Privacidade</Link>
-          {' · '}
-          <Link href="/dossiery/garantia" className="hover:text-[hsl(var(--brass))]">Garantia</Link>
+        <p className="d-rodape mt-8 flex flex-wrap items-center justify-center gap-x-1 text-center font-mono-d text-[10px] tracking-widest uppercase text-muted-foreground/60">
+          <Link href="/dossiery/termos" className="d-toque hover:text-[hsl(var(--brass))]">Termos</Link>
+          <span aria-hidden>·</span>
+          <Link href="/dossiery/privacidade" className="d-toque hover:text-[hsl(var(--brass))]">Privacidade</Link>
+          <span aria-hidden>·</span>
+          <Link href="/dossiery/garantia" className="d-toque hover:text-[hsl(var(--brass))]">Garantia</Link>
         </p>
       </main>
     </div>

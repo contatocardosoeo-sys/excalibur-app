@@ -13,11 +13,11 @@ export default function GarantiaPage() {
     <div className="min-h-screen d-grid-bg">
       <header className="border-b border-border/70">
         <div className="mx-auto max-w-2xl px-6 h-14 flex items-center justify-between">
-          <Link href="/dossiery" className="flex items-center gap-2">
+          <Link href="/dossiery" className="flex items-center gap-2 h-11 -ml-1 px-1">
             <span className="text-primary text-lg leading-none">♠</span>
             <span className="font-serif-d text-[17px] tracking-tight">Dossiery</span>
           </Link>
-          <Link href="/dossiery/precos" className="text-[13px] text-muted-foreground hover:text-primary transition">
+          <Link href="/dossiery/precos" className="d-toque -mr-1 text-[13px] text-muted-foreground hover:text-primary transition">
             Preços
           </Link>
         </div>

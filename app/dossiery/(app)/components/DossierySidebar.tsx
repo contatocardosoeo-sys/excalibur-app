@@ -22,7 +22,7 @@ export default function DossierySidebar() {
   return (
     <aside className="w-60 shrink-0 flex flex-col bg-sidebar border-r border-sidebar-border">
       <div className="px-5 py-5 border-b border-sidebar-border">
-        <Link href="/dossiery" className="flex items-center gap-2.5 group">
+        <Link href="/dossiery" className="flex items-center gap-2.5 min-h-[44px] group">
           <span className="grid place-items-center w-8 h-8 rounded-[3px] border border-[hsl(var(--brass))] text-[hsl(var(--brass))] font-serif-d text-lg leading-none group-hover:bg-primary/10 transition">
             D
           </span>
@@ -44,7 +44,7 @@ export default function DossierySidebar() {
             <Link
               key={href}
               href={href}
-              className={`group flex items-center gap-3 rounded-[4px] px-3 py-2 text-[13px] transition ${
+              className={`group flex items-center gap-3 rounded-[4px] px-3 min-h-[44px] text-[13px] transition ${
                 active
                   ? 'bg-primary text-primary-foreground font-semibold'
                   : 'text-muted-foreground hover:bg-sidebar-accent hover:text-foreground'
@@ -78,7 +78,7 @@ export default function DossierySidebar() {
           </div>
           <Link
             href="/dossiery"
-            className="text-muted-foreground hover:text-primary text-sm transition"
+            className="grid place-items-center w-11 h-11 -mr-2 rounded-[4px] text-muted-foreground hover:text-primary hover:bg-sidebar-accent text-sm transition"
             title="Sair"
           >
             ↪

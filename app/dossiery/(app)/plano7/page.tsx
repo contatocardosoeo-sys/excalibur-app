@@ -46,7 +46,7 @@ function Plano7Conteudo() {
           <a
             key={d.dia}
             href={`#d${d.dia}`}
-            className="rounded-[4px] border border-border bg-card px-3 py-1.5 text-[12px] text-muted-foreground hover:border-[hsl(var(--brass))] hover:text-foreground transition"
+            className="inline-flex items-center rounded-[4px] border border-border bg-card px-3 min-h-[44px] text-[12px] text-muted-foreground hover:border-[hsl(var(--brass))] hover:text-foreground transition"
           >
             D{d.dia} · {d.titulo}
           </a>

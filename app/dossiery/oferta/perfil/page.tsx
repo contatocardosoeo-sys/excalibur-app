@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import OfertaCliente from '../../components/OfertaCliente'
+import PrazoOferta from '../../components/PrazoOferta'
+import { fimDaJanela } from '@/app/lib/dossiery/janela'
 import { PERFIL_MAGNETICO, TOTAL_ITENS_PERFIL } from '@/app/lib/dossiery/perfilMagnetico'
 
 export const metadata: Metadata = {
@@ -9,13 +11,19 @@ export const metadata: Metadata = {
 
 // ♠ OTO 2 — última oferta do funil pós-compra (depois do Encontro/downsell).
 // Janela real de 60min no servidor (preço sobe pra R$67 dentro do app).
-export default function Oto2PerfilPage() {
+export const dynamic = 'force-dynamic'
+
+export default async function Oto2PerfilPage() {
+  const fim = await fimDaJanela()
   return (
     <div className="min-h-screen d-grid-bg">
       <main className="mx-auto max-w-xl px-6 py-12">
         <div className="text-center">
           <div className="font-mono-d text-[11px] tracking-[0.26em] uppercase text-primary">
             Última tela antes do seu acesso
+          </div>
+          <div className="mt-3 flex justify-center">
+            <PrazoOferta fim={fim} />
           </div>
           <h1 className="font-serif-d text-4xl md:text-[42px] leading-[1.05] mt-4">
             Antes da primeira mensagem,

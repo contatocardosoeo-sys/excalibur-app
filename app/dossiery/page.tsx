@@ -149,7 +149,7 @@ export default function DossierySalesPage() {
           </div>
           <Link
             href="/dossiery/precos"
-            className="text-[13px] font-semibold rounded-[4px] bg-primary text-primary-foreground px-4 py-1.5 hover:opacity-90 transition"
+            className="text-[13px] font-semibold rounded-[4px] bg-primary text-primary-foreground px-4 py-2.5 min-h-[44px] inline-flex items-center hover:opacity-90 transition"
           >
             Quero entrar
           </Link>
@@ -365,16 +365,18 @@ export default function DossierySalesPage() {
       <MobileCTA />
 
       <footer className="mx-auto max-w-5xl px-6 pt-10 pb-28 md:pb-10">
-        <p className="font-mono-d text-[10px] tracking-[0.12em] uppercase text-muted-foreground text-center leading-loose">
-          ♠ &nbsp;Dossiery · Treina o homem. Respeita a autonomia.<br />
-          <Link href="/dossiery/precos" className="hover:text-primary transition">Preços</Link>
-          {' · '}
-          <Link href="/dossiery/entrar" className="hover:text-primary transition">Entrar</Link>
-          {' · '}
-          <Link href="/dossiery/termos" className="hover:text-primary transition">Termos</Link>
-          {' · '}
-          <Link href="/dossiery/privacidade" className="hover:text-primary transition">Privacidade</Link>
+        <p className="font-mono-d text-[10px] tracking-[0.12em] uppercase text-muted-foreground text-center">
+          ♠ &nbsp;Dossiery · Treina o homem. Respeita a autonomia.
         </p>
+        <nav className="d-rodape mt-1 flex flex-wrap items-center justify-center gap-x-1 font-mono-d text-[10px] tracking-[0.12em] uppercase text-muted-foreground">
+          <Link href="/dossiery/precos" className="d-toque hover:text-primary transition">Preços</Link>
+          <span aria-hidden>·</span>
+          <Link href="/dossiery/entrar" className="d-toque hover:text-primary transition">Entrar</Link>
+          <span aria-hidden>·</span>
+          <Link href="/dossiery/termos" className="d-toque hover:text-primary transition">Termos</Link>
+          <span aria-hidden>·</span>
+          <Link href="/dossiery/privacidade" className="d-toque hover:text-primary transition">Privacidade</Link>
+        </nav>
       </footer>
     </div>
   )

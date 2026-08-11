@@ -92,7 +92,7 @@ export default function OfertaCliente({
         <div className="mt-5 text-center">
           <Link
             href={declineHref}
-            className="text-[12.5px] text-muted-foreground/70 underline underline-offset-4 hover:text-muted-foreground transition"
+            className="d-toque text-[12.5px] text-muted-foreground/70 underline underline-offset-4 hover:text-muted-foreground transition"
           >
             {declineLabel || 'Não, obrigado'}
           </Link>

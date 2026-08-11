@@ -2,6 +2,8 @@ import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import CompraTrack from '../../bem-vindo/CompraTrack'
 import OfertaCliente from '../../components/OfertaCliente'
+import PrazoOferta from '../../components/PrazoOferta'
+import { fimDaJanela } from '@/app/lib/dossiery/janela'
 import { PROTOCOLO_ENCONTRO, TOTAL_JOGADAS } from '@/app/lib/dossiery/protocoloEncontro'
 
 export const metadata: Metadata = {
@@ -11,7 +13,10 @@ export const metadata: Metadata = {
 
 // ♠ OTO — upsell pós-compra. O cliente acabou de pagar; o Purchase do plano
 // dispara aqui (CompraTrack). Aceitou → bem-vindo. Recusou → downsell.
-export default function OtoEncontroPage() {
+export const dynamic = 'force-dynamic'
+
+export default async function OtoEncontroPage() {
+  const fim = await fimDaJanela()
   return (
     <div className="min-h-screen d-grid-bg">
       <Suspense fallback={null}>
@@ -30,6 +35,9 @@ export default function OtoEncontroPage() {
           <div className="font-mono-d text-[11px] tracking-[0.26em] uppercase text-primary">
             Não fecha essa tela: só aparece uma vez
           </div>
+          <div className="mt-3 flex justify-center">
+            <PrazoOferta fim={fim} />
+          </div>
           <h1 className="font-serif-d text-4xl md:text-[44px] leading-[1.05] mt-4">
             Você resolveu o chat.
             <br />
@@ -40,6 +48,16 @@ export default function OtoEncontroPage() {
             entrevista, mão gelada no beijo. O{' '}
             <span className="text-foreground">“chegou bem?”</span> de manhã enterra a noite.
           </p>
+          {/* decisão perto da dor: quem já entendeu não precisa rolar a lista */}
+          <div className="mt-7">
+            <OfertaCliente
+              oferta="encontro_oto"
+              valor={97}
+              cta="SIM, adicionar o Protocolo por R$97 →"
+              next="/dossiery/oferta/perfil"
+              nota="No app custa R$147 · cartão salvo: 1 clique"
+            />
+          </div>
         </div>
 
         {/* o produto */}
