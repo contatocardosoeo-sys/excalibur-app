@@ -1,62 +1,166 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
-import {
-  PERGUNTAS,
-  RESULTADOS,
-  calcularResultado,
-  type Arq,
-} from '@/app/lib/dossiery/raioX'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { PERGUNTAS, RESULTADOS, calcularResultado, type Arq } from '@/app/lib/dossiery/raioX'
+import { alternarSom, carregarPreferencia, somLigado, tocar, vibrar } from '@/app/lib/dossiery/quizFx'
 
 type Tela = 'intro' | 'quiz' | 'processando' | 'email' | 'resultado'
 
 const PASSOS_ANALISE = [
   'Lendo suas respostas…',
-  'Cruzando com 4.000+ conversas reais…',
-  'Identificando seu Modo dominante…',
+  'Cruzando com os padrões do cânone…',
+  'Isolando seu Modo dominante…',
   'Montando o dossiê…',
 ]
+
+// Micro-feedback por pergunta: o cara sente que está avançando.
+const RITMO = ['', 'boa', 'seguindo', 'no ritmo', 'metade', 'passou da metade', 'firme', 'quase lá', 'reta final', 'última']
+
+const CHAVE_PROGRESSO = 'dossiery_raiox'
 
 export default function RaioXClient() {
   const [tela, setTela] = useState<Tela>('intro')
   const [idx, setIdx] = useState(0)
   const [respostas, setRespostas] = useState<number[]>([])
+  const [escolhida, setEscolhida] = useState<number | null>(null)
   const [passoAnalise, setPassoAnalise] = useState(0)
   const [email, setEmail] = useState('')
   const [zap, setZap] = useState('')
   const [consent, setConsent] = useState(false)
   const [enviando, setEnviando] = useState(false)
   const [erro, setErro] = useState<string | null>(null)
+  const [som, setSom] = useState(true)
+  const [placar, setPlacar] = useState(0)
   const resultado = useRef<{ arq: Arq | 'O'; score: number } | null>(null)
+  const tituloRef = useRef<HTMLHeadingElement>(null)
 
-  // animação da tela de análise → gate de e-mail
+  // Preferência de som + progresso salvo (refresh não perde o teste)
+  useEffect(() => {
+    carregarPreferencia()
+    setSom(somLigado())
+    try {
+      const cru = localStorage.getItem(CHAVE_PROGRESSO)
+      if (cru) {
+        const p = JSON.parse(cru)
+        if (Array.isArray(p?.respostas) && p.respostas.length > 0 && p.respostas.length < PERGUNTAS.length) {
+          setRespostas(p.respostas)
+          setIdx(p.respostas.length)
+          setTela('quiz')
+        }
+      }
+    } catch {
+      /* sem progresso salvo */
+    }
+  }, [])
+
+  // Foco no enunciado a cada pergunta: leitor de tela acompanha e o teclado
+  // volta pro lugar certo (nada de foco preso no botão anterior).
+  useEffect(() => {
+    if (tela === 'quiz') tituloRef.current?.focus()
+  }, [tela, idx])
+
   useEffect(() => {
     if (tela !== 'processando') return
     if (passoAnalise >= PASSOS_ANALISE.length) {
-      const t = setTimeout(() => setTela('email'), 350)
+      const t = setTimeout(() => {
+        tocar('lock')
+        setTela('email')
+      }, 320)
       return () => clearTimeout(t)
     }
-    const t = setTimeout(() => setPassoAnalise((p) => p + 1), 650)
+    const t = setTimeout(() => {
+      tocar('lock')
+      setPassoAnalise((p) => p + 1)
+    }, 620)
     return () => clearTimeout(t)
   }, [tela, passoAnalise])
 
+  // Contagem animada do índice na revelação
+  useEffect(() => {
+    if (tela !== 'resultado' || !resultado.current) return
+    const alvo = resultado.current.score
+    let atual = 0
+    const passo = Math.max(1, Math.round(alvo / 28))
+    const t = setInterval(() => {
+      atual = Math.min(alvo, atual + passo)
+      setPlacar(atual)
+      if (atual >= alvo) clearInterval(t)
+    }, 26)
+    return () => clearInterval(t)
+  }, [tela])
+
+  const responder = useCallback(
+    (opIdx: number) => {
+      if (escolhida !== null) return // evita duplo toque
+      setEscolhida(opIdx)
+      tocar('select')
+      vibrar(12)
+
+      // Confirma visualmente e só então vira a página
+      setTimeout(() => {
+        const novas = [...respostas, opIdx]
+        setRespostas(novas)
+        setEscolhida(null)
+        try {
+          localStorage.setItem(CHAVE_PROGRESSO, JSON.stringify({ respostas: novas }))
+        } catch {
+          /* modo privado */
+        }
+        if (idx + 1 < PERGUNTAS.length) {
+          tocar('next')
+          setIdx(idx + 1)
+        } else {
+          resultado.current = calcularResultado(novas)
+          setPassoAnalise(0)
+          setTela('processando')
+          try {
+            localStorage.removeItem(CHAVE_PROGRESSO)
+          } catch {
+            /* ok */
+          }
+        }
+      }, 190)
+    },
+    [escolhida, idx, respostas]
+  )
+
+  function voltar() {
+    if (idx === 0 || escolhida !== null) return
+    tocar('select')
+    setRespostas((r) => r.slice(0, -1))
+    setIdx((i) => i - 1)
+  }
+
+  // Teclado: 1-4 ou A-D respondem, Backspace volta. Desktop fica rápido.
+  useEffect(() => {
+    if (tela !== 'quiz') return
+    function onKey(e: KeyboardEvent) {
+      const n = PERGUNTAS[idx].opcoes.length
+      const k = e.key.toLowerCase()
+      const porNumero = parseInt(k, 10)
+      const porLetra = 'abcd'.indexOf(k)
+      if (porNumero >= 1 && porNumero <= n) {
+        e.preventDefault()
+        responder(porNumero - 1)
+      } else if (porLetra >= 0 && porLetra < n) {
+        e.preventDefault()
+        responder(porLetra)
+      } else if (e.key === 'Backspace') {
+        e.preventDefault()
+        voltar()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  })
+
   function iniciar() {
+    tocar('next')
+    vibrar(14)
     window.fbq?.('trackCustom', 'QuizStart')
     window.gtag?.('event', 'quiz_start')
     setTela('quiz')
-  }
-
-  function responder(opIdx: number) {
-    const novas = [...respostas, opIdx]
-    setRespostas(novas)
-    if (idx + 1 < PERGUNTAS.length) {
-      setIdx(idx + 1)
-    } else {
-      resultado.current = calcularResultado(novas)
-      setPassoAnalise(0)
-      setTela('processando')
-    }
   }
 
   async function liberarResultado(e: React.FormEvent) {
@@ -64,6 +168,7 @@ export default function RaioXClient() {
     if (enviando) return
     setErro(null)
     if (!consent) {
+      tocar('erro')
       setErro('Marca a caixinha pra eu liberar o resultado.')
       return
     }
@@ -87,8 +192,11 @@ export default function RaioXClient() {
       if (!res.ok) throw new Error(data?.error || `Erro ${res.status}`)
       window.fbq?.('track', 'Lead', undefined, data?.eventId ? { eventID: data.eventId } : undefined)
       window.gtag?.('event', 'generate_lead')
+      tocar('reveal')
+      vibrar([18, 60, 26])
       setTela('resultado')
     } catch (err) {
+      tocar('erro')
       setErro(err instanceof Error ? err.message : 'Falha inesperada')
     } finally {
       setEnviando(false)
@@ -97,43 +205,54 @@ export default function RaioXClient() {
 
   const r = resultado.current
   const res = r ? RESULTADOS[r.arq] : null
+  const pergunta = PERGUNTAS[idx]
 
   return (
     <div className="min-h-screen d-grid-bg">
-      <header className="border-b border-border/70">
+      <header className="border-b border-border/70 sticky top-0 z-30 bg-background/85 backdrop-blur-md">
         <div className="mx-auto max-w-xl px-6 h-14 flex items-center justify-between">
           <Link href="/dossiery" className="flex items-center gap-2">
             <span className="text-primary text-lg leading-none">♠</span>
             <span className="font-serif-d text-[17px] tracking-tight">Dossiery</span>
           </Link>
-          <span className="font-mono-d text-[10px] tracking-[0.2em] uppercase text-muted-foreground">
-            Raio-X · 2 min
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="font-mono-d text-[10px] tracking-[0.2em] uppercase text-muted-foreground hidden sm:inline">
+              Raio-X · 2 min
+            </span>
+            <button
+              onClick={() => setSom(alternarSom())}
+              aria-label={som ? 'Desligar som' : 'Ligar som'}
+              title={som ? 'Som ligado' : 'Som desligado'}
+              className="grid place-items-center w-8 h-8 rounded-[4px] border border-border text-muted-foreground hover:text-foreground hover:border-[hsl(var(--brass))] transition text-[13px]"
+            >
+              {som ? '♪' : '✕'}
+            </button>
+          </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-xl px-6 py-10">
+      <main className="mx-auto max-w-xl px-6 py-10 pb-24">
         {/* ── INTRO ── */}
         {tela === 'intro' && (
-          <div className="text-center">
+          <div className="text-center d-quiz-in">
             <div className="font-mono-d text-[11px] tracking-[0.26em] uppercase text-primary">
-              Grátis · resultado na hora
+              Grátis · 10 cenários · resultado na hora
             </div>
-            <h1 className="font-serif-d text-4xl md:text-5xl leading-[1.05] mt-4">
+            <h1 className="font-serif-d text-4xl md:text-5xl leading-[1.05] mt-4 text-balance">
               Qual padrão tá <span className="text-primary">matando suas conversas?</span>
             </h1>
             <p className="text-muted-foreground mt-5 text-[15px] leading-relaxed max-w-md mx-auto">
-              O vácuo se repete porque o padrão é seu. Responde 10 cenários e sai com seu
-              Índice Modo Trouxa, arquétipo e 3 correções.
+              O vácuo se repete porque o padrão é seu. Responde 10 cenários e sai com seu Índice
+              Modo Trouxa, o arquétipo dominante e 3 correções.
             </p>
             <button
               onClick={iniciar}
-              className="mt-8 w-full sm:w-auto rounded-[4px] bg-primary text-primary-foreground font-semibold text-[16px] px-10 py-4 hover:opacity-90 transition"
+              className="mt-8 w-full sm:w-auto rounded-[4px] bg-primary text-primary-foreground font-semibold text-[16px] px-10 py-4 hover:opacity-90 active:scale-[0.99] transition"
             >
               Começar o Raio-X →
             </button>
             <p className="mt-4 font-mono-d text-[10px] tracking-widest uppercase text-muted-foreground/60">
-              Anônimo · sem resposta certa
+              Anônimo · sem resposta certa · 2 minutos
             </p>
           </div>
         )}
@@ -141,43 +260,73 @@ export default function RaioXClient() {
         {/* ── QUIZ ── */}
         {tela === 'quiz' && (
           <div>
+            {/* progresso em fichas */}
             <div className="flex items-center gap-3">
-              <div className="flex-1 h-1.5 rounded-full bg-secondary overflow-hidden">
-                <div
-                  className="h-full bg-primary transition-all duration-300"
-                  style={{ width: `${(idx / PERGUNTAS.length) * 100}%` }}
-                />
+              <div className="flex-1 flex gap-1" role="progressbar" aria-valuenow={idx + 1} aria-valuemin={1} aria-valuemax={PERGUNTAS.length} aria-label="Progresso do Raio-X">
+                {PERGUNTAS.map((_, i) => (
+                  <span key={i} className="d-seg" data-on={i < idx ? '1' : '0'} data-now={i === idx ? '1' : '0'}>
+                    <i />
+                  </span>
+                ))}
               </div>
-              <span className="font-mono-d text-[11px] text-muted-foreground tabular-nums">
+              <span className="font-mono-d text-[11px] text-muted-foreground tabular-nums shrink-0">
                 {idx + 1}/{PERGUNTAS.length}
               </span>
             </div>
-
-            <h2 className="font-serif-d text-2xl md:text-[28px] leading-snug mt-8">
-              {PERGUNTAS[idx].q}
-            </h2>
-
-            <div className="mt-6 space-y-3">
-              {PERGUNTAS[idx].opcoes.map((op, i) => (
+            <div className="flex items-center justify-between mt-2 h-4">
+              <span className="font-mono-d text-[10px] tracking-[0.16em] uppercase text-[hsl(var(--brass))]">
+                {RITMO[idx]}
+              </span>
+              {idx > 0 && (
                 <button
-                  key={op.t}
-                  onClick={() => responder(i)}
-                  className="w-full text-left rounded-md border border-border bg-card px-4 py-3.5 text-[14.5px] leading-snug text-foreground hover:border-primary hover:bg-primary/[0.05] active:scale-[0.99] transition"
+                  onClick={voltar}
+                  className="font-mono-d text-[10px] tracking-[0.14em] uppercase text-muted-foreground/70 hover:text-foreground transition"
                 >
-                  <span className="font-mono-d text-[11px] text-[hsl(var(--brass))] mr-2.5">
-                    {String.fromCharCode(65 + i)}
-                  </span>
-                  {op.t}
+                  ← voltar
                 </button>
-              ))}
+              )}
             </div>
+
+            {/* a pergunta remonta a cada índice: nada de estado preso do botão anterior */}
+            <div key={idx} className="d-quiz-in">
+              <h2
+                ref={tituloRef}
+                tabIndex={-1}
+                className="font-serif-d text-2xl md:text-[28px] leading-snug mt-7 outline-none text-balance"
+              >
+                {pergunta.q}
+              </h2>
+
+              <div className="mt-6 flex flex-col gap-3">
+                {pergunta.opcoes.map((op, i) => (
+                  <button
+                    key={`${idx}-${i}`}
+                    type="button"
+                    data-sel={escolhida === i ? '1' : '0'}
+                    disabled={escolhida !== null}
+                    onPointerUp={(e) => e.currentTarget.blur()}
+                    onClick={() => responder(i)}
+                    className="d-opt"
+                  >
+                    <span className="d-opt-letra font-mono-d text-[hsl(var(--brass))]">
+                      {String.fromCharCode(65 + i)}
+                    </span>
+                    {op.t}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <p className="mt-6 text-center font-mono-d text-[9.5px] tracking-[0.14em] uppercase text-muted-foreground/40 hidden sm:block">
+              teclado: A a D ou 1 a 4 · backspace volta
+            </p>
           </div>
         )}
 
         {/* ── PROCESSANDO ── */}
         {tela === 'processando' && (
-          <div className="text-center py-16">
-            <div className="mx-auto w-14 h-14 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+          <div className="text-center py-16 d-quiz-in" aria-live="polite">
+            <div className="mx-auto w-14 h-14 rounded-full border-2 border-primary border-t-transparent animate-spin motion-reduce:animate-none" />
             <div className="mt-8 space-y-2.5">
               {PASSOS_ANALISE.map((p, i) => (
                 <p
@@ -198,45 +347,76 @@ export default function RaioXClient() {
           </div>
         )}
 
-        {/* ── GATE DE E-MAIL ── */}
-        {tela === 'email' && (
-          <div className="text-center">
+        {/* ── GATE: o dossiê aparece borrado, o e-mail abre ── */}
+        {tela === 'email' && r && res && (
+          <div className="text-center d-quiz-in">
             <div className="font-mono-d text-[11px] tracking-[0.26em] uppercase text-[hsl(145_35%_55%)]">
               ✓ Análise concluída
             </div>
-            <h2 className="font-serif-d text-3xl md:text-4xl mt-4 leading-tight">
+            <h2 className="font-serif-d text-3xl md:text-4xl mt-3 leading-tight">
               Seu dossiê tá pronto.
             </h2>
-            <p className="text-muted-foreground mt-4 text-[14.5px] max-w-md mx-auto">
-              Diz pra onde mando.
+
+            {/* teaser real: o resultado existe, só está lacrado */}
+            <div className="mt-6 rounded-lg border border-border bg-card p-5 text-left relative overflow-hidden">
+              <div className="font-mono-d text-[10px] tracking-[0.18em] uppercase text-muted-foreground">
+                Índice Modo Trouxa
+              </div>
+              <div className="flex items-baseline gap-3 mt-1">
+                <span className="font-serif-d text-4xl text-primary select-none blur-[7px]" aria-hidden>
+                  {r.score}
+                </span>
+                <span className="font-mono-d text-[11px] uppercase tracking-widest text-muted-foreground">
+                  de 100
+                </span>
+              </div>
+              <div className="mt-3 font-mono-d text-[10px] tracking-[0.18em] uppercase text-muted-foreground">
+                Arquétipo dominante
+              </div>
+              <div className="font-serif-d text-xl select-none blur-[7px]" aria-hidden>
+                {res.nome}
+              </div>
+              <div className="absolute inset-0 grid place-items-center bg-background/35">
+                <span className="font-mono-d text-[10px] tracking-[0.2em] uppercase text-[hsl(var(--brass))] border border-[hsl(var(--brass))] rounded-[3px] px-3 py-1.5 bg-background/80">
+                  lacrado
+                </span>
+              </div>
+            </div>
+
+            <p className="text-muted-foreground mt-5 text-[14px]">
+              Diz pra onde mando e ele abre agora, aqui na tela.
             </p>
-            <form onSubmit={liberarResultado} className="mt-7 max-w-sm mx-auto text-left">
+
+            <form onSubmit={liberarResultado} className="mt-5 max-w-sm mx-auto text-left">
               <input
                 type="email"
                 required
+                autoComplete="email"
+                inputMode="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="seu@email.com"
-                className="w-full rounded-[4px] border border-border bg-card px-4 py-3.5 text-[15px] text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none transition"
+                className="w-full rounded-[4px] border border-border bg-card px-4 py-3.5 text-[16px] text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none transition"
               />
               <input
                 type="tel"
                 inputMode="numeric"
+                autoComplete="tel"
                 value={zap}
                 onChange={(e) => setZap(e.target.value)}
                 placeholder="WhatsApp com DDD (opcional)"
-                className="mt-3 w-full rounded-[4px] border border-border bg-card px-4 py-3.5 text-[15px] text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none transition"
+                className="mt-3 w-full rounded-[4px] border border-border bg-card px-4 py-3.5 text-[16px] text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none transition"
               />
               <label className="flex items-start gap-2.5 mt-3.5 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={consent}
                   onChange={(e) => setConsent(e.target.checked)}
-                  className="mt-0.5 accent-[#B81E33]"
+                  className="mt-0.5 w-4 h-4 accent-[#B81E33]"
                 />
                 <span className="text-[12px] text-muted-foreground leading-snug">
-                  Topo receber o resultado e as táticas do Dossiery por e-mail. Cancelo quando
-                  quiser.{' '}
+                  Topo receber meu resultado e as táticas do Dossiery por e-mail ou WhatsApp. Zero
+                  spam, cancelo quando quiser.{' '}
                   <Link href="/dossiery/privacidade" className="underline underline-offset-2">
                     Privacidade
                   </Link>
@@ -245,12 +425,12 @@ export default function RaioXClient() {
               <button
                 type="submit"
                 disabled={enviando}
-                className="mt-5 w-full rounded-[4px] bg-primary text-primary-foreground font-semibold text-[15px] py-3.5 hover:opacity-90 disabled:opacity-50 transition"
+                className="mt-5 w-full rounded-[4px] bg-primary text-primary-foreground font-semibold text-[15px] py-4 hover:opacity-90 active:scale-[0.99] disabled:opacity-50 transition"
               >
-                {enviando ? 'Liberando…' : 'Ver meu resultado →'}
+                {enviando ? 'Abrindo…' : 'Abrir meu dossiê →'}
               </button>
               {erro && (
-                <div className="mt-3 rounded-md border border-destructive/50 bg-destructive/10 px-3 py-2.5 text-[12.5px] text-destructive">
+                <div role="alert" className="mt-3 rounded-md border border-destructive/50 bg-destructive/10 px-3 py-2.5 text-[12.5px] text-destructive">
                   {erro}
                 </div>
               )}
@@ -260,24 +440,42 @@ export default function RaioXClient() {
 
         {/* ── RESULTADO ── */}
         {tela === 'resultado' && r && res && (
-          <div>
+          <div className="d-quiz-in">
             <div className="text-center">
               <div className="font-mono-d text-[11px] tracking-[0.26em] uppercase text-muted-foreground">
                 Índice Modo Trouxa
               </div>
-              <div className="font-serif-d text-7xl mt-2 text-primary tabular-nums">{r.score}</div>
-              <div className="font-mono-d text-[10px] tracking-widest uppercase text-muted-foreground/70 mt-1">
+              {/* medidor: número + arco, porque número sozinho não dói */}
+              <div className="relative w-[184px] h-[104px] mx-auto mt-3">
+                <svg viewBox="0 0 184 104" className="w-full h-full" aria-hidden>
+                  <path d="M12 100 A80 80 0 0 1 172 100" fill="none" stroke="hsl(var(--secondary))" strokeWidth="10" strokeLinecap="round" />
+                  <path
+                    d="M12 100 A80 80 0 0 1 172 100"
+                    fill="none"
+                    stroke="hsl(var(--primary))"
+                    strokeWidth="10"
+                    strokeLinecap="round"
+                    strokeDasharray="251"
+                    strokeDashoffset={251 - (251 * placar) / 100}
+                    style={{ transition: 'stroke-dashoffset .7s cubic-bezier(.2,.8,.3,1)' }}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-end justify-center pb-1">
+                  <span className="font-serif-d text-6xl text-primary tabular-nums">{placar}</span>
+                </div>
+              </div>
+              <div className="font-mono-d text-[10px] tracking-widest uppercase text-muted-foreground/70 -mt-1">
                 de 100 · quanto maior, pior
               </div>
             </div>
 
-            <div className="mt-8 rounded-lg border border-primary/50 bg-card p-6 relative overflow-hidden">
+            <div className="mt-8 rounded-lg border border-primary/50 bg-card p-6 relative overflow-hidden d-pop">
               <div className="absolute top-0 inset-x-0 h-1 bg-primary" />
               <div className="font-mono-d text-[11px] tracking-[0.2em] uppercase text-[hsl(var(--brass))]">
                 Seu arquétipo dominante
               </div>
               <h2 className="font-serif-d text-3xl mt-2">
-                {res.nome}<span className="text-muted-foreground text-lg">: {res.tag}</span>
+                {res.nome} <span className="text-muted-foreground text-lg">· {res.tag}</span>
               </h2>
               <p className="text-[14.5px] text-muted-foreground leading-relaxed mt-4">{res.diagnostico}</p>
               <div className="mt-5 rounded-md border border-border bg-secondary/40 p-4">
@@ -304,7 +502,6 @@ export default function RaioXClient() {
               </ol>
             </div>
 
-            {/* ponte pro produto */}
             <div className="mt-8 rounded-lg border-2 border-primary bg-primary/[0.06] p-6 text-center">
               <p className="font-serif-d text-[22px] leading-snug">
                 Isso foi o raio-x de <span className="text-primary">10 respostas</span>.

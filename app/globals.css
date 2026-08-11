@@ -168,3 +168,73 @@
     linear-gradient(90deg, hsl(40 20% 88% / 0.028) 1px, transparent 1px);
   background-size: 44px 44px;
 }
+/* ═══════════ QUIZ RAIO-X: opção, transição e medidor ═══════════ */
+
+/* Opção do quiz. Hover só onde existe mouse de verdade: no touch o :hover
+   fica grudado depois do toque e a próxima pergunta abre com a opção acesa. */
+.d-opt {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--card));
+  color: hsl(var(--foreground));
+  border-radius: 6px;
+  padding: 14px 16px;
+  min-height: 52px;
+  font-size: 14.5px;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: border-color .15s ease, background .15s ease, transform .1s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+@media (hover: hover) and (pointer: fine) {
+  .d-opt:hover { border-color: hsl(var(--primary)); background: hsl(var(--primary) / .06); }
+}
+.d-opt:focus-visible { outline: 2px solid hsl(var(--brass)); outline-offset: 2px; }
+.d-opt:active { transform: scale(.99); }
+/* Confirmação do toque antes de avançar */
+.d-opt[data-sel="1"] {
+  border-color: hsl(var(--primary));
+  background: hsl(var(--primary) / .14);
+  transform: scale(.995);
+}
+.d-opt[data-sel="1"] .d-opt-letra {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-color: hsl(var(--primary));
+}
+.d-opt-letra {
+  display: inline-grid;
+  place-items: center;
+  width: 22px; height: 22px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 4px;
+  margin-right: 11px;
+  font-size: 11px;
+  transition: background .15s ease, color .15s ease, border-color .15s ease;
+}
+
+/* Entrada da pergunta: dá a sensação de "virou a página" */
+@keyframes d-quiz-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+.d-quiz-in { animation: d-quiz-in .26s cubic-bezier(.2,.8,.3,1) both; }
+@keyframes d-pop {
+  0% { transform: scale(.9); opacity: 0; }
+  60% { transform: scale(1.04); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.d-pop { animation: d-pop .32s cubic-bezier(.2,.85,.25,1) both; }
+
+/* Progresso em blocos: 10 fichas do dossiê, não uma barra genérica */
+.d-seg { height: 5px; border-radius: 999px; background: hsl(var(--secondary)); flex: 1; overflow: hidden; }
+.d-seg > i { display: block; height: 100%; width: 0; background: hsl(var(--primary)); transition: width .3s ease; }
+.d-seg[data-on="1"] > i { width: 100%; }
+.d-seg[data-now="1"] > i { width: 45%; background: hsl(var(--brass)); }
+
+@media (prefers-reduced-motion: reduce) {
+  .d-quiz-in, .d-pop { animation: none; }
+  .d-opt, .d-seg > i, .d-opt-letra { transition: none; }
+}
