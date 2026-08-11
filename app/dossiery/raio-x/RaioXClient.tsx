@@ -302,20 +302,20 @@ export default function RaioXClient() {
                 Imagina das suas conversas REAIS.
               </p>
               <p className="text-[13.5px] text-muted-foreground mt-3 max-w-sm mx-auto">
-                O Dossiery analisa as SUAS conversas, mostra seu {res.nome} agindo ao vivo e
-                treina você até o padrão morrer.
+                O Plano 7 Dias mata seu {res.nome} em uma semana. Uma missão por dia, 40 passos,
+                menos de 30 minutos por dia.
               </p>
               <Link
-                href="/dossiery/precos"
+                href="/dossiery/criar-conta?next=/dossiery/plano7"
                 className="mt-5 block w-full rounded-[4px] bg-primary text-primary-foreground font-semibold text-[15px] py-4 hover:opacity-90 transition"
               >
-                Matar meu {res.nome}: ver o sistema →
+                Começar por R$19: Plano 7 Dias →
               </Link>
               <Link
-                href="/dossiery/criar-conta?next=/dossiery/plano7"
+                href="/dossiery/precos"
                 className="mt-3 block text-[12.5px] text-muted-foreground underline underline-offset-4 hover:text-foreground transition"
               >
-                Grana curta? Plano 7 Dias por R$19 →
+                Quero o acesso completo: ver o sistema →
               </Link>
             </div>
 
