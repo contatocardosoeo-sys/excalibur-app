@@ -81,8 +81,12 @@ export async function POST(request: NextRequest) {
       // Recibo por e-mail + guarda o user no payment_intent p/ o webhook.
       // setup_future_usage SÓ no cartão (PIX não suporta): habilita o
       // upsell de 1 clique pós-compra sem redigitar o cartão.
+      // installments: parcelamento BR no cartão (até 12x) — exige o recurso
+      // ativado no painel Stripe; sem ele, o checkout segue à vista normal.
       params.payment_intent_data = { metadata: { user_id: user.id, ciclo } }
-      params.payment_method_options = { card: { setup_future_usage: 'off_session' } }
+      params.payment_method_options = {
+        card: { setup_future_usage: 'off_session', installments: { enabled: true } },
+      }
       if (!clienteExistente) params.customer_creation = 'always'
     }
 

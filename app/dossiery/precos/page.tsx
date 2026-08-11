@@ -122,7 +122,7 @@ export default function PrecosPage() {
           </div>
           {ciclo === 'anual' ? (
             <div className="mt-1 font-mono-d text-[10px] tracking-widest uppercase text-[hsl(145_35%_55%)]">
-              ≈ 40% off · pagamento único à vista (PIX ou cartão)
+              40% off · 12x de R$58 no cartão ou R$697 no PIX
             </div>
           ) : (
             <div className="mt-1 font-mono-d text-[10px] tracking-widest uppercase text-muted-foreground/70">

@@ -143,6 +143,9 @@ painel. Se preferir fazer tudo manual, o passo a passo abaixo cobre o mesmo.
 4. **PIX:** Settings → Payment methods → ativar **Pix** (aparece no checkout do
    anual, que é `mode=payment`). O código omite `payment_method_types` de
    propósito p/ o Stripe surfar cartão + PIX conforme o painel.
+   **Parcelamento:** ativar também *Card installments* (Settings → Payment
+   methods) — o checkout do anual já pede `installments.enabled` e mostra
+   até 12x de R$58; sem o recurso ativo, segue à vista sem erro.
 5. **Webhook:** Developers → Webhooks → *Add endpoint* →
    `https://SEU-DOMINIO/api/webhooks/stripe` → eventos:
    `checkout.session.completed`, **`checkout.session.async_payment_succeeded`**

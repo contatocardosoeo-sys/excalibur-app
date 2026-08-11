@@ -48,7 +48,8 @@ Regra de mídia: cada campanha aponta pra UM funil — o pixel aprende separado;
 
 | # | Tática (fonte) | Impacto | Esforço | Quando |
 |---|---|---|---|---|
-| 1 | **12x R$69,90 no anual** (parcelamento cartão BR) | alto | baixo (config Stripe) | antes do lançamento |
+| 1 | ~~12x no anual~~ **FEITO em código** (installments no checkout; falta ativar o recurso no painel Stripe) | alto | feito | pronto |
+| 1b | **Guest checkout** (só e-mail no Stripe; conta via webhook + magic link; OTO autentica pelo cs). Auditoria: conta antes do checkout custa 20-35% da conversão | alto | 2-4 dias | semana 1-2 |
 | 2 | Upgrade mensal→anual em 1 clique (OTO p/ assinante mensal no D7) | alto | médio | semana 2 |
 | 3 | Quiz longo 25-40 telas com projeção datada (Noom-style) — evoluir o Raio-X | alto | médio | após validar Funil B |
 | 4 | Garantia condicional "cumpriu o Plano 7 Dias e nada? dobro o reembolso" | médio | baixo (copy+regra) | teste semana 3 |
