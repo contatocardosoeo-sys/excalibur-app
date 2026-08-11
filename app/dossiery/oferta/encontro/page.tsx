@@ -77,7 +77,7 @@ export default function OtoEncontroPage() {
               oferta="encontro_oto"
               valor={97}
               cta="SIM — adicionar o Protocolo por R$97 →"
-              next="/dossiery/bem-vindo"
+              next="/dossiery/oferta/perfil"
               declineHref="/dossiery/oferta/ultima"
               declineLabel="Não. Prefiro improvisar na mesa e ver no que dá →"
               nota="Cartão salvo? 1 clique, sem redigitar. PIX? Um QR e pronto."

@@ -100,6 +100,12 @@ disponível no Supabase). Idempotente.
 | `STRIPE_PRICE_ENCONTRO_OTO` | price único R$97 — upsell pós-compra (janela 60min) |
 | `STRIPE_PRICE_ENCONTRO_DOWN` | price único R$47 — downsell (mesma janela) |
 | `STRIPE_PRICE_ENCONTRO_APP` | price único R$147 — Protocolo Encontro dentro do app |
+| `STRIPE_PRICE_PLANO7` | price único R$19 — tripwire do quiz |
+| `STRIPE_PRICE_PERFIL_OTO` | price único R$47 — Perfil Magnético na OTO2 (janela 60min) |
+| `STRIPE_PRICE_PERFIL_APP` | price único R$67 — Perfil Magnético no app |
+| `STRIPE_PRICE_RECOMECO_OTO` | price único R$97 — Recomeço em oferta (janela 60min) |
+| `STRIPE_PRICE_RECOMECO_APP` | price único R$147 — Recomeço no app |
+| `META_CAPI_TOKEN` | token da Conversions API (Events Manager → Configurações). Liga o tracking server-side. |
 | `DOSSIERY_GATE` | `off` = tudo aberto (preview). **Remover no go-live.** |
 | `DOSSIERY_PAYWALL` | `off` = login exigido mas IA liberada sem assinar. Padrão: on. |
 | `NEXT_PUBLIC_META_PIXEL_ID` | ID do Pixel (Meta Events Manager). Sem ele, nenhum script carrega. |
@@ -162,7 +168,9 @@ painel. Se preferir fazer tudo manual, o passo a passo abaixo cobre o mesmo.
    `0001_dossiery_schema.sql` → `0002_dossiery_billing.sql` →
    `0003_dossiery_kit.sql` (coluna `kit_aberturas`) →
    `0004_dossiery_funil.sql` (coluna `protocolo_encontro` + **RLS: assinaturas
-   viram somente-leitura pro usuário** — correção de segurança, não pule).
+   viram somente-leitura pro usuário** — correção de segurança, não pule) →
+   `0005_dossiery_esteira.sql` (leads do quiz + colunas `plano_7d`,
+   `perfil_magnetico`, `recomeco`).
 2. Auth → Providers → Email: para funil sem fricção, **desligar** “Confirm
    email” (ou manter ligado — o fluxo de confirmação já é tratado no app).
 3. Auth → URL Configuration: adicionar o domínio de produção em *Site URL* e
@@ -171,14 +179,27 @@ painel. Se preferir fazer tudo manual, o passo a passo abaixo cobre o mesmo.
 ### O funil completo (mapa)
 
 ```
-Landing /dossiery
-  → Preços /dossiery/precos          [ORDER BUMP ✓ default: Kit R$37]
-  → Stripe Checkout                   (anual R$697 one-time PIX/cartão · mensal R$97 cartão)
-  → OTO /dossiery/oferta/encontro    [UPSELL 1-CLIQUE: Protocolo Encontro R$97]
-      recusou → /dossiery/oferta/ultima  [DOWNSELL: R$47 · janela real 60min]
-  → /dossiery/bem-vindo               (mostra o arsenal: ✓ comprado / 🔒 bloqueado)
-  → In-app CROSS-SELL: /dossiery/kit (R$37) · /dossiery/encontro (R$147 fora da janela)
+ENTRADA A (direto)                    ENTRADA B (quiz gamificado)
+/dossiery ────────────┐               /dossiery/raio-x → arquétipo + LEAD
+                      ▼                        │ (e-mail capturado, seq. B)
+             /dossiery/precos  ◄───────────────┤
+             [BUMP ✓: Kit R$37]                └→ tripwire /dossiery/plano7 (R$19)
+                      ▼
+             Stripe Checkout (anual R$697 PIX · mensal R$97)
+                      ▼
+             OTO1 /dossiery/oferta/encontro   [1-CLIQUE R$97]
+               recusou → /oferta/ultima       [DOWNSELL R$47 · janela real 60min]
+                      ▼
+             OTO2 /dossiery/oferta/perfil     [1-CLIQUE R$47]
+                      ▼
+             /dossiery/bem-vindo (✓/🔒) → /dossiery/arsenal
+             CROSS-SELL eterno: Kit R$37 · Encontro R$147 · Perfil R$67
+                                Recomeço R$147 · Plano7 R$19
 ```
+
+Esteira, backlog e roadmap de escala: [`DOSSIERY-ESTRATEGIA.md`](DOSSIERY-ESTRATEGIA.md).
+Assets: [`DOSSIERY-EMAILS.md`](DOSSIERY-EMAILS.md) · [`DOSSIERY-ADS.md`](DOSSIERY-ADS.md) ·
+[`DOSSIERY-PESQUISA-FUNIS.md`](DOSSIERY-PESQUISA-FUNIS.md).
 
 - **1 clique de verdade:** o checkout principal salva o cartão
   (`setup_future_usage`, só p/ cartão); o upsell cobra off-session sem

@@ -55,8 +55,8 @@ export default function DownsellPage() {
               oferta="encontro_down"
               valor={47}
               cta="Destravar por R$47 — 1 clique →"
-              next="/dossiery/bem-vindo"
-              declineHref="/dossiery/bem-vindo"
+              next="/dossiery/oferta/perfil"
+              declineHref="/dossiery/oferta/perfil"
               declineLabel="Deixar pra lá (e pagar R$147 se eu mudar de ideia) →"
               nota="Um clique no cartão salvo · ou PIX na hora"
             />

@@ -7,8 +7,7 @@ export const dynamic = 'force-dynamic'
 
 // ♠ Fim do funil — confirma a compra e mostra o arsenal que ele destravou.
 export default async function BemVindoPage() {
-  let temKit = false
-  let temEncontro = false
+  let e = { kit_aberturas: false, protocolo_encontro: false, perfil_magnetico: false, recomeco: false }
   try {
     const supabase = await createSupabaseServer()
     const {
@@ -17,30 +16,23 @@ export default async function BemVindoPage() {
     if (user) {
       const { data } = await supabase
         .from('dossiery_assinaturas')
-        .select('kit_aberturas, protocolo_encontro')
+        .select('kit_aberturas, protocolo_encontro, perfil_magnetico, recomeco')
         .eq('user_id', user.id)
         .maybeSingle()
-      temKit = data?.kit_aberturas === true
-      temEncontro = data?.protocolo_encontro === true
+      if (data) e = { ...e, ...data }
     }
   } catch {
     /* sem env/sessão → mostra o padrão */
   }
 
+  const naoIncluido = 'não incluído — destrave dentro do app'
+  const vitalicio = 'liberado — acesso vitalício'
   const arsenal = [
     { ok: true, t: 'Plano Operador', d: 'Raio-X + Coach + Campo, ilimitados', href: '/dossiery/base' },
-    {
-      ok: temKit,
-      t: 'Kit 50 Aberturas',
-      d: temKit ? 'liberado — acesso vitalício' : 'não incluído — destrave dentro do app',
-      href: '/dossiery/kit',
-    },
-    {
-      ok: temEncontro,
-      t: 'Protocolo Encontro',
-      d: temEncontro ? 'liberado — acesso vitalício' : 'não incluído — destrave dentro do app',
-      href: '/dossiery/encontro',
-    },
+    { ok: e.kit_aberturas, t: 'Kit 50 Aberturas', d: e.kit_aberturas ? vitalicio : naoIncluido, href: '/dossiery/kit' },
+    { ok: e.protocolo_encontro, t: 'Protocolo Encontro', d: e.protocolo_encontro ? vitalicio : naoIncluido, href: '/dossiery/encontro' },
+    { ok: e.perfil_magnetico, t: 'Perfil Magnético', d: e.perfil_magnetico ? vitalicio : naoIncluido, href: '/dossiery/perfil' },
+    { ok: e.recomeco, t: 'Protocolo Recomeço', d: e.recomeco ? vitalicio : naoIncluido, href: '/dossiery/recomeco' },
   ]
 
   return (

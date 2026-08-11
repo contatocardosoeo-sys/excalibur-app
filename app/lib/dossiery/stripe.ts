@@ -30,37 +30,83 @@ export function priceIdBump(): string | null {
   return process.env.STRIPE_PRICE_BUMP || null
 }
 
-// ── Funil: ofertas avulsas (upsell 1-clique, downsell, cross-sell in-app) ──
-// kit           = Kit 50 Aberturas (R$37 — mesmo price do bump)
-// encontro_oto  = Protocolo Encontro na tela pós-compra (R$97, janela de 60min)
-// encontro_down = downsell do Encontro (R$47, janela de 60min)
-// encontro_app  = Encontro destravado depois, dentro do app (R$147 — âncora real)
-export type Oferta = 'kit' | 'encontro_oto' | 'encontro_down' | 'encontro_app'
+// ── Esteira: ofertas avulsas (tripwire, upsell 1-clique, downsell, cross-sell) ──
+// kit           = Kit 50 Aberturas R$37 (mesmo price do bump)
+// encontro_oto  = Protocolo Encontro na OTO pós-compra R$97 (janela 60min)
+// encontro_down = downsell do Encontro R$47 (janela 60min)
+// encontro_app  = Encontro dentro do app R$147 (âncora real)
+// plano7        = Plano 7 Dias R$19 (tripwire do quiz)
+// perfil_oto    = Perfil Magnético na OTO2 R$47 (janela 60min)
+// perfil_app    = Perfil Magnético dentro do app R$67
+// recomeco_oto  = Protocolo Recomeço em oferta R$97 (janela 60min)
+// recomeco_app  = Protocolo Recomeço dentro do app R$147
+export type Oferta =
+  | 'kit'
+  | 'encontro_oto'
+  | 'encontro_down'
+  | 'encontro_app'
+  | 'plano7'
+  | 'perfil_oto'
+  | 'perfil_app'
+  | 'recomeco_oto'
+  | 'recomeco_app'
 
-export const OFERTAS: Oferta[] = ['kit', 'encontro_oto', 'encontro_down', 'encontro_app']
+export const OFERTAS: Oferta[] = [
+  'kit',
+  'encontro_oto',
+  'encontro_down',
+  'encontro_app',
+  'plano7',
+  'perfil_oto',
+  'perfil_app',
+  'recomeco_oto',
+  'recomeco_app',
+]
+
+const PRICE_ENV: Record<Oferta, string | undefined> = {
+  kit: process.env.STRIPE_PRICE_BUMP,
+  encontro_oto: process.env.STRIPE_PRICE_ENCONTRO_OTO,
+  encontro_down: process.env.STRIPE_PRICE_ENCONTRO_DOWN,
+  encontro_app: process.env.STRIPE_PRICE_ENCONTRO_APP,
+  plano7: process.env.STRIPE_PRICE_PLANO7,
+  perfil_oto: process.env.STRIPE_PRICE_PERFIL_OTO,
+  perfil_app: process.env.STRIPE_PRICE_PERFIL_APP,
+  recomeco_oto: process.env.STRIPE_PRICE_RECOMECO_OTO,
+  recomeco_app: process.env.STRIPE_PRICE_RECOMECO_APP,
+}
 
 export function priceIdOferta(oferta: Oferta): string | null {
-  switch (oferta) {
-    case 'kit':
-      return process.env.STRIPE_PRICE_BUMP || null
-    case 'encontro_oto':
-      return process.env.STRIPE_PRICE_ENCONTRO_OTO || null
-    case 'encontro_down':
-      return process.env.STRIPE_PRICE_ENCONTRO_DOWN || null
-    case 'encontro_app':
-      return process.env.STRIPE_PRICE_ENCONTRO_APP || null
-  }
+  return PRICE_ENV[oferta] || null
 }
 
 // Coluna de entitlement que cada oferta libera em dossiery_assinaturas.
-export function colunaDaOferta(oferta: Oferta): 'kit_aberturas' | 'protocolo_encontro' {
-  return oferta === 'kit' ? 'kit_aberturas' : 'protocolo_encontro'
+export type ColunaEntitlement =
+  | 'kit_aberturas'
+  | 'protocolo_encontro'
+  | 'plano_7d'
+  | 'perfil_magnetico'
+  | 'recomeco'
+
+export const COLUNAS_ENTITLEMENT: ColunaEntitlement[] = [
+  'kit_aberturas',
+  'protocolo_encontro',
+  'plano_7d',
+  'perfil_magnetico',
+  'recomeco',
+]
+
+export function colunaDaOferta(oferta: Oferta): ColunaEntitlement {
+  if (oferta === 'kit') return 'kit_aberturas'
+  if (oferta === 'plano7') return 'plano_7d'
+  if (oferta.startsWith('perfil')) return 'perfil_magnetico'
+  if (oferta.startsWith('recomeco')) return 'recomeco'
+  return 'protocolo_encontro'
 }
 
 // Ofertas com preço de funil têm janela real (60min pós-ativação, checada no servidor).
 export const JANELA_OFERTA_MS = 60 * 60 * 1000
 export function ofertaTemJanela(oferta: Oferta): boolean {
-  return oferta === 'encontro_oto' || oferta === 'encontro_down'
+  return oferta === 'encontro_oto' || oferta === 'encontro_down' || oferta === 'perfil_oto' || oferta === 'recomeco_oto'
 }
 
 // ISO de agora + N meses (usado no acesso do plano anual one-time).

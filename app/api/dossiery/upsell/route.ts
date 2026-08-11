@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServer } from '@/app/lib/supabase-server'
 import { getSupabaseAdmin } from '@/app/lib/dossiery/supabaseAdmin'
+import { enviarCapi } from '@/app/lib/dossiery/capi'
 import {
   getStripe,
   stripeConfigurado,
@@ -64,7 +65,7 @@ export async function POST(request: NextRequest) {
   try {
     const { data: linha } = await admin
       .from('dossiery_assinaturas')
-      .select('stripe_customer_id, kit_aberturas, protocolo_encontro, updated_at')
+      .select('stripe_customer_id, kit_aberturas, protocolo_encontro, plano_7d, perfil_magnetico, recomeco, updated_at')
       .eq('user_id', user.id)
       .maybeSingle()
 
@@ -78,8 +79,13 @@ export async function POST(request: NextRequest) {
     if (ofertaTemJanela(oferta) && linha?.updated_at) {
       const idade = Date.now() - new Date(linha.updated_at).getTime()
       if (idade > JANELA_OFERTA_MS) {
+        const destino = oferta.startsWith('perfil')
+          ? '/dossiery/perfil'
+          : oferta.startsWith('recomeco')
+            ? '/dossiery/recomeco'
+            : '/dossiery/encontro'
         return NextResponse.json(
-          { error: 'Essa condição expirou (era só na janela pós-compra).', destino: '/dossiery/encontro' },
+          { error: 'Essa condição expirou (era só na janela pós-compra).', destino },
           { status: 410 }
         )
       }
@@ -118,6 +124,13 @@ export async function POST(request: NextRequest) {
               { onConflict: 'user_id' }
             )
             if (error) throw new Error(`upsert entitlement: ${error.message}`)
+            // CAPI server-side (dedup: mesmo event_id do pixel do client = pi.id)
+            void enviarCapi({
+              event_name: 'Purchase',
+              event_id: pi.id,
+              value: amount / 100,
+              email: user.email,
+            })
             return NextResponse.json({ ok: true, id: pi.id, valor: amount / 100 })
           }
           // requires_action etc. → cai pro checkout normal abaixo

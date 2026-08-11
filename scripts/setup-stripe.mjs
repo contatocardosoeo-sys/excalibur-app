@@ -63,6 +63,9 @@ try {
   const prodOperador = await acharOuCriarProduto('Dossiery — Operador', 'operador')
   const prodBump = await acharOuCriarProduto('Dossiery — Kit 50 Aberturas', 'bump')
   const prodEncontro = await acharOuCriarProduto('Dossiery — Protocolo Encontro', 'encontro')
+  const prodPlano7 = await acharOuCriarProduto('Dossiery — Plano 7 Dias', 'plano7')
+  const prodPerfil = await acharOuCriarProduto('Dossiery — Perfil Magnético', 'perfil')
+  const prodRecomeco = await acharOuCriarProduto('Dossiery — Protocolo Recomeço', 'recomeco')
 
   const mensal = await acharOuCriarPrice({
     product: prodOperador.id, lookup: 'dossiery_mensal', amount: 9700, recurring: true,
@@ -83,6 +86,22 @@ try {
   })
   const encontroApp = await acharOuCriarPrice({
     product: prodEncontro.id, lookup: 'dossiery_encontro_app', amount: 14700, recurring: false,
+  })
+  // Esteira: tripwire do quiz + Perfil Magnético + Protocolo Recomeço
+  const plano7 = await acharOuCriarPrice({
+    product: prodPlano7.id, lookup: 'dossiery_plano7', amount: 1900, recurring: false,
+  })
+  const perfilOto = await acharOuCriarPrice({
+    product: prodPerfil.id, lookup: 'dossiery_perfil_oto', amount: 4700, recurring: false,
+  })
+  const perfilApp = await acharOuCriarPrice({
+    product: prodPerfil.id, lookup: 'dossiery_perfil_app', amount: 6700, recurring: false,
+  })
+  const recomecoOto = await acharOuCriarPrice({
+    product: prodRecomeco.id, lookup: 'dossiery_recomeco_oto', amount: 9700, recurring: false,
+  })
+  const recomecoApp = await acharOuCriarPrice({
+    product: prodRecomeco.id, lookup: 'dossiery_recomeco_app', amount: 14700, recurring: false,
   })
 
   let whsec = null
@@ -132,6 +151,11 @@ try {
   console.log(`STRIPE_PRICE_ENCONTRO_OTO=${encontroOto.id}`)
   console.log(`STRIPE_PRICE_ENCONTRO_DOWN=${encontroDown.id}`)
   console.log(`STRIPE_PRICE_ENCONTRO_APP=${encontroApp.id}`)
+  console.log(`STRIPE_PRICE_PLANO7=${plano7.id}`)
+  console.log(`STRIPE_PRICE_PERFIL_OTO=${perfilOto.id}`)
+  console.log(`STRIPE_PRICE_PERFIL_APP=${perfilApp.id}`)
+  console.log(`STRIPE_PRICE_RECOMECO_OTO=${recomecoOto.id}`)
+  console.log(`STRIPE_PRICE_RECOMECO_APP=${recomecoApp.id}`)
   if (whsec) console.log(`STRIPE_WEBHOOK_SECRET=${whsec}`)
   console.log('═════════════════════════════════════════════════════════════')
   console.log('\n✅ Stripe pronto. Agora:')

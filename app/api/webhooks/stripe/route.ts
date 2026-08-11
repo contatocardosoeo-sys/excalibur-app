@@ -1,7 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import type Stripe from 'stripe'
-import { getStripe, fimDoPeriodo, mapStatus, daquiAMeses } from '@/app/lib/dossiery/stripe'
+import {
+  getStripe,
+  fimDoPeriodo,
+  mapStatus,
+  daquiAMeses,
+  OFERTAS,
+  colunaDaOferta,
+  type Oferta,
+} from '@/app/lib/dossiery/stripe'
 import { getSupabaseAdmin } from '@/app/lib/dossiery/supabaseAdmin'
+import { enviarCapi } from '@/app/lib/dossiery/capi'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 export const runtime = 'nodejs'
@@ -94,12 +103,12 @@ async function ativarPorSession(admin: SupabaseClient, session: Stripe.Checkout.
   const customerId =
     typeof session.customer === 'string' ? session.customer : session.customer?.id ?? null
 
-  // ── Oferta avulsa do funil (upsell/downsell/cross-sell pago via checkout/PIX) ──
+  // ── Oferta avulsa da esteira (tripwire/upsell/downsell/cross-sell via checkout/PIX) ──
   // Libera SÓ o entitlement. Nunca toca plano/status/renova_em: se a linha não
   // existir, o insert cai nos defaults ('recruta') que NÃO passam no paywall.
   const tipo = session.metadata?.tipo
-  if (tipo === 'kit' || tipo === 'encontro_oto' || tipo === 'encontro_down' || tipo === 'encontro_app') {
-    const coluna = tipo === 'kit' ? 'kit_aberturas' : 'protocolo_encontro'
+  if (tipo && (OFERTAS as string[]).includes(tipo)) {
+    const coluna = colunaDaOferta(tipo as Oferta)
     const { error } = await admin.from('dossiery_assinaturas').upsert(
       {
         user_id: userId,
@@ -109,6 +118,13 @@ async function ativarPorSession(admin: SupabaseClient, session: Stripe.Checkout.
       { onConflict: 'user_id' }
     )
     if (error) throw new Error(`upsert oferta ${tipo}: ${error.message}`)
+    // CAPI server-side (dedup com o pixel do client via event_id = session.id)
+    void enviarCapi({
+      event_name: 'Purchase',
+      event_id: session.id,
+      value: (session.amount_total ?? 0) / 100,
+      email: session.customer_details?.email || session.customer_email,
+    })
     return
   }
 
@@ -146,4 +162,12 @@ async function ativarPorSession(admin: SupabaseClient, session: Stripe.Checkout.
     { onConflict: 'user_id' }
   )
   if (error) throw new Error(`upsert assinatura: ${error.message}`)
+
+  // CAPI server-side da compra principal (dedup: mesmo event_id do pixel = cs)
+  void enviarCapi({
+    event_name: 'Purchase',
+    event_id: session.id,
+    value: (session.amount_total ?? 0) / 100,
+    email: session.customer_details?.email || session.customer_email,
+  })
 }
