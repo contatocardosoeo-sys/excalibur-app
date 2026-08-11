@@ -33,9 +33,8 @@ function KitBloqueado() {
         </div>
         <h1 className="font-serif-d text-4xl mt-3">Kit 50 Aberturas Que Não Morrem</h1>
         <p className="text-muted-foreground mt-4 text-[14.5px] leading-relaxed max-w-md mx-auto">
-          As {TOTAL_ABERTURAS} primeiras mensagens testadas que puxam resposta — por situação:
-          match novo, resposta seca, conversa morta, Instagram, puxar o encontro e pós-encontro.
-          Cada uma com o porquê. Você adapta na sua voz e manda.
+          {TOTAL_ABERTURAS} aberturas que puxam resposta: match novo, resposta seca, conversa
+          morta, pós-encontro. Cada uma com o porquê. Adapta na sua voz e manda.
         </p>
       </div>
 
@@ -47,14 +46,14 @@ function KitBloqueado() {
         <OfertaCliente
           oferta="kit"
           valor={37}
-          cta="Destravar o Kit por R$37 →"
+          cta={`Destravar as ${TOTAL_ABERTURAS} aberturas por R$37 →`}
           next="/dossiery/kit"
           nota="1 clique no cartão salvo · ou PIX na hora"
         />
       </div>
 
       <p className="mt-6 text-center font-mono-d text-[10px] tracking-widest uppercase text-muted-foreground/60">
-        Mesmo preço do checkout — sem multa por destravar depois
+        Mesmo preço do checkout. Sem multa por destravar depois
       </p>
     </div>
   )

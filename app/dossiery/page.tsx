@@ -6,13 +6,12 @@ import VagasFundador from './components/VagasFundador'
 import { VAGAS_FUNDADOR, PRECO_DEPOIS } from '@/app/lib/dossiery/fundador'
 
 export const metadata: Metadata = {
-  title: 'Dossiery — Do vácuo ao "que horas a gente se vê?"',
+  title: 'Dossiery: do vácuo ao encontro marcado',
   description:
-    'A IA que lê suas conversas, mostra onde você se sabota e te treina até virar o cara que ela responde na hora. Sem cantada decorada. 7 dias de garantia.',
+    'A IA que lê suas conversas, aponta o vacilo e treina você até ela responder na hora. 7 dias de garantia.',
   openGraph: {
-    title: 'Dossiery — Vire o homem que ela responde na hora.',
-    description:
-      'Raio-X das suas conversas + treino de elite 24/7. Do vácuo ao encontro marcado. 7 dias de garantia.',
+    title: 'Dossiery: vire o cara que ela responde na hora.',
+    description: 'Raio-X das suas conversas + treino 24/7. 7 dias de garantia.',
     images: [{ url: '/dossiery/hero.jpg', width: 1440, height: 2560 }],
     locale: 'pt_BR',
     type: 'website',
@@ -20,9 +19,9 @@ export const metadata: Metadata = {
   twitter: { card: 'summary_large_image' },
 }
 
-/* ESCASSEZ: números em app/lib/dossiery/fundador.ts — cumpra-os (é o que a torna real) */
+/* ESCASSEZ: números em app/lib/dossiery/fundador.ts. Cumpra-os: é o que torna a escassez real. */
 
-/* ————— before/after: conversas simuladas ————— */
+/* ===== before/after: conversas simuladas ===== */
 type Bolha = { by: 'ela' | 'ele'; t: string; meta?: string }
 const CONVERSAS: { titulo: string; antes: Bolha[]; depois: Bolha[]; legenda: string }[] = [
   {
@@ -40,7 +39,7 @@ const CONVERSAS: { titulo: string; antes: Bolha[]; depois: Bolha[]; legenda: str
       { by: 'ele', t: 'é dom. quinta você me mostra a tal playlist pessoalmente' },
       { by: 'ela', t: 'marcado 😏' },
     ],
-    legenda: 'Mesma mulher. Postura diferente. Do vácuo ao encontro marcado.',
+    legenda: 'Mesma mulher. Só mudou o que ele escreveu.',
   },
   {
     titulo: 'Ela esfriou (a reconquista)',
@@ -51,16 +50,16 @@ const CONVERSAS: { titulo: string; antes: Bolha[]; depois: Bolha[]; legenda: str
       { by: 'ela', t: 'visualizado', meta: 'te arquivou' },
     ],
     depois: [
-      { by: 'ele', t: 'tô te devendo aquele desafio de sinuca. ainda vale — a menos que você tenha medo de perder' },
+      { by: 'ele', t: 'tô te devendo aquele desafio de sinuca. ainda vale. a menos que você tenha medo de perder' },
       { by: 'ela', t: 'MEDO? kkk você que vai chorar' },
       { by: 'ele', t: 'prova sexta então. 21h' },
       { by: 'ela', t: 'tá bom confiante 😏' },
     ],
-    legenda: 'Três mensagens carentes viraram um sim. A diferença é calibragem.',
+    legenda: 'Carência ela arquiva. Desafio com hora marcada ela responde.',
   },
 ]
 
-/* ————— componentes ————— */
+/* ===== componentes ===== */
 function CTA({
   children = 'Entrar no Protocolo →',
   sub,
@@ -106,7 +105,7 @@ function Chat({ msgs, tag }: { msgs: Bolha[]; tag: 'antes' | 'depois' }) {
             antes ? 'border-destructive text-destructive' : 'border-[hsl(145_30%_45%)] text-[hsl(145_38%_55%)]'
           }`}
         >
-          {antes ? 'Antes' : 'Depois'}
+          {antes ? 'Modo Trouxa' : 'Operador'}
         </span>
       </div>
       <div className="p-3.5 flex flex-col gap-2">
@@ -136,7 +135,7 @@ function Chat({ msgs, tag }: { msgs: Bolha[]; tag: 'antes' | 'depois' }) {
   )
 }
 
-/* ————— página ————— */
+/* ===== página ===== */
 export default function DossierySalesPage() {
   return (
     <div className="relative overflow-hidden">
@@ -171,10 +170,10 @@ export default function DossierySalesPage() {
                 <span className="text-primary">Ele já marcou o encontro.</span>
               </h1>
               <p className="text-[16px] md:text-[17px] text-foreground/90 mt-5 md:max-w-lg leading-relaxed">
-                Não é mais bonito, mais rico, nem mais interessante que você. Ele só domina um{' '}
-                <b className="text-foreground">jogo que ninguém te ensinou</b> — e joga contra você
-                todo dia. O Dossiery rouba esse jogo pra você: lê suas conversas, expõe onde você se
-                entrega e te treina até <b className="text-foreground">a mesa virar</b>.
+                Ele não é mais bonito que você. Ele só não joga no{' '}
+                <b className="text-foreground">Modo Trouxa</b>. O Dossiery lê suas conversas e
+                aponta o vacilo. Depois te treina até virar{' '}
+                <b className="text-foreground">Operador</b>: o cara que ela responde na hora.
               </p>
               <div className="mt-7" id="cta-hero">
                 <CTA align="md-left" sub="Garantia de 7 dias · PIX ou cartão">
@@ -204,14 +203,14 @@ export default function DossierySalesPage() {
         </div>
       </section>
 
-      {/* ============ PROVA — before/after ============ */}
+      {/* ============ PROVA: before/after ============ */}
       <section className="border-b border-border bg-card/30">
         <div className="mx-auto max-w-5xl px-6 py-14">
           <div className="text-center">
-            <Kicker>Abra o arquivo · veja com seus olhos</Kicker>
+            <Kicker>Abra o arquivo</Kicker>
             <h2 className="font-serif-d text-3xl md:text-[2.4rem] mt-3 text-balance">
-              O mesmo homem. 30 dias de Protocolo. Ela nem percebeu o que mudou —{' '}
-              <span className="text-primary">só sentiu.</span>
+              Mesmo cara, 30 dias de Protocolo.{' '}
+              <span className="text-primary">Ela só sentiu a diferença.</span>
             </h2>
           </div>
           <div className="mt-10 space-y-10">
@@ -228,12 +227,12 @@ export default function DossierySalesPage() {
             ))}
           </div>
           <p className="text-center font-mono-d text-[10px] tracking-widest uppercase text-muted-foreground/50 mt-8">
-            Conversas ilustrativas do método · não é frase pronta — é você, treinado
+            Conversas ilustrativas do método · o treino é pra você escrever as suas
           </p>
         </div>
       </section>
 
-      {/* ============ MECANISMO — 3 passos ============ */}
+      {/* ============ MECANISMO: 3 passos ============ */}
       <section className="border-b border-border">
         <div className="mx-auto max-w-5xl px-6 py-14">
           <div className="text-center">
@@ -242,9 +241,9 @@ export default function DossierySalesPage() {
           </div>
           <div className="grid md:grid-cols-3 gap-4 mt-9">
             {[
-              { n: '01', t: 'RAIO-X', d: 'Cola a conversa. Em 3 minutos você vê o que ela pensa de você — sem filtro, sem ilusão. Dói. E destrava.' },
-              { n: '02', t: 'TREINO', d: 'O cânone que os caras "naturais" nunca vão te contar — destilado por uma IA que não te poupa. Cada resposta com o porquê.' },
-              { n: '03', t: 'CAMPO', d: 'A jogada certa, na hora certa, na SUA voz. E a leitura fria: quem está a fim, quem está te usando, quando avançar, quando cortar.' },
+              { n: '01', t: 'RAIO-X', d: 'Cola a conversa. A IA mostra onde você entregou o jogo. Dói. E destrava.' },
+              { n: '02', t: 'TREINO', d: 'Treino com uma IA que não passa pano. Cada resposta vem com o porquê, até virar reflexo.' },
+              { n: '03', t: 'CAMPO', d: 'Travou no meio do papo, cola aqui: sai a jogada certa, na SUA voz.' },
             ].map((s) => (
               <div key={s.n} className="rounded-md border border-border bg-card p-6 relative overflow-hidden">
                 <div className="absolute left-0 inset-y-0 w-1 bg-primary" />
@@ -260,23 +259,23 @@ export default function DossierySalesPage() {
       {/* ============ OFERTA + ESCASSEZ ============ */}
       <section className="border-b border-border bg-card/30">
         <div className="mx-auto max-w-2xl px-6 py-14 text-center">
-          <Kicker>O que está atrás da porta</Kicker>
+          <Kicker>O que você leva</Kicker>
           <h2 className="font-serif-d text-3xl md:text-4xl mt-3 text-balance">
-            A vantagem injusta que os outros caras{' '}
-            <span className="text-primary">rezam pra você nunca descobrir.</span>
+            A vantagem injusta que outro cara{' '}
+            <span className="text-primary">reza pra você não descobrir.</span>
           </h2>
           <p className="text-muted-foreground mt-3 text-[15px]">
-            Coach humano cobra R$300 a sessão pra falar a metade. Aqui é o arsenal inteiro, R$3/dia.
+            Coach cobra R$300 a sessão. Isso aqui trabalha 24/7 por R$3 por dia.
           </p>
 
           <ul className="mt-7 grid sm:grid-cols-2 gap-x-6 gap-y-2.5 text-left max-w-lg mx-auto">
             {[
-              'O que ela realmente pensa de você — em 3 minutos',
-              'O erro invisível que te joga na friendzone',
-              'A resposta certa pro vácuo, pro “kkkk”, pro gelo',
-              'Quem está a fim × quem está te usando de reserva',
-              'A hora exata de chamar pro encontro (e a de cortar)',
-              'Acesso na hora · PIX ou cartão · anônimo',
+              'O que ela pensa de você, em 3 minutos',
+              'O erro que te jogou na friendzone',
+              'A resposta pro vácuo e pro “kkkk” seco',
+              'Quem tá a fim × quem te usa de reserva',
+              'A hora certa de chamar pro encontro',
+              'Acesso na hora · anônimo · cancela em 2 cliques',
             ].map((b) => (
               <li key={b} className="flex gap-2.5 text-[14px] text-muted-foreground">
                 <span className="text-primary font-bold">✓</span>
@@ -291,9 +290,9 @@ export default function DossierySalesPage() {
               ⚠ Preço de fundador · {VAGAS_FUNDADOR} vagas
             </p>
             <p className="text-[14px] text-foreground mt-1.5 leading-relaxed">
-              Quem entrar agora trava <b>R$97/mês pra sempre</b>. Depois, <b>R${PRECO_DEPOIS}</b>.
-              E pensa no detalhe cruel: <b>enquanto você “vai pensar”, outro cara entra</b> — e é
-              com ele que ela vai estar conversando.
+              Quem entra agora trava <b>R$97/mês pra sempre</b>. Depois sobe pra{' '}
+              <b>R${PRECO_DEPOIS}</b>. E enquanto você “vai pensar”,{' '}
+              <b>ela responde outro cara</b>.
             </p>
             <p className="mt-3 pt-3 border-t border-primary/20 text-[13px] text-muted-foreground">
               <VagasFundador />
@@ -301,7 +300,7 @@ export default function DossierySalesPage() {
           </div>
 
           <div className="mt-8">
-            <CTA sub="R$97/mês ou R$697/ano à vista · 7 dias de garantia">Garantir minha vaga →</CTA>
+            <CTA sub="R$97/mês ou R$697/ano no PIX · 7 dias de garantia">Garantir minha vaga →</CTA>
           </div>
         </div>
       </section>
@@ -310,25 +309,21 @@ export default function DossierySalesPage() {
       <section className="border-b border-border">
         <div className="mx-auto max-w-2xl px-6 py-14">
           <h2 className="font-serif-d text-2xl md:text-3xl text-center text-balance">
-            As desculpas que sua cabeça vai inventar nos próximos 10 segundos.
+            As desculpas que sua cabeça já está inventando.
           </h2>
           <div className="mt-7 space-y-3">
             {[
               {
                 q: '“E se alguém descobrir que eu uso?”',
-                a: 'Ninguém descobre. Não conecta nas suas redes, não posta nada, não manda nada. Seus amigos só vão notar o resultado — e perguntar o que mudou. Aí você decide se conta.',
+                a: 'Ninguém descobre. Não conecta nas suas redes, não manda nada pra ninguém. Seus amigos só veem o resultado.',
               },
               {
                 q: '“Deve ser joguinho de PUA…”',
-                a: 'O oposto — e é por isso que funciona. Cantada decorada e personagem quebram no primeiro encontro. Aqui você é treinado de verdade: quando ela estiver na sua frente, o cara confiante é você, não um script.',
-              },
-              {
-                q: '“Vou deixar pra semana que vem.”',
-                a: 'Você já disse isso — sobre a academia, sobre a conversa que morreu, sobre ela. É exatamente assim que se chega em dezembro igual a janeiro. 7 dias de garantia: o único cenário sem risco é testar. O único com risco é continuar como está.',
+                a: 'Cantada decorada quebra no primeiro encontro. O Dossiery treina o SEU papo até o cara confiante ser você. Regra da casa: aqui se treina homem, ninguém vigia mulher.',
               },
               {
                 q: '“E se não funcionar pra mim?”',
-                a: 'Devolvemos 100% em até 7 dias, um clique, sem formulário de retenção. A gente só consegue bancar essa garantia porque sabemos o que acontece quando você vê seu jogo de fora pela primeira vez.',
+                a: '7 dias pra testar. Pede reembolso em 1 clique e recebe 100%. Sem formulário.',
               },
             ].map((f) => (
               <details key={f.q} className="group rounded-md border border-border bg-card p-5">
@@ -352,12 +347,11 @@ export default function DossierySalesPage() {
             <span className="text-primary">A única dúvida é com quem.</span>
           </h2>
           <p className="text-muted-foreground mt-5 text-[15px] max-w-md mx-auto">
-            Daqui a 7 dias você pode estar do outro lado da conversa — ou relendo esta página como
-            releu aquela mensagem. Você conhece o custo de "deixar pra depois". Vive ele todo fim de
-            semana.
+            Daqui a 7 dias você está do outro lado do chat. Ou relendo esta página, como releu
+            aquela mensagem.
           </p>
           <div className="mt-8">
-            <CTA sub={`Preço de fundador · vagas limitadas · sobe pra R$${PRECO_DEPOIS} depois`}>
+            <CTA sub={`Preço de fundador · sobe pra R$${PRECO_DEPOIS} depois`}>
               Virar o jogo agora →
             </CTA>
           </div>

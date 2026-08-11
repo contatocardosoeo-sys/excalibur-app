@@ -5,7 +5,7 @@ import OfertaCliente from '../../components/OfertaCliente'
 import { PROTOCOLO_ENCONTRO, TOTAL_JOGADAS } from '@/app/lib/dossiery/protocoloEncontro'
 
 export const metadata: Metadata = {
-  title: 'Oferta única — Protocolo Encontro · Dossiery',
+  title: 'Oferta única: Protocolo Encontro · Dossiery',
   robots: { index: false },
 }
 
@@ -22,13 +22,13 @@ export default function OtoEncontroPage() {
         {/* confirmação primeiro — ele acabou de pagar */}
         <div className="rounded-[5px] border border-[hsl(145_35%_35%)] bg-[hsl(145_35%_20%/0.15)] px-4 py-3 text-center">
           <span className="font-mono-d text-[11px] tracking-[0.2em] uppercase text-[hsl(145_35%_55%)]">
-            ✓ Pagamento confirmado — seu acesso está sendo liberado
+            ✓ Pagamento confirmado. Liberando seu acesso
           </span>
         </div>
 
         <div className="mt-8 text-center">
           <div className="font-mono-d text-[11px] tracking-[0.26em] uppercase text-primary">
-            Não fecha essa tela — oferta de uma vez só
+            Não fecha essa tela: só aparece uma vez
           </div>
           <h1 className="font-serif-d text-4xl md:text-[44px] leading-[1.05] mt-4">
             Você resolveu o chat.
@@ -36,10 +36,9 @@ export default function OtoEncontroPage() {
             <span className="text-primary">Agora falta a mesa.</span>
           </h1>
           <p className="text-muted-foreground mt-5 text-[15px] leading-relaxed max-w-md mx-auto">
-            O sistema te leva até o encontro marcado. E é exatamente aí que 90% dos caras queimam
-            tudo: entrevista de emprego com talheres, mão gelada na hora do beijo, despedida de
-            aperto de mão — e um <span className="text-foreground">“chegou bem?”</span> no dia
-            seguinte que enterra a noite inteira.
+            O Dossiery marca o encontro. É na mesa que 90% dos caras queimam tudo. Papo de
+            entrevista, mão gelada no beijo. O{' '}
+            <span className="text-foreground">“chegou bem?”</span> de manhã enterra a noite.
           </p>
         </div>
 
@@ -50,14 +49,14 @@ export default function OtoEncontroPage() {
             Protocolo Encontro · {TOTAL_JOGADAS} jogadas
           </div>
           <p className="font-serif-d text-[22px] mt-2 leading-snug">
-            Da chegada ao beijo — e do beijo ao segundo encontro. Cada jogada com o porquê.
+            Da chegada ao segundo encontro. Cada jogada com o porquê.
           </p>
           <ul className="mt-5 space-y-2.5">
             {PROTOCOLO_ENCONTRO.map((f) => (
               <li key={f.fase} className="flex gap-2.5 text-[13.5px] leading-snug">
                 <span className="text-primary font-bold shrink-0">✓</span>
                 <span className="text-muted-foreground">
-                  <span className="text-foreground font-medium">{f.codinome}</span> — {f.objetivo}
+                  <span className="text-foreground font-medium">{f.codinome}</span>: {f.objetivo}
                 </span>
               </li>
             ))}
@@ -67,26 +66,26 @@ export default function OtoEncontroPage() {
         {/* preço + CTA isolado */}
         <div className="mt-8 rounded-lg border-2 border-primary bg-primary/[0.06] p-6 text-center">
           <p className="text-[14px] text-muted-foreground">
-            Dentro do app, ele custa <span className="line-through">R$147</span>.
+            No app, custa <span className="line-through">R$147</span>.
           </p>
           <p className="font-serif-d text-3xl mt-1">
-            Nesta tela — e só nesta tela — <span className="text-primary">R$97</span>.
+            Na janela pós-compra: <span className="text-primary">R$97</span>.
           </p>
           <div className="mt-5">
             <OfertaCliente
               oferta="encontro_oto"
               valor={97}
-              cta="SIM — adicionar o Protocolo por R$97 →"
+              cta="SIM, adicionar o Protocolo por R$97 →"
               next="/dossiery/oferta/perfil"
               declineHref="/dossiery/oferta/ultima"
-              declineLabel="Não. Prefiro improvisar na mesa e ver no que dá →"
-              nota="Cartão salvo? 1 clique, sem redigitar. PIX? Um QR e pronto."
+              declineLabel="Vou improvisar na mesa →"
+              nota="Cartão salvo: 1 clique. PIX: QR na hora."
             />
           </div>
         </div>
 
         <p className="mt-6 text-center font-mono-d text-[10px] tracking-widest uppercase text-muted-foreground/60">
-          Coberto pela mesma garantia de 7 dias da sua compra
+          Mesma garantia de 7 dias da compra
         </p>
       </main>
     </div>

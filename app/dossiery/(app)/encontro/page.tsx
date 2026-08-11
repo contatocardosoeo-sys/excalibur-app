@@ -47,8 +47,8 @@ function EncontroConteudo() {
         <h1 className="font-serif-d text-4xl mt-2">Protocolo Encontro</h1>
         <p className="text-muted-foreground mt-3 text-[14px] max-w-xl leading-relaxed">
           Da marcação ao segundo encontro: {TOTAL_JOGADAS} jogadas em 7 fases, cada uma com o
-          porquê. <span className="text-foreground">Leia a fase antes do encontro, não durante</span>{' '}
-          — na mesa, celular é jogada proibida.
+          porquê. <span className="text-foreground">Leia a fase antes do encontro.</span> Na mesa,
+          celular é jogada proibida.
         </p>
       </div>
 
@@ -104,7 +104,7 @@ function EncontroConteudo() {
       ))}
 
       <p className="mt-12 text-center font-mono-d text-[10px] tracking-widest uppercase text-muted-foreground/60">
-        ♠ voltou do encontro? Debriefa com o Coach — o que funcionou vira padrão, o que travou vira treino.
+        ♠ voltou do encontro? Debriefa com o Coach: o que funcionou vira padrão, o que travou vira treino.
       </p>
     </div>
   )
@@ -120,9 +120,8 @@ function EncontroBloqueado({ naJanela }: { naJanela: boolean }) {
         </div>
         <h1 className="font-serif-d text-4xl mt-3">Protocolo Encontro</h1>
         <p className="text-muted-foreground mt-4 text-[14.5px] leading-relaxed max-w-md mx-auto">
-          O chat te leva até a mesa — e é NA mesa que 90% queimam tudo. {TOTAL_JOGADAS} jogadas em 7
-          fases: convite fechado, véspera anti-bolo, chegada, conversa, a janela do beijo, fim no
-          pico e o D+1 que puxa o segundo encontro. Cada uma com o porquê.
+          90% queimam na mesa o que ganharam no chat. {TOTAL_JOGADAS} jogadas em 7 fases: convite
+          fechado, anti-bolo, janela do beijo, D+1 do segundo encontro. Cada uma com o porquê.
         </p>
       </div>
 
@@ -132,7 +131,7 @@ function EncontroBloqueado({ naJanela }: { naJanela: boolean }) {
             <li key={f.fase} className="flex gap-2.5 text-[13px] text-muted-foreground leading-snug">
               <span className="text-primary font-bold shrink-0">✓</span>
               <span>
-                <span className="text-foreground font-medium">{f.codinome}</span> — {f.objetivo}
+                <span className="text-foreground font-medium">{f.codinome}:</span> {f.objetivo}
               </span>
             </li>
           ))}
@@ -149,7 +148,7 @@ function EncontroBloqueado({ naJanela }: { naJanela: boolean }) {
               <span className="line-through text-muted-foreground text-lg mr-2">R$147</span>
               <span className="font-serif-d text-3xl text-primary">R$97</span>
               <p className="font-mono-d text-[10px] tracking-widest uppercase text-primary mt-1.5">
-                condição da janela pós-compra — o servidor cumpre o prazo
+                preço da janela pós-compra · quando fecha, fechou
               </p>
             </>
           ) : (

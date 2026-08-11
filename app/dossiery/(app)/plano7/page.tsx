@@ -98,7 +98,7 @@ function Plano7Conteudo() {
       ))}
 
       <p className="mt-12 text-center font-mono-d text-[10px] tracking-widest uppercase text-muted-foreground/60">
-        ♠ terminou o D7? O Operador completo (Raio-X + Coach ilimitados) é o próximo nível — /dossiery/precos
+        ♠ terminou o D7? O Operador (Raio-X + Coach ilimitados) é o próximo nível: /dossiery/precos
       </p>
     </div>
   )
@@ -113,9 +113,8 @@ function Plano7Bloqueado() {
         </div>
         <h1 className="font-serif-d text-4xl mt-3">Plano 7 Dias</h1>
         <p className="text-muted-foreground mt-4 text-[14.5px] leading-relaxed max-w-md mx-auto">
-          Do zero a conversas vivas e 1 encontro proposto em uma semana. Uma missão por dia, menos
-          de 30 minutos, com o porquê de cada passo — perfil, reativação, abertura, sustentação,
-          proposta, anti-bolo e debrief.
+          Uma missão por dia, {TOTAL_PASSOS_PLANO} passos, nada acima de 30 minutos. No D7 você
+          tem conversa viva e um encontro proposto.
         </p>
       </div>
 
@@ -127,14 +126,14 @@ function Plano7Bloqueado() {
         <OfertaCliente
           oferta="plano7"
           valor={19}
-          cta="Começar o bootcamp por R$19 →"
+          cta="Começar o Dia 1 por R$19 →"
           next="/dossiery/plano7"
           nota="PIX ou cartão · menos que um lanche"
         />
       </div>
 
       <p className="mt-6 text-center font-mono-d text-[10px] tracking-widest uppercase text-muted-foreground/60">
-        Garantia de 7 dias — se não executar, devolvo seu dinheiro e seu Modo Trouxa
+        Garantia de 7 dias: devolvo seu dinheiro e o seu Modo Trouxa junto
       </p>
     </div>
   )

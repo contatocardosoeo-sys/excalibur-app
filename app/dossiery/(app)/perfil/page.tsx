@@ -43,8 +43,8 @@ function PerfilConteudo() {
         </div>
         <h1 className="font-serif-d text-4xl mt-2">Perfil Magnético</h1>
         <p className="text-muted-foreground mt-3 text-[14px] max-w-xl leading-relaxed">
-          {TOTAL_ITENS_PERFIL} ações para o Instagram (e apps) que trabalha por você 24/7.{' '}
-          <span className="text-foreground">Execute em ordem</span> — fotos primeiro, o resto em
+          {TOTAL_ITENS_PERFIL} ações para o Instagram (e apps) trabalhar por você 24/7.{' '}
+          <span className="text-foreground">Execute em ordem:</span> fotos primeiro, o resto em
           cima. Tudo com a SUA vida real: a vitrine melhora, o produto é você.
         </p>
       </div>
@@ -96,7 +96,7 @@ function PerfilConteudo() {
       ))}
 
       <p className="mt-12 text-center font-mono-d text-[10px] tracking-widest uppercase text-muted-foreground/60">
-        ♠ perfil arrumado? Agora as aberturas do Kit rendem o dobro — /dossiery/kit
+        ♠ perfil arrumado? As aberturas do Kit rendem o dobro: /dossiery/kit
       </p>
     </div>
   )
@@ -112,9 +112,8 @@ function PerfilBloqueado({ naJanela }: { naJanela: boolean }) {
         </div>
         <h1 className="font-serif-d text-4xl mt-3">Perfil Magnético</h1>
         <p className="text-muted-foreground mt-4 text-[14.5px] leading-relaxed max-w-md mx-auto">
-          Antes de responder, ela olha seu perfil — e decide em 5 segundos. {TOTAL_ITENS_PERFIL}{' '}
-          ações em 6 frentes: o stack das 6 fotos, bio e grade, stories que puxam DM, o jogo dos
-          stories dela, DM game e a auditoria do que apagar hoje.
+          Ela olha seu perfil antes de responder. Decide em 5 segundos. {TOTAL_ITENS_PERFIL} ações
+          em 6 frentes: fotos, bio, stories, DM game, e o que apagar hoje.
         </p>
       </div>
 
@@ -139,7 +138,7 @@ function PerfilBloqueado({ naJanela }: { naJanela: boolean }) {
               <span className="line-through text-muted-foreground text-lg mr-2">R$67</span>
               <span className="font-serif-d text-3xl text-primary">R$47</span>
               <p className="font-mono-d text-[10px] tracking-widest uppercase text-primary mt-1.5">
-                condição da janela pós-compra — o servidor cumpre o prazo
+                preço da janela pós-compra · quando fecha, fechou
               </p>
             </>
           ) : (

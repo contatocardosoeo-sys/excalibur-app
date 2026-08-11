@@ -44,10 +44,9 @@ function RecomecoConteudo() {
         </div>
         <h1 className="font-serif-d text-4xl mt-2">Protocolo Recomeço</h1>
         <p className="text-muted-foreground mt-3 text-[14px] max-w-xl leading-relaxed">
-          {TOTAL_JOGADAS_RECOMECO} jogadas em 6 fases — da verdade nua ao veredito.{' '}
+          {TOTAL_JOGADAS_RECOMECO} jogadas em 6 fases, da verdade nua ao veredito.{' '}
           <span className="text-foreground">Leia a Fase 1 inteira antes de qualquer mensagem.</span>{' '}
-          Este protocolo tem duas vitórias possíveis: voltar em outra dinâmica, ou fechar o ciclo
-          com dignidade. As duas valem.
+          Duas vitórias valem aqui: voltar em outra dinâmica ou fechar o ciclo com dignidade.
         </p>
       </div>
 
@@ -102,7 +101,7 @@ function RecomecoConteudo() {
       ))}
 
       <p className="mt-12 text-center font-mono-d text-[10px] tracking-widest uppercase text-muted-foreground/60">
-        ♠ na dúvida numa fase? Debriefa com o Coach antes de agir — frieza é a regra da casa.
+        ♠ na dúvida numa fase? Debriefa com o Coach antes de agir. Frieza é a regra da casa.
       </p>
     </div>
   )
@@ -118,10 +117,9 @@ function RecomecoBloqueado({ naJanela }: { naJanela: boolean }) {
         </div>
         <h1 className="font-serif-d text-4xl mt-3">Protocolo Recomeço</h1>
         <p className="text-muted-foreground mt-4 text-[14.5px] leading-relaxed max-w-md mx-auto">
-          Terminou e ela não sai da cabeça? Este é o protocolo da decisão FRIA:{' '}
-          {TOTAL_JOGADAS_RECOMECO} jogadas em 6 fases — diagnóstico brutal (dá pra voltar? DEVERIA?),
-          silêncio estratégico, reconstrução real, reaproximação sem carência, o encontro de reset,
-          e o veredito: voltar em outra dinâmica ou fechar o ciclo com dignidade.
+          Terminou e ela ainda mora na sua cabeça. Aqui a decisão sai fria:{' '}
+          {TOTAL_JOGADAS_RECOMECO} jogadas em 6 fases, do diagnóstico brutal ao veredito. Voltar em
+          outra dinâmica ou fechar o ciclo com dignidade.
         </p>
       </div>
 
@@ -131,7 +129,7 @@ function RecomecoBloqueado({ naJanela }: { naJanela: boolean }) {
             <li key={f.fase} className="flex gap-2.5 text-[13px] text-muted-foreground leading-snug">
               <span className="text-primary font-bold shrink-0">✓</span>
               <span>
-                <span className="text-foreground font-medium">{f.codinome}</span> — {f.objetivo}
+                <span className="text-foreground font-medium">{f.codinome}:</span> {f.objetivo}
               </span>
             </li>
           ))}
@@ -148,7 +146,7 @@ function RecomecoBloqueado({ naJanela }: { naJanela: boolean }) {
               <span className="line-through text-muted-foreground text-lg mr-2">R$147</span>
               <span className="font-serif-d text-3xl text-primary">R$97</span>
               <p className="font-mono-d text-[10px] tracking-widest uppercase text-primary mt-1.5">
-                condição da janela pós-compra — o servidor cumpre o prazo
+                preço da janela pós-compra · quando fecha, fechou
               </p>
             </>
           ) : (
@@ -170,7 +168,7 @@ function RecomecoBloqueado({ naJanela }: { naJanela: boolean }) {
       </div>
 
       <p className="mt-6 text-center font-mono-d text-[10px] tracking-widest uppercase text-muted-foreground/60">
-        Aviso honesto: este protocolo tem uma fase que pode te dizer pra NÃO voltar
+        Aviso honesto: o veredito pode ser NÃO voltar
       </p>
     </div>
   )

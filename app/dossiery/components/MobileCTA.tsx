@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
-// Barra de CTA fixa no mobile — aparece depois que o CTA do hero sai da tela.
+// Barra de CTA fixa no mobile: aparece depois que o CTA do hero sai da tela.
 // A maior alavanca de conversão em tráfego frio mobile: a saída sempre no polegar.
 export default function MobileCTA() {
   const [visivel, setVisivel] = useState(false)
@@ -33,7 +33,7 @@ export default function MobileCTA() {
         href="/dossiery/precos"
         className="block text-center rounded-[4px] bg-primary text-primary-foreground font-semibold text-[15px] py-3.5 active:opacity-90"
       >
-        Virar o jogo — R$97/mês →
+        Fechar por R$97/mês →
       </Link>
       <p className="mt-1.5 text-center font-mono-d text-[9px] tracking-[0.14em] uppercase text-muted-foreground/70">
         Preço de fundador · 7 dias de garantia

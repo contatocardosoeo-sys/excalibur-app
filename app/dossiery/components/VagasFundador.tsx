@@ -23,8 +23,8 @@ export default function VagasFundador({ className = '' }: { className?: string }
         <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
       </span>
       <span>
-        Restam <b className="text-foreground tabular-nums">{restantes}</b> das {VAGAS_FUNDADOR} vagas
-        — contador real, direto do banco.
+        Restam <b className="text-foreground tabular-nums">{restantes}</b> das {VAGAS_FUNDADOR} vagas.
+        Contador real, direto do banco.
       </span>
     </span>
   )

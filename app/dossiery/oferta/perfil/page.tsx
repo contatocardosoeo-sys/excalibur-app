@@ -3,7 +3,7 @@ import OfertaCliente from '../../components/OfertaCliente'
 import { PERFIL_MAGNETICO, TOTAL_ITENS_PERFIL } from '@/app/lib/dossiery/perfilMagnetico'
 
 export const metadata: Metadata = {
-  title: 'Só mais uma coisa — Perfil Magnético · Dossiery',
+  title: 'Só mais uma coisa: Perfil Magnético · Dossiery',
   robots: { index: false },
 }
 
@@ -15,18 +15,17 @@ export default function Oto2PerfilPage() {
       <main className="mx-auto max-w-xl px-6 py-12">
         <div className="text-center">
           <div className="font-mono-d text-[11px] tracking-[0.26em] uppercase text-primary">
-            Última tela — depois disso, o funil acabou
+            Última tela antes do seu acesso
           </div>
           <h1 className="font-serif-d text-4xl md:text-[42px] leading-[1.05] mt-4">
-            Antes de você mandar a primeira mensagem…
+            Antes da primeira mensagem,
             <br />
             <span className="text-primary">ela vai olhar seu perfil.</span>
           </h1>
           <p className="text-muted-foreground mt-5 text-[15px] leading-relaxed max-w-md mx-auto">
-            É o que toda mulher faz antes de responder: abre seu Instagram e decide em{' '}
-            <span className="text-foreground">5 segundos</span> se você merece resposta. Selfie de
-            banheiro, grade morta, indireta triste de 2023 — seu perfil pode estar matando
-            conversas que você nem começou.
+            Ela abre seu Instagram e decide em{' '}
+            <span className="text-foreground">5 segundos</span> se responde. Selfie de banheiro e
+            indireta de 2023 matam o papo antes do oi.
           </p>
         </div>
 
@@ -36,7 +35,7 @@ export default function Oto2PerfilPage() {
             Perfil Magnético · {TOTAL_ITENS_PERFIL} ações
           </div>
           <p className="font-serif-d text-[22px] mt-2 leading-snug">
-            O Instagram que trabalha por você 24/7 — antes, durante e depois do match.
+            Seu Instagram aprovado na vistoria dos 5 segundos.
           </p>
           <ul className="mt-5 space-y-2.5">
             {PERFIL_MAGNETICO.map((g) => (
@@ -52,10 +51,10 @@ export default function Oto2PerfilPage() {
 
         <div className="mt-8 rounded-lg border-2 border-primary bg-primary/[0.06] p-6 text-center">
           <p className="text-[14px] text-muted-foreground">
-            Dentro do app: <span className="line-through">R$67</span>.
+            No app: <span className="line-through">R$67</span>.
           </p>
           <p className="font-serif-d text-3xl mt-1">
-            Agora, junto com o pacote: <span className="text-primary">R$47</span>.
+            Agora: <span className="text-primary">R$47</span>.
           </p>
           <div className="mt-5">
             <OfertaCliente
@@ -64,8 +63,8 @@ export default function Oto2PerfilPage() {
               cta="Adicionar o Perfil Magnético por R$47 →"
               next="/dossiery/bem-vindo"
               declineHref="/dossiery/bem-vindo"
-              declineLabel="Não — meu perfil tá ok do jeito que tá →"
-              nota="1 clique no cartão salvo · ou PIX na hora"
+              declineLabel="Meu perfil tá bom assim →"
+              nota="1 clique no cartão salvo · PIX na hora"
             />
           </div>
         </div>

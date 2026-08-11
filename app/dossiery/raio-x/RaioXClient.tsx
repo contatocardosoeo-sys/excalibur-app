@@ -12,9 +12,9 @@ import {
 type Tela = 'intro' | 'quiz' | 'processando' | 'email' | 'resultado'
 
 const PASSOS_ANALISE = [
-  'Lendo seu padrão de resposta…',
-  'Cruzando com o cânone de 4.000+ conversas…',
-  'Identificando o seu Modo dominante…',
+  'Lendo suas respostas…',
+  'Cruzando com 4.000+ conversas reais…',
+  'Identificando seu Modo dominante…',
   'Montando o dossiê…',
 ]
 
@@ -63,7 +63,7 @@ export default function RaioXClient() {
     if (enviando) return
     setErro(null)
     if (!consent) {
-      setErro('Marque a caixinha pra eu poder te mandar o resultado.')
+      setErro('Marca a caixinha pra eu liberar o resultado.')
       return
     }
     setEnviando(true)

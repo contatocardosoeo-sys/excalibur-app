@@ -35,35 +35,35 @@ export default async function ArsenalPage() {
     {
       href: '/dossiery/plano7',
       nome: 'Plano 7 Dias',
-      desc: 'Bootcamp de entrada: uma missão por dia, do zero ao encontro proposto.',
+      desc: 'Bootcamp de entrada: 40 passos em 7 dias, do zero ao encontro proposto.',
       tem: aberto || e.plano_7d,
       preco: 'R$19',
     },
     {
       href: '/dossiery/kit',
       nome: 'Kit 50 Aberturas',
-      desc: 'As 50 primeiras mensagens que puxam resposta, por situação, com o porquê.',
+      desc: '50 mensagens de abertura que puxam resposta, por situação, com o porquê.',
       tem: aberto || e.kit_aberturas,
       preco: 'R$37',
     },
     {
       href: '/dossiery/encontro',
       nome: 'Protocolo Encontro',
-      desc: 'Da chegada ao beijo — e ao segundo encontro. 34 jogadas em 7 fases.',
+      desc: '34 jogadas em 7 fases, do convite fechado ao segundo encontro.',
       tem: aberto || e.protocolo_encontro,
       preco: 'R$147',
     },
     {
       href: '/dossiery/perfil',
       nome: 'Perfil Magnético',
-      desc: 'O Instagram que trabalha por você 24/7: fotos, bio, stories, DM game.',
+      desc: '37 ações pro perfil trabalhar por você 24/7: fotos, bio, stories, DM game.',
       tem: aberto || e.perfil_magnetico,
       preco: 'R$67',
     },
     {
       href: '/dossiery/recomeco',
       nome: 'Protocolo Recomeço',
-      desc: 'Reconquista fria ou ciclo fechado com dignidade. Decisão antes de mensagem.',
+      desc: '30 jogadas pra decidir a frio: voltar ou fechar o ciclo com dignidade.',
       tem: aberto || e.recomeco,
       preco: 'R$147',
     },
@@ -94,7 +94,7 @@ export default async function ArsenalPage() {
       {meus.length > 0 && (
         <div className="mt-8">
           <div className="font-mono-d text-[11px] tracking-[0.2em] uppercase text-muted-foreground mb-4">
-            Seus — acesso vitalício
+            Seus · acesso vitalício
           </div>
           <div className="grid sm:grid-cols-2 gap-4">
             {meus.map((i) => (
@@ -124,7 +124,7 @@ export default async function ArsenalPage() {
       {bloqueados.length > 0 && (
         <div className="mt-8">
           <div className="font-mono-d text-[11px] tracking-[0.2em] uppercase text-muted-foreground mb-4">
-            Bloqueados — destrave quando quiser
+            Bloqueados · destrave quando quiser
           </div>
           <div className="grid sm:grid-cols-2 gap-4">
             {bloqueados.map((i) => (
@@ -150,7 +150,7 @@ export default async function ArsenalPage() {
       )}
 
       <p className="mt-10 text-center font-mono-d text-[10px] tracking-widest uppercase text-muted-foreground/60">
-        ♠ todo produto do arsenal é vitalício — compra uma vez, é seu pra sempre
+        ♠ todo produto aqui é vitalício: comprou uma vez, é seu pra sempre
       </p>
     </div>
   )
