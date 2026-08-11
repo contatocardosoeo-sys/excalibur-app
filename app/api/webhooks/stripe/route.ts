@@ -11,6 +11,7 @@ import {
   type Oferta,
 } from '@/app/lib/dossiery/stripe'
 import { getSupabaseAdmin } from '@/app/lib/dossiery/supabaseAdmin'
+import { acharOuCriarUsuario } from '@/app/lib/dossiery/conta'
 import { enviarCapi } from '@/app/lib/dossiery/capi'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
@@ -95,9 +96,19 @@ export async function POST(request: NextRequest) {
 
 // Libera o acesso a partir de uma checkout.session paga (cartão ou PIX).
 async function ativarPorSession(admin: SupabaseClient, session: Stripe.Checkout.Session) {
-  const userId = session.client_reference_id || session.metadata?.user_id
+  const email = session.customer_details?.email || session.customer_email || null
+  let userId = session.client_reference_id || session.metadata?.user_id || null
+
+  // Guest checkout: pagou sem conta. A conta nasce aqui, pelo e-mail da compra.
+  if (!userId && email) {
+    userId = await acharOuCriarUsuario(admin, email)
+    if (!userId) {
+      console.error('[stripe-webhook] falhou criar conta do convidado', session.id, email)
+      return
+    }
+  }
   if (!userId) {
-    console.error('[stripe-webhook] session sem user_id', session.id)
+    console.error('[stripe-webhook] session sem user_id e sem e-mail', session.id)
     return
   }
 
@@ -181,6 +192,7 @@ async function ativarPorSession(admin: SupabaseClient, session: Stripe.Checkout.
       stripe_id: stripeId,
       stripe_customer_id: customerId,
       renova_em: renovaEm,
+      ...(email ? { email } : {}),
       // Order bump marcado no checkout → kit liberado junto (nunca volta a false)
       ...(session.metadata?.bump === '1' ? { kit_aberturas: true } : {}),
       // Comandante leva o arsenal inteiro, vitalício, na hora.

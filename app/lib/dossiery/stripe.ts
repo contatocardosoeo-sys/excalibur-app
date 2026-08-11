@@ -80,6 +80,7 @@ export type Oferta =
   | 'recomeco_oto'
   | 'recomeco_app'
   | 'operador_credito'
+  | 'renovacao'
 
 export const OFERTAS: Oferta[] = [
   'kit',
@@ -92,6 +93,7 @@ export const OFERTAS: Oferta[] = [
   'recomeco_oto',
   'recomeco_app',
   'operador_credito',
+  'renovacao',
 ]
 
 const PRICE_ENV: Record<Oferta, string | undefined> = {
@@ -105,6 +107,7 @@ const PRICE_ENV: Record<Oferta, string | undefined> = {
   recomeco_oto: process.env.STRIPE_PRICE_RECOMECO_OTO,
   recomeco_app: process.env.STRIPE_PRICE_RECOMECO_APP,
   operador_credito: process.env.STRIPE_PRICE_OPERADOR_CREDITO,
+  renovacao: process.env.STRIPE_PRICE_RENOVACAO,
 }
 
 export function priceIdOferta(oferta: Oferta): string | null {
@@ -122,8 +125,11 @@ export type ColunaEntitlement =
 // operador_credito não é entitlement de arsenal: é upgrade de PLANO.
 // O webhook trata separado (vira assinatura ativa de 12 meses).
 export function ofertaEhUpgradeDePlano(oferta: Oferta): boolean {
-  return oferta === 'operador_credito'
+  return oferta === 'operador_credito' || oferta === 'renovacao'
 }
+
+// Quantos dias antes do fim o aviso de renovação aparece (D330 de 365).
+export const JANELA_RENOVACAO_DIAS = 35
 
 export const COLUNAS_ENTITLEMENT: ColunaEntitlement[] = [
   'kit_aberturas',

@@ -110,6 +110,8 @@ disponível no Supabase). Idempotente.
 | `STRIPE_PRICE_ANUAL_T3` | price único R$697 — faixa Vanguarda (200 seguintes) |
 | `STRIPE_PRICE_COMANDANTE` | price único R$1.297 — tier alto com arsenal completo + call |
 | `STRIPE_PRICE_OPERADOR_CREDITO` | price único R$478 — upsell pós-tripwire (R$497 menos os R$19) |
+| `STRIPE_PRICE_RENOVACAO` | price único R$597 — renovação de fidelidade (D330) |
+| `DOSSIERY_CRON_SECRET` | segredo do cron de renovação (header `x-dossiery-cron`) |
 | `META_CAPI_TOKEN` | token da Conversions API (Events Manager → Configurações). Liga o tracking server-side. |
 | `DOSSIERY_GATE` | `off` = tudo aberto (preview). **Remover no go-live.** |
 | `DOSSIERY_PAYWALL` | `off` = login exigido mas IA liberada sem assinar. Padrão: on. |
@@ -178,7 +180,9 @@ painel. Se preferir fazer tudo manual, o passo a passo abaixo cobre o mesmo.
    `0004_dossiery_funil.sql` (coluna `protocolo_encontro` + **RLS: assinaturas
    viram somente-leitura pro usuário** — correção de segurança, não pule) →
    `0005_dossiery_esteira.sql` (leads do quiz + colunas `plano_7d`,
-   `perfil_magnetico`, `recomeco`).
+   `perfil_magnetico`, `recomeco`) →
+   `0006_dossiery_guest_renovacao.sql` (guest checkout: `email`; ciclo de
+   renovação: `renovacao_avisada_em`; WhatsApp no lead).
 2. Auth → Providers → Email: para funil sem fricção, **desligar** “Confirm
    email” (ou manter ligado — o fluxo de confirmação já é tratado no app).
 3. Auth → URL Configuration: adicionar o domínio de produção em *Site URL* e

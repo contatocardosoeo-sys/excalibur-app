@@ -1,4 +1,6 @@
+import { Suspense } from 'react'
 import DossierySidebar from './components/DossierySidebar'
+import AvisoRenovacao from './components/AvisoRenovacao'
 
 export default function DossieryAppLayout({
   children,
@@ -8,7 +10,13 @@ export default function DossieryAppLayout({
   return (
     <div className="flex min-h-screen">
       <DossierySidebar />
-      <main className="flex-1 overflow-auto d-grid-bg">{children}</main>
+      <div className="flex-1 flex flex-col overflow-auto d-grid-bg">
+        {/* D330: aviso de renovação nos últimos 35 dias do anual */}
+        <Suspense fallback={null}>
+          <AvisoRenovacao />
+        </Suspense>
+        <main className="flex-1">{children}</main>
+      </div>
     </div>
   )
 }

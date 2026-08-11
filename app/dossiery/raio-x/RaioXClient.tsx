@@ -24,6 +24,7 @@ export default function RaioXClient() {
   const [respostas, setRespostas] = useState<number[]>([])
   const [passoAnalise, setPassoAnalise] = useState(0)
   const [email, setEmail] = useState('')
+  const [zap, setZap] = useState('')
   const [consent, setConsent] = useState(false)
   const [enviando, setEnviando] = useState(false)
   const [erro, setErro] = useState<string | null>(null)
@@ -74,6 +75,7 @@ export default function RaioXClient() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email,
+          whatsapp: zap,
           arquetipo: r?.arq,
           score: r?.score,
           respostas,
@@ -216,6 +218,14 @@ export default function RaioXClient() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="seu@email.com"
                 className="w-full rounded-[4px] border border-border bg-card px-4 py-3.5 text-[15px] text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none transition"
+              />
+              <input
+                type="tel"
+                inputMode="numeric"
+                value={zap}
+                onChange={(e) => setZap(e.target.value)}
+                placeholder="WhatsApp com DDD (opcional)"
+                className="mt-3 w-full rounded-[4px] border border-border bg-card px-4 py-3.5 text-[15px] text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none transition"
               />
               <label className="flex items-start gap-2.5 mt-3.5 cursor-pointer">
                 <input

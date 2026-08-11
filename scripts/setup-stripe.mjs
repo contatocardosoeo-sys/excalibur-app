@@ -121,6 +121,10 @@ try {
   const operadorCredito = await acharOuCriarPrice({
     product: prodOperador.id, lookup: 'dossiery_operador_credito', amount: 47800, recurring: false,
   })
+  // Renovação de fidelidade: quem já foi cliente paga menos que o degrau vigente
+  const renovacao = await acharOuCriarPrice({
+    product: prodOperador.id, lookup: 'dossiery_renovacao', amount: 59700, recurring: false,
+  })
 
   let whsec = null
   if (webhookUrl) {
@@ -179,6 +183,7 @@ try {
   console.log(`STRIPE_PRICE_ANUAL_T3=${anualT3.id}`)
   console.log(`STRIPE_PRICE_COMANDANTE=${comandante.id}`)
   console.log(`STRIPE_PRICE_OPERADOR_CREDITO=${operadorCredito.id}`)
+  console.log(`STRIPE_PRICE_RENOVACAO=${renovacao.id}`)
   if (whsec) console.log(`STRIPE_WEBHOOK_SECRET=${whsec}`)
   console.log('═════════════════════════════════════════════════════════════')
   console.log('\n✅ Stripe pronto. Agora:')

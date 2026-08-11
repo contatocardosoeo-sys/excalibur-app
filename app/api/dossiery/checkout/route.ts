@@ -23,16 +23,14 @@ export async function POST(request: NextRequest) {
     )
   }
 
+  // Guest checkout: comprar NÃO exige conta. Quem já está logado segue logado;
+  // quem não está compra pelo e-mail e a conta nasce no webhook, com entrada
+  // automática em /dossiery/entrando. Cadastro antes do pagamento é a maior
+  // fricção do funil em mobile.
   const supabase = await createSupabaseServer()
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  if (!user) {
-    return NextResponse.json(
-      { error: 'Crie sua conta antes de assinar.', entrar: '/dossiery/criar-conta?next=/dossiery/precos' },
-      { status: 401 }
-    )
-  }
 
   let tier: Tier = 'operador'
   let bump = false
@@ -55,11 +53,13 @@ export async function POST(request: NextRequest) {
     const admin = getSupabaseAdmin()
 
     // Reaproveita customer existente (se o usuário já tentou/assinou antes)
-    const { data: assinatura } = await supabase
-      .from('dossiery_assinaturas')
-      .select('stripe_customer_id')
-      .eq('user_id', user.id)
-      .maybeSingle()
+    const { data: assinatura } = user
+      ? await supabase
+          .from('dossiery_assinaturas')
+          .select('stripe_customer_id')
+          .eq('user_id', user.id)
+          .maybeSingle()
+      : { data: null }
 
     // Degrau REAL: o preço do anual sai do contador do banco, no servidor.
     // O cliente nunca escolhe o preço, só vê o que a faixa vigente oferece.
@@ -93,14 +93,23 @@ export async function POST(request: NextRequest) {
     const params: Stripe.Checkout.SessionCreateParams = {
       mode: modo,
       line_items,
-      // Sucesso cai na OTO (upsell pós-compra) — o funil continua de lá.
-      success_url: `${origin}/dossiery/oferta/encontro?cs={CHECKOUT_SESSION_ID}&ciclo=${ciclo}&bump=${comBump ? 1 : 0}`,
+      // Convidado passa pela ponte de entrada (cria sessão pelo cs) antes da OTO.
+      success_url: `${origin}/dossiery/entrando?cs={CHECKOUT_SESSION_ID}&next=${encodeURIComponent(
+        `/dossiery/oferta/encontro?ciclo=${ciclo}&bump=${comBump ? 1 : 0}`
+      )}`,
       cancel_url: `${origin}/dossiery/precos`,
-      client_reference_id: user.id,
+      ...(user ? { client_reference_id: user.id } : {}),
       ...(clienteExistente
         ? { customer: clienteExistente }
-        : { customer_email: user.email ?? undefined }),
-      metadata: { user_id: user.id, ciclo, tier, bump: comBump ? '1' : '0' },
+        : user?.email
+          ? { customer_email: user.email }
+          : {}),
+      metadata: {
+        ...(user ? { user_id: user.id } : { guest: '1' }),
+        ciclo,
+        tier,
+        bump: comBump ? '1' : '0',
+      },
       allow_promotion_codes: true,
       locale: 'pt-BR',
       // payment_method_types omitido de propósito: o Stripe usa os métodos
@@ -108,14 +117,16 @@ export async function POST(request: NextRequest) {
     }
 
     if (modo === 'subscription') {
-      params.subscription_data = { metadata: { user_id: user.id } }
+      if (user) params.subscription_data = { metadata: { user_id: user.id } }
     } else {
       // Recibo por e-mail + guarda o user no payment_intent p/ o webhook.
       // setup_future_usage SÓ no cartão (PIX não suporta): habilita o
       // upsell de 1 clique pós-compra sem redigitar o cartão.
       // installments: parcelamento BR no cartão (até 12x) — exige o recurso
       // ativado no painel Stripe; sem ele, o checkout segue à vista normal.
-      params.payment_intent_data = { metadata: { user_id: user.id, ciclo } }
+      params.payment_intent_data = {
+        metadata: { ...(user ? { user_id: user.id } : { guest: '1' }), ciclo },
+      }
       params.payment_method_options = {
         card: { setup_future_usage: 'off_session', installments: { enabled: true } },
       }

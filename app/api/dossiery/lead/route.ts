@@ -18,6 +18,7 @@ export async function POST(request: NextRequest) {
     respostas?: number[]
     origem?: string
     consent?: boolean
+    whatsapp?: string
   } | null = null
   try {
     body = await request.json()
@@ -43,6 +44,9 @@ export async function POST(request: NextRequest) {
       ? body.respostas.filter((n) => typeof n === 'number').slice(0, 20)
       : null
   const origem = typeof body?.origem === 'string' ? body.origem.slice(0, 300) : null
+  // WhatsApp opcional: só dígitos, tamanho de telefone BR (com ou sem DDI).
+  const zapCru = typeof body?.whatsapp === 'string' ? body.whatsapp.replace(/\D/g, '') : ''
+  const whatsapp = zapCru.length >= 10 && zapCru.length <= 13 ? zapCru : null
 
   try {
     const admin = getSupabaseAdmin()
@@ -52,6 +56,7 @@ export async function POST(request: NextRequest) {
       score,
       respostas,
       origem,
+      whatsapp,
       consent: true,
       updated_at: new Date().toISOString(),
     }
@@ -62,7 +67,13 @@ export async function POST(request: NextRequest) {
       if (error.code === '23505') {
         const { error: upErr } = await admin
           .from('dossiery_leads')
-          .update({ arquetipo, score, respostas, updated_at: linha.updated_at })
+          .update({
+            arquetipo,
+            score,
+            respostas,
+            ...(whatsapp ? { whatsapp } : {}),
+            updated_at: linha.updated_at,
+          })
           .ilike('email', email)
         if (upErr) throw new Error(upErr.message)
       } else {
