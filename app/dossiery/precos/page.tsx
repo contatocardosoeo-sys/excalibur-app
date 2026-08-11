@@ -5,11 +5,10 @@ import { useState } from 'react'
 import VagasFundador from '../components/VagasFundador'
 
 const BENEFICIOS = [
-  'RAIO-X ilimitado — cola a conversa, vê o Modo Trouxa de fora',
-  'TREINO 24/7 — coach de elite no cânone, sempre com o porquê',
-  'CAMPO — jogadas na SUA voz, leitura de sinal, fim do bolo surpresa',
-  'Zero joguinho: te tornamos o cara de verdade, não um personagem',
-  'Arsenal em expansão: Arena de Treino, Diário de Campo e mais',
+  'RAIO-X ilimitado: cola o print, caça o Modo Trouxa',
+  'TREINO 24/7: coach no cânone, sempre com o porquê',
+  'CAMPO: jogadas na sua voz, fim do bolo surpresa',
+  'Arena de Treino, Diário de Campo e o que mais vier',
 ]
 
 const BUMP_PRECO = 37
@@ -70,13 +69,13 @@ export default function PrecosPage() {
           <div className="font-mono-d text-[11px] tracking-[0.26em] uppercase text-[hsl(var(--brass))]">
             Protocolo Operador · acesso completo
           </div>
-          <h1 className="font-serif-d text-4xl md:text-5xl mt-3">Um plano. Sem pegadinha.</h1>
+          <h1 className="font-serif-d text-4xl md:text-5xl mt-3">Um plano. Tudo dentro.</h1>
           <p className="text-muted-foreground mt-3 max-w-md mx-auto text-[15px]">
-            Raio-X + Treino + Campo, ilimitados. Preço honesto e{' '}
+            Raio-X + Treino + Campo, ilimitados.{' '}
             <span className="text-foreground">7 dias de garantia incondicional</span>.
           </p>
           <p className="mt-3 inline-block rounded-[4px] border border-primary/50 bg-primary/[0.07] px-3 py-1.5 font-mono-d text-[10px] tracking-[0.14em] uppercase text-primary">
-            ⚠ Preço de fundador — trava pra sempre nas primeiras vagas
+            ⚠ Preço de fundador: trava pra sempre nas primeiras vagas
           </p>
           <div className="mt-2.5 text-[12.5px] text-muted-foreground flex justify-center">
             <VagasFundador />
@@ -96,7 +95,7 @@ export default function PrecosPage() {
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                {c === 'mensal' ? 'Mensal' : 'Anual · economize'}
+                {c === 'mensal' ? 'Mensal' : 'Anual · 40% off'}
               </button>
             ))}
           </div>
@@ -169,8 +168,8 @@ export default function PrecosPage() {
                   Kit “50 Aberturas Que Não Morrem”
                 </div>
                 <p className="text-[12.5px] text-muted-foreground mt-0.5 leading-snug">
-                  As 50 primeiras mensagens testadas que puxam resposta — por situação (match novo,
-                  ela sumiu, reconquista). Cole, adapte na sua voz, mande. Acesso vitalício.
+                  50 mensagens testadas que puxam resposta: match novo, ela sumiu, reconquista.
+                  Cola e manda na sua voz. Acesso vitalício.
                 </p>
               </div>
             </div>
@@ -183,7 +182,7 @@ export default function PrecosPage() {
           >
             {loading
               ? 'Abrindo checkout…'
-              : `${ciclo === 'anual' ? 'Garantir acesso' : 'Assinar agora'} — R$${base + (bump ? BUMP_PRECO : 0)} →`}
+              : `${ciclo === 'anual' ? 'Fechar agora' : 'Assinar agora'}: R$${base + (bump ? BUMP_PRECO : 0)} →`}
           </button>
           <p className="mt-3 text-center font-mono-d text-[10px] tracking-widest uppercase text-muted-foreground/70">
             Garantia de 7 dias · {ciclo === 'anual' ? 'PIX ou cartão' : 'cancele em 2 cliques'}
@@ -196,8 +195,8 @@ export default function PrecosPage() {
         </div>
 
         <p className="mt-10 text-center text-[12.5px] text-muted-foreground max-w-md mx-auto">
-          Pagamento seguro via Stripe. Não curtiu em 7 dias? Devolvemos tudo, sem perguntas — é só
-          pedir pelo portal ou suporte.
+          Pagamento seguro via Stripe. Reembolso total em até 7 dias, sem perguntas. Pede pelo
+          portal ou no suporte.
         </p>
         <p className="mt-4 text-center font-mono-d text-[10px] tracking-widest uppercase text-muted-foreground/60">
           <Link href="/dossiery/termos" className="hover:text-[hsl(var(--brass))]">Termos</Link>

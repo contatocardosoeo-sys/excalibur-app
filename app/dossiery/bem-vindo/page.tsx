@@ -5,7 +5,7 @@ import CompraTrack from './CompraTrack'
 
 export const dynamic = 'force-dynamic'
 
-// ♠ Fim do funil — confirma a compra e mostra o arsenal que ele destravou.
+// ♠ Fim do funil: confirma a compra e mostra o arsenal que ele destravou.
 export default async function BemVindoPage() {
   let e = { kit_aberturas: false, protocolo_encontro: false, perfil_magnetico: false, recomeco: false }
   try {
@@ -25,8 +25,8 @@ export default async function BemVindoPage() {
     /* sem env/sessão → mostra o padrão */
   }
 
-  const naoIncluido = 'não incluído — destrave dentro do app'
-  const vitalicio = 'liberado — acesso vitalício'
+  const naoIncluido = 'não incluído: destrave no app'
+  const vitalicio = 'liberado: acesso vitalício'
   const arsenal = [
     { ok: true, t: 'Plano Operador', d: 'Raio-X + Coach + Campo, ilimitados', href: '/dossiery/base' },
     { ok: e.kit_aberturas, t: 'Kit 50 Aberturas', d: e.kit_aberturas ? vitalicio : naoIncluido, href: '/dossiery/kit' },
@@ -50,9 +50,8 @@ export default async function BemVindoPage() {
         </div>
         <h1 className="font-serif-d text-4xl mt-3">Bem-vindo ao arsenal, Operador.</h1>
         <p className="text-muted-foreground mt-4 text-[14.5px] leading-relaxed">
-          Cartão libera na hora; se você pagou no PIX, o acesso abre assim que a transferência cair
-          (costuma ser 1-2 minutos). A partir de agora, o dossiê é sobre você: seu jogo, sua
-          evolução, seu resultado.
+          Cartão libera na hora. PIX abre 1-2 minutos depois da transferência cair. Seu arsenal
+          está listado abaixo.
         </p>
 
         {/* o que ele destravou */}
