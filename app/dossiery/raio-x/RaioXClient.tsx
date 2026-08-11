@@ -267,7 +267,7 @@ export default function RaioXClient() {
                 Seu arquétipo dominante
               </div>
               <h2 className="font-serif-d text-3xl mt-2">
-                {res.nome} <span className="text-muted-foreground text-lg">— {res.tag}</span>
+                {res.nome}<span className="text-muted-foreground text-lg">: {res.tag}</span>
               </h2>
               <p className="text-[14.5px] text-muted-foreground leading-relaxed mt-4">{res.diagnostico}</p>
               <div className="mt-5 rounded-md border border-border bg-secondary/40 p-4">
@@ -302,26 +302,25 @@ export default function RaioXClient() {
                 Imagina das suas conversas REAIS.
               </p>
               <p className="text-[13.5px] text-muted-foreground mt-3 max-w-sm mx-auto">
-                O Dossiery analisa as SUAS conversas, aponta o seu {res.nome} agindo em tempo real e
-                treina você até o padrão morrer. Correção genérica ajuda; correção no seu caso
-                resolve.
+                O Dossiery analisa as SUAS conversas, mostra seu {res.nome} agindo ao vivo e
+                treina você até o padrão morrer.
               </p>
               <Link
                 href="/dossiery/precos"
                 className="mt-5 block w-full rounded-[4px] bg-primary text-primary-foreground font-semibold text-[15px] py-4 hover:opacity-90 transition"
               >
-                Matar meu {res.nome} — ver o sistema →
+                Matar meu {res.nome}: ver o sistema →
               </Link>
               <Link
                 href="/dossiery/criar-conta?next=/dossiery/plano7"
                 className="mt-3 block text-[12.5px] text-muted-foreground underline underline-offset-4 hover:text-foreground transition"
               >
-                Orçamento apertado? Começa pelo Plano 7 Dias — R$19 →
+                Grana curta? Plano 7 Dias por R$19 →
               </Link>
             </div>
 
             <p className="mt-6 text-center font-mono-d text-[10px] tracking-widest uppercase text-muted-foreground/60">
-              Resultado completo + correções enviados pro seu e-mail
+              Resultado completo enviado pro seu e-mail
             </p>
           </div>
         )}
