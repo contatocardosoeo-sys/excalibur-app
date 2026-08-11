@@ -10,9 +10,9 @@ export interface Degrau {
 }
 
 export const DEGRAUS: Degrau[] = [
-  { nome: 'Fundador', vagas: 100, preco: 497, parcela: 42 },
-  { nome: 'Pioneiro', vagas: 200, preco: 597, parcela: 50 },
-  { nome: 'Vanguarda', vagas: 200, preco: 697, parcela: 58 },
+  { nome: 'Fundador', vagas: 100, preco: 497, parcela: 45 },
+  { nome: 'Pioneiro', vagas: 200, preco: 597, parcela: 53 },
+  { nome: 'Vanguarda', vagas: 200, preco: 697, parcela: 62 },
 ]
 
 export const TOTAL_VAGAS = DEGRAUS.reduce((n, d) => n + d.vagas, 0)

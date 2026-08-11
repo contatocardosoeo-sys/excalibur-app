@@ -188,6 +188,11 @@ async function ativarPorSession(admin: SupabaseClient, session: Stripe.Checkout.
     {
       user_id: userId,
       plano: 'operador',
+      // Tier real da compra: sem isso não dá para medir margem por plano
+      // nem aplicar limite de uso diferente por tier.
+      tier: session.metadata?.tier === 'recruta' || session.metadata?.tier === 'comandante'
+        ? session.metadata.tier
+        : 'operador',
       status: 'ativo',
       stripe_id: stripeId,
       stripe_customer_id: customerId,

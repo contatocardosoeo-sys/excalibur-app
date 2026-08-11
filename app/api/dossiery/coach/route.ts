@@ -3,6 +3,7 @@ import { anthropicStream, type ChatMessage } from '@/app/lib/dossiery/claude'
 import { COACH_SYSTEM } from '@/app/lib/dossiery/coachPrompt'
 import { createSupabaseServer } from '@/app/lib/supabase-server'
 import { paywallAtivo, temAssinaturaAtiva } from '@/app/lib/dossiery/assinatura'
+import { passouDoTeto, registrarUso, TETO_30D } from '@/app/lib/dossiery/uso'
 
 export const runtime = 'nodejs'
 export const maxDuration = 120
@@ -19,6 +20,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Gate: login + assinatura (pulado com DOSSIERY_GATE=off, p/ preview)
+  let userId: string | null = null
   if (process.env.DOSSIERY_GATE !== 'off') {
     const supabase = await createSupabaseServer()
     const {
@@ -31,6 +33,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Assine o Dossiery para destravar o Coach.', url: '/dossiery/precos' },
         { status: 402 }
+      )
+    }
+    userId = user.id
+    // Uso justo: teto alto, feito para pegar laço automatizado, não cliente.
+    if (await passouDoTeto(userId, 'coach')) {
+      return NextResponse.json(
+        {
+          error:
+            `Você passou de ${TETO_30D.coach} conversas com o Coach em 30 dias. ` +
+            'Isso é muito acima do uso normal. Fala comigo pelo suporte que a gente libera.',
+        },
+        { status: 429 }
       )
     }
   }
@@ -59,10 +73,13 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    const uid = userId
     const stream = await anthropicStream({
       system: COACH_SYSTEM,
       messages,
       effort: 'low',
+      // Roda quando o stream fecha, sem segurar a resposta do usuário.
+      onUso: uid ? (uso) => void registrarUso(uid, 'coach', uso) : undefined,
     })
     return new Response(stream, {
       headers: {

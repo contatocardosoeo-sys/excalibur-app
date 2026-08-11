@@ -3,6 +3,7 @@ import { anthropicText } from '@/app/lib/dossiery/claude'
 import { ANALISAR_SYSTEM, ANALISAR_SCHEMA } from '@/app/lib/dossiery/coachPrompt'
 import { createSupabaseServer } from '@/app/lib/supabase-server'
 import { paywallAtivo, temAssinaturaAtiva } from '@/app/lib/dossiery/assinatura'
+import { passouDoTeto, registrarUso, TETO_30D } from '@/app/lib/dossiery/uso'
 
 export const runtime = 'nodejs'
 export const maxDuration = 120
@@ -24,6 +25,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Gate: login + assinatura (pulado com DOSSIERY_GATE=off, p/ preview)
+  let userId: string | null = null
   if (process.env.DOSSIERY_GATE !== 'off') {
     const supabase = await createSupabaseServer()
     const {
@@ -36,6 +38,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Assine o Dossiery para destravar o Analisador.', url: '/dossiery/precos' },
         { status: 402 }
+      )
+    }
+    userId = user.id
+    if (await passouDoTeto(userId, 'analisar')) {
+      return NextResponse.json(
+        {
+          error:
+            `Você passou de ${TETO_30D.analisar} raio-x em 30 dias. Isso é muito acima do ` +
+            'uso normal. Fala comigo pelo suporte que a gente libera.',
+        },
+        { status: 429 }
       )
     }
   }
@@ -69,11 +82,15 @@ export async function POST(request: NextRequest) {
     .join('\n')
 
   try {
+    const uid = userId
     const jsonText = await anthropicText({
       system: ANALISAR_SYSTEM,
       messages: [{ role: 'user', content: prompt }],
       effort: 'medium',
       outputSchema: ANALISAR_SCHEMA,
+      // Sem cache aqui: o system tem ~275 tokens (abaixo do piso de 512) e
+      // cada análise é uma conversa diferente. Não há prefixo reaproveitável.
+      onUso: uid ? (uso) => void registrarUso(uid, 'analisar', uso) : undefined,
     })
     const resultado = JSON.parse(jsonText) as AnaliseResultado
     return NextResponse.json({ resultado })
