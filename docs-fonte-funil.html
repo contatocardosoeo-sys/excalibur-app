@@ -1,0 +1,830 @@
+<title>Dossiery · Especificação do Funil</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm 20mm; }
+  :root{
+    --fg:#141118; --fg-soft:#3E3847; --muted:#6B6478; --line:#D5CFC4; --line-soft:#E7E2D8;
+    --surface:#FAF8F4; --surface-2:#F0ECE4; --brass:#7C6118; --neg:#9C0E24; --pos:#255E3C; --alerta:#8A5410;
+    --serif:Georgia,"Iowan Old Style","Times New Roman",serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    --mono:"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#fff;color:var(--fg);font-family:var(--sans);font-size:10.2pt;line-height:1.5}
+  .pg{padding:0 0 10mm}
+
+  /* ── Capa ── */
+  .capa{height:252mm;display:flex;flex-direction:column;justify-content:space-between;page-break-after:always}
+  .capa .topo{padding-top:38mm}
+  .capa .selo{font-family:var(--mono);font-size:8.5pt;letter-spacing:.24em;text-transform:uppercase;color:var(--brass)}
+  .capa h1{font-family:var(--serif);font-size:34pt;line-height:1.04;margin:8mm 0 0;font-weight:600;letter-spacing:-.01em}
+  .capa .sub{font-size:13pt;color:var(--fg-soft);margin-top:6mm;max-width:135mm;line-height:1.45}
+  .capa .rodape{border-top:1.5pt solid var(--fg);padding-top:5mm;font-family:var(--mono);font-size:8.5pt;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:3mm}
+
+  h2{font-family:var(--serif);font-size:19pt;line-height:1.15;margin:0 0 3mm;font-weight:600;page-break-after:avoid}
+  h3{font-family:var(--serif);font-size:13pt;margin:8mm 0 2.5mm;font-weight:600;page-break-after:avoid}
+  h4{font-family:var(--sans);font-size:10pt;font-weight:700;margin:5mm 0 2mm;page-break-after:avoid}
+  .parte{page-break-before:always;border-top:1.5pt solid var(--fg);padding-top:5mm;margin-bottom:8mm}
+  .parte .rot{font-family:var(--mono);font-size:8.5pt;letter-spacing:.2em;text-transform:uppercase;color:var(--brass);margin-bottom:2mm}
+  .sec{page-break-before:always}
+  .eyebrow{font-family:var(--mono);font-size:8pt;letter-spacing:.18em;text-transform:uppercase;color:var(--brass);margin-bottom:1.5mm}
+  p{margin:0 0 3mm;max-width:none}
+  strong{font-weight:700}
+  code{font-family:var(--mono);font-size:8.8pt;background:var(--surface-2);padding:.5mm 1.2mm;border-radius:1mm}
+
+  table{border-collapse:collapse;width:100%;margin:3mm 0 5mm;font-size:8.8pt;page-break-inside:auto}
+  th,td{padding:1.8mm 2.5mm;text-align:left;border-bottom:.4pt solid var(--line-soft);vertical-align:top}
+  th{background:var(--surface-2);font-family:var(--mono);font-size:7.6pt;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600;border-bottom:.8pt solid var(--line)}
+  td.m,th.m{font-family:var(--mono);font-size:8.4pt}
+  td.num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+  tr{page-break-inside:avoid}
+  .pos{color:var(--pos);font-weight:600} .neg{color:var(--neg);font-weight:600} .al{color:var(--alerta);font-weight:600}
+
+  pre{margin:2mm 0 4mm;padding:3mm 3.5mm;background:var(--surface);border:.4pt solid var(--line);border-radius:1mm;font-family:var(--mono);font-size:8.3pt;line-height:1.45;white-space:pre-wrap;page-break-inside:avoid}
+
+  .ficha{border:.5pt solid var(--line);border-left:2pt solid var(--brass);padding:3mm 4mm;margin:0 0 3mm;page-break-inside:avoid;background:#fff}
+  .ficha .url{font-family:var(--mono);font-size:9.6pt;font-weight:600;color:var(--fg)}
+  .ficha .tipo{font-family:var(--mono);font-size:7.4pt;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);float:right;padding-top:1mm}
+  .ficha dl{margin:2mm 0 0;display:grid;grid-template-columns:26mm 1fr;gap:1.2mm 3mm;font-size:8.9pt}
+  .ficha dt{font-family:var(--mono);font-size:7.6pt;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-top:.5mm}
+  .ficha dd{margin:0}
+
+  .nota{border:.5pt solid var(--line);border-left:2pt solid var(--alerta);background:var(--surface);padding:3mm 4mm;margin:3mm 0;page-break-inside:avoid}
+  .nota .rot{font-family:var(--mono);font-size:7.6pt;letter-spacing:.14em;text-transform:uppercase;color:var(--alerta);margin-bottom:1.5mm}
+  .nota p{margin:0;font-size:9pt}
+  .nota.crit{border-left-color:var(--neg)} .nota.crit .rot{color:var(--neg)}
+
+  ul{margin:0 0 3mm;padding-left:5mm}
+  li{margin-bottom:1.2mm}
+  ol{margin:0 0 3mm;padding-left:6mm}
+
+  .fluxo{font-family:var(--mono);font-size:8.4pt;line-height:1.6;background:var(--surface);border:.4pt solid var(--line);padding:4mm;margin:3mm 0;white-space:pre;overflow-x:hidden;page-break-inside:avoid}
+
+  .sumario{margin-top:4mm}
+  .sumario ol{list-style:none;padding:0;counter-reset:s}
+  .sumario li{counter-increment:s;display:flex;gap:3mm;padding:1.6mm 0;border-bottom:.4pt dotted var(--line);font-size:9.6pt}
+  .sumario li::before{content:counter(s,decimal-leading-zero);font-family:var(--mono);font-size:8.2pt;color:var(--brass);padding-top:.6mm}
+  .sumario .gp{font-family:var(--mono);font-size:7.8pt;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:5mm 0 1.5mm}
+</style>
+
+<!-- ══════════════ CAPA ══════════════ -->
+<div class="capa">
+  <div class="topo">
+    <div class="selo">Dossiery · Documento técnico</div>
+    <h1>Especificação<br>do Funil</h1>
+    <p class="sub">
+      Mapa completo de produtos, páginas, checkout e regras de negócio.
+      Escrito para configurar o funil do zero, em qualquer plataforma, sem
+      precisar consultar quem construiu.
+    </p>
+  </div>
+  <div class="rodape">
+    <span>11 de agosto de 2026</span>
+    <span>7 produtos · 17 preços · 30 rotas</span>
+    <span>v1</span>
+  </div>
+</div>
+
+<!-- ══════════════ SUMÁRIO ══════════════ -->
+<div class="pg">
+  <h2>Como usar este documento</h2>
+  <p>
+    Todo o conteúdo foi extraído do código em produção, não escrito de memória.
+    Onde houver divergência entre este documento e o código, o código manda —
+    e é bug do documento.
+  </p>
+  <p>
+    A <strong>Parte A</strong> descreve o funil de forma independente de tecnologia: serve
+    tanto para configurar o sistema atual quanto para reconstruí-lo em Hotmart,
+    Kiwify, Cartpanda ou qualquer outra plataforma. A <strong>Parte B</strong> é o anexo de
+    configuração do código Next.js que já existe.
+  </p>
+
+  <div class="sumario">
+    <div class="gp">Parte A · Especificação do funil</div>
+    <ol>
+      <li>Visão geral e mapa dos caminhos</li>
+      <li>Catálogo de produtos e preços</li>
+      <li>As páginas, uma ficha cada</li>
+      <li>Os cinco fluxos de compra</li>
+      <li>Regras de negócio que não são óbvias</li>
+    </ol>
+    <div class="gp">Parte B · Configuração do sistema atual</div>
+    <ol start="6">
+      <li>Stripe: produtos, preços e métodos</li>
+      <li>Webhook: eventos e o que cada um faz</li>
+      <li>Banco de dados e permissões</li>
+      <li>Variáveis de ambiente</li>
+      <li>Roteiro de teste antes de subir tráfego</li>
+    </ol>
+  </div>
+
+  <div class="nota crit">
+    <div class="rot">Antes de configurar qualquer coisa</div>
+    <p>
+      O funil está construído mas <strong>não está em produção</strong>. O projeto na Vercel
+      responde 402 (desligado por cobrança), o código está numa branch que não foi
+      para a <code>main</code>, e nenhuma migração ou preço foi criado. O documento
+      complementar <code>DOSSIERY-LANCAMENTO.md</code> lista os 20 itens pendentes em
+      ordem de execução.
+    </p>
+  </div>
+</div>
+
+<!-- ══════════════ PARTE A ══════════════ -->
+<div class="parte">
+  <div class="rot">Parte A</div>
+  <h2>Especificação do funil</h2>
+  <p>Independente de plataforma. Descreve o que o sistema faz, não como está codificado.</p>
+</div>
+
+<!-- ─── 1. VISÃO GERAL ─── -->
+<div class="pg">
+  <div class="eyebrow">Seção 1</div>
+  <h2>Visão geral e mapa dos caminhos</h2>
+
+  <p>
+    O Dossiery é um produto de coaching de conquista com IA, vendido por uma esteira
+    de resposta direta. Existem <strong>duas portas de entrada</strong> e elas levam a fluxos
+    de compra diferentes.
+  </p>
+
+  <h3>Entrada 1 · Quiz gratuito → tripwire</h3>
+  <div class="fluxo">/dossiery              landing de venda
+      ↓
+/dossiery/raio-x       quiz de 10 cenários (grátis)
+      ↓
+  captura de e-mail    ← lead entra na base aqui
+      ↓
+  resultado na tela    índice + arquétipo + 3 correções
+      ↓
+/dossiery/plano7       oferta do tripwire · R$19
+      ↓ comprou
+/dossiery/entrando     ponte: cria conta e abre sessão
+      ↓
+/dossiery/oferta/operador   OTO · R$478 (R$497 − R$19 de crédito)
+      ↓ recusou
+/dossiery/plano7       entrega o que ele comprou</div>
+
+  <h3>Entrada 2 · Página de preços → plano</h3>
+  <div class="fluxo">/dossiery/precos       3 planos + order bump
+      ↓ escolheu um plano
+  checkout Stripe      cartão ou PIX
+      ↓
+/dossiery/entrando     ponte: cria conta e abre sessão
+      ↓
+/dossiery/oferta/encontro   OTO1 · R$97 · janela de 60 min
+      ↓ recusou                    ↓ comprou
+/dossiery/oferta/ultima     downsell · R$47 · mesma janela
+      ↓ recusou                    ↓ comprou
+/dossiery/oferta/perfil     OTO2 · R$47
+      ↓ recusou                    ↓ comprou
+/dossiery/bem-vindo    boas-vindas
+      ↓
+/dossiery/base         app (área logada)</div>
+
+  <h3>Depois: venda contínua dentro do app</h3>
+  <p>
+    Quem não comprou nas OTOs continua vendo os produtos dentro do app, mas pelo
+    <strong>preço cheio</strong>. O Protocolo Encontro que custava R$97 na janela passa a
+    custar R$147. Essa diferença é o que dá força à urgência da OTO, e ela é real:
+    o servidor recusa o preço de janela depois de 60 minutos.
+  </p>
+
+  <table>
+    <thead><tr><th>Produto</th><th class="num">Na janela</th><th class="num">Downsell</th><th class="num">No app</th></tr></thead>
+    <tbody>
+      <tr><td>Protocolo Encontro</td><td class="num">R$ 97</td><td class="num">R$ 47</td><td class="num">R$ 147</td></tr>
+      <tr><td>Perfil Magnético</td><td class="num">R$ 47</td><td class="num">—</td><td class="num">R$ 67</td></tr>
+      <tr><td>Protocolo Recomeço</td><td class="num">R$ 97</td><td class="num">—</td><td class="num">R$ 147</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ─── 2. CATÁLOGO ─── -->
+<div class="sec">
+  <div class="eyebrow">Seção 2</div>
+  <h2>Catálogo de produtos e preços</h2>
+  <p>
+    <strong>7 produtos, 17 preços.</strong> Um mesmo produto pode ter vários preços — o Protocolo
+    Encontro tem três, porque é vendido em contextos diferentes. Na plataforma que você
+    usar, o conceito equivalente é "produto com múltiplas ofertas".
+  </p>
+
+  <h3>Os 7 produtos</h3>
+  <table>
+    <thead><tr><th>Produto</th><th>O que entrega</th><th class="num">Itens</th></tr></thead>
+    <tbody>
+      <tr><td>Operador</td><td>Acesso ao app: Coach IA, Raio-X de conversas, Base</td><td class="num">—</td></tr>
+      <tr><td>Comandante</td><td>Tudo do Operador + arsenal completo + 1 call de 45 min</td><td class="num">—</td></tr>
+      <tr><td>Kit 50 Aberturas</td><td>50 primeiras mensagens por situação, com o porquê de cada</td><td class="num">50</td></tr>
+      <tr><td>Protocolo Encontro</td><td>Da chegada ao segundo encontro</td><td class="num">34</td></tr>
+      <tr><td>Perfil Magnético</td><td>Ações para o perfil nos apps</td><td class="num">37</td></tr>
+      <tr><td>Protocolo Recomeço</td><td>Reconstrução depois de término</td><td class="num">30</td></tr>
+      <tr><td>Plano 7 Dias</td><td>Bootcamp: 7 missões, uma por dia</td><td class="num">40</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Os 17 preços</h3>
+  <table>
+    <thead><tr><th class="m">Identificador</th><th class="num">Valor</th><th>Tipo</th><th>Onde aparece</th></tr></thead>
+    <tbody>
+      <tr><td class="m">dossiery_plano7</td><td class="num">R$ 19</td><td>único</td><td>Tripwire, pós-quiz</td></tr>
+      <tr><td class="m">dossiery_bump</td><td class="num">R$ 37</td><td>único</td><td>Order bump na página de preços</td></tr>
+      <tr><td class="m">dossiery_encontro_down</td><td class="num">R$ 47</td><td>único</td><td>Downsell da OTO1</td></tr>
+      <tr><td class="m">dossiery_perfil_oto</td><td class="num">R$ 47</td><td>único</td><td>OTO2</td></tr>
+      <tr><td class="m">dossiery_perfil_app</td><td class="num">R$ 67</td><td>único</td><td>Preço cheio no app</td></tr>
+      <tr><td class="m">dossiery_mensal</td><td class="num">R$ 97/mês</td><td><strong>assinatura</strong></td><td>Plano Recruta</td></tr>
+      <tr><td class="m">dossiery_encontro_oto</td><td class="num">R$ 97</td><td>único</td><td>OTO1, janela de 60 min</td></tr>
+      <tr><td class="m">dossiery_recomeco_oto</td><td class="num">R$ 97</td><td>único</td><td>Oferta do Recomeço</td></tr>
+      <tr><td class="m">dossiery_encontro_app</td><td class="num">R$ 147</td><td>único</td><td>Preço cheio no app</td></tr>
+      <tr><td class="m">dossiery_recomeco_app</td><td class="num">R$ 147</td><td>único</td><td>Preço cheio no app</td></tr>
+      <tr><td class="m">dossiery_operador_credito</td><td class="num">R$ 478</td><td>único</td><td>OTO pós-tripwire (R$497 − R$19)</td></tr>
+      <tr><td class="m">dossiery_anual_t1</td><td class="num">R$ 497</td><td>único</td><td>Degrau Fundador (100 vagas)</td></tr>
+      <tr><td class="m">dossiery_anual_t2</td><td class="num">R$ 597</td><td>único</td><td>Degrau Pioneiro (200 vagas)</td></tr>
+      <tr><td class="m">dossiery_renovacao</td><td class="num">R$ 597</td><td>único</td><td>Renovação no D330</td></tr>
+      <tr><td class="m">dossiery_anual_t3</td><td class="num">R$ 697</td><td>único</td><td>Degrau Vanguarda (200 vagas)</td></tr>
+      <tr><td class="m">dossiery_anual</td><td class="num">R$ 697</td><td>único</td><td>Preço padrão sem degrau</td></tr>
+      <tr><td class="m">dossiery_comandante</td><td class="num">R$ 1.297</td><td>único</td><td>Plano Comandante</td></tr>
+    </tbody>
+  </table>
+
+  <div class="nota">
+    <div class="rot">Atenção ao configurar</div>
+    <p>
+      Só <strong>um</strong> preço é assinatura recorrente: o <code>dossiery_mensal</code>. Todos os
+      outros são pagamento único, inclusive os anuais — o acesso anual é controlado por
+      data no banco (<code>renova_em</code>), não por assinatura no gateway. Isso é
+      proposital: evita cobrança automática surpresa no aniversário do plano.
+    </p>
+  </div>
+
+  <h3>O que cada compra libera</h3>
+  <table>
+    <thead><tr><th>Compra</th><th class="m">Campo liberado no banco</th></tr></thead>
+    <tbody>
+      <tr><td>Kit 50 Aberturas (bump)</td><td class="m">kit_aberturas = true</td></tr>
+      <tr><td>Protocolo Encontro (qualquer preço)</td><td class="m">protocolo_encontro = true</td></tr>
+      <tr><td>Perfil Magnético (qualquer preço)</td><td class="m">perfil_magnetico = true</td></tr>
+      <tr><td>Protocolo Recomeço (qualquer preço)</td><td class="m">recomeco = true</td></tr>
+      <tr><td>Plano 7 Dias</td><td class="m">plano_7d = true</td></tr>
+      <tr><td>Recruta / Operador</td><td class="m">plano = 'operador', tier = o tier real</td></tr>
+      <tr><td>Comandante</td><td class="m">plano + <strong>os 5 campos acima de uma vez</strong></td></tr>
+    </tbody>
+  </table>
+  <p>
+    Cada campo é <strong>vitalício e irreversível</strong>: uma vez <code>true</code>, nunca volta
+    a <code>false</code>. Isso simplifica o suporte e evita perda de acesso por bug.
+  </p>
+</div>
+
+<!-- ─── 3. PÁGINAS ─── -->
+<div class="sec">
+  <div class="eyebrow">Seção 3</div>
+  <h2>As páginas</h2>
+  <p>São 30 rotas, em cinco grupos. Cada ficha traz o que a página faz, o que o botão dispara e para onde leva.</p>
+
+  <h3>Grupo 1 · Públicas de venda</h3>
+
+  <div class="ficha">
+    <span class="tipo">pública</span><span class="url">/dossiery</span>
+    <dl>
+      <dt>O que é</dt><dd>Landing de venda longa. Herói, demonstração de chat (Modo Trouxa vs Operador), 3 passos, o que leva, preço, FAQ, CTA final.</dd>
+      <dt>CTA</dt><dd>Botões levam para <code>/dossiery/raio-x</code> (topo) e <code>/dossiery/precos</code> (após o bloco de preço).</dd>
+      <dt>Elementos vivos</dt><dd>Contador de vagas do degrau, lido do servidor. CTA fixo no rodapé em telas pequenas.</dd>
+    </dl>
+  </div>
+
+  <div class="ficha">
+    <span class="tipo">pública</span><span class="url">/dossiery/raio-x</span>
+    <dl>
+      <dt>O que é</dt><dd>Quiz de 10 cenários. Estados: intro → perguntas → processando → captura de e-mail → resultado.</dd>
+      <dt>Captura</dt><dd>E-mail obrigatório, WhatsApp opcional, checkbox de consentimento obrigatório (LGPD).</dd>
+      <dt>Resultado</dt><dd>Índice Modo Trouxa (0-100), arquétipo dominante entre 6, e 3 correções.</dd>
+      <dt>Depois</dt><dd>Oferta do tripwire de R$19.</dd>
+      <dt>Detalhe</dt><dd>O resultado aparece borrado antes do e-mail: existe de verdade, só está lacrado. Progresso salvo em localStorage — recarregar não perde o teste.</dd>
+    </dl>
+  </div>
+
+  <div class="ficha">
+    <span class="tipo">pública</span><span class="url">/dossiery/precos</span>
+    <dl>
+      <dt>O que é</dt><dd>Três planos lado a lado + order bump acima deles.</dd>
+      <dt>Planos</dt><dd>Recruta R$97/mês · Operador (preço do degrau vigente) · Comandante R$1.297</dd>
+      <dt>Order bump</dt><dd>Kit 50 Aberturas +R$37, <strong>pré-marcado</strong>, vale para Recruta e Operador. O Comandante já inclui.</dd>
+      <dt>Resumo</dt><dd>Antes do botão, um resumo do pedido mostra plano + bump + total. Nenhum número novo pode aparecer no checkout.</dd>
+      <dt>CTA</dt><dd>Chama a API de checkout com <code>{ tier, bump }</code>. O cliente <strong>nunca envia preço</strong>.</dd>
+    </dl>
+  </div>
+
+  <div class="ficha">
+    <span class="tipo">pública</span><span class="url">/dossiery/garantia · /termos · /privacidade</span>
+    <dl>
+      <dt>O que é</dt><dd>Páginas legais. A garantia explica a condicional (7 missões cumpridas → devolução em dobro) e o direito de arrependimento de 7 dias do CDC, que vale sempre.</dd>
+      <dt>Pendência</dt><dd>Termos e Privacidade estão com placeholders entre colchetes: razão social, CNPJ, endereço, e-mail. Precisam ser preenchidos antes de vender.</dd>
+    </dl>
+  </div>
+
+  <h3>Grupo 2 · Conta e ponte</h3>
+
+  <div class="ficha">
+    <span class="tipo">pública</span><span class="url">/dossiery/criar-conta · /dossiery/entrar</span>
+    <dl>
+      <dt>O que é</dt><dd>Cadastro e login por e-mail e senha. Aceitam <code>?next=</code> para voltar ao destino depois.</dd>
+      <dt>Importante</dt><dd>Não são obrigatórios para comprar. O checkout aceita visitante sem conta (guest checkout).</dd>
+    </dl>
+  </div>
+
+  <div class="ficha">
+    <span class="tipo">crítica</span><span class="url">/dossiery/entrando</span>
+    <dl>
+      <dt>O que é</dt><dd>Ponte pós-pagamento. Recebe <code>?cs={id da sessão}&next={destino}</code>.</dd>
+      <dt>O que faz</dt><dd>Consulta a sessão no gateway, pega o e-mail, cria a conta se não existir, abre a sessão do usuário automaticamente e redireciona para o destino.</dd>
+      <dt>Por que existe</dt><dd>É o que permite comprar sem conta. Sem essa ponte, o comprador cairia numa tela de cadastro logo após pagar — que é onde se perde de 20% a 35% da conversão no celular.</dd>
+      <dt>Se falhar</dt><dd>Mostra tela honesta: o pagamento foi confirmado, e o acesso chega por e-mail. Nunca some com o dinheiro sem explicação.</dd>
+    </dl>
+  </div>
+
+  <div class="ficha">
+    <span class="tipo">pós-compra</span><span class="url">/dossiery/bem-vindo</span>
+    <dl>
+      <dt>O que é</dt><dd>Fim da cadeia de OTOs. Confirma o que a pessoa comprou e manda para o app.</dd>
+    </dl>
+  </div>
+
+  <h3>Grupo 3 · Ofertas pós-compra (OTO)</h3>
+
+  <div class="ficha">
+    <span class="tipo">OTO1 · janela 60 min</span><span class="url">/dossiery/oferta/encontro</span>
+    <dl>
+      <dt>Oferta</dt><dd>Protocolo Encontro por <strong>R$97</strong> (no app custa R$147).</dd>
+      <dt>Compra</dt><dd>1 clique no cartão salvo, sem novo checkout. Se não houver cartão (caso do PIX), abre checkout normal.</dd>
+      <dt>Aceite</dt><dd>Segue para <code>/dossiery/oferta/perfil</code></dd>
+      <dt>Recusa</dt><dd>Vai para <code>/dossiery/oferta/ultima</code> (o downsell)</dd>
+      <dt>Urgência</dt><dd>Contador regressivo real, alimentado pelo prazo calculado no servidor.</dd>
+    </dl>
+  </div>
+
+  <div class="ficha">
+    <span class="tipo">downsell · mesma janela</span><span class="url">/dossiery/oferta/ultima</span>
+    <dl>
+      <dt>Oferta</dt><dd>O mesmo Protocolo Encontro por <strong>R$47</strong>. Nada é cortado do produto.</dd>
+      <dt>Aceite</dt><dd>Segue para <code>/dossiery/oferta/perfil</code></dd>
+      <dt>Recusa</dt><dd>Vai para <code>/dossiery/oferta/perfil</code> também — o downsell não tem terceira chance.</dd>
+    </dl>
+  </div>
+
+  <div class="ficha">
+    <span class="tipo">OTO2</span><span class="url">/dossiery/oferta/perfil</span>
+    <dl>
+      <dt>Oferta</dt><dd>Perfil Magnético por <strong>R$47</strong> (no app custa R$67).</dd>
+      <dt>Aceite ou recusa</dt><dd>Ambos levam a <code>/dossiery/bem-vindo</code>. É a última oferta da cadeia.</dd>
+    </dl>
+  </div>
+
+  <div class="ficha">
+    <span class="tipo">OTO pós-tripwire</span><span class="url">/dossiery/oferta/operador</span>
+    <dl>
+      <dt>Oferta</dt><dd>Subir do Plano 7 Dias (R$19) para o Operador com o valor creditado: <strong>R$478</strong>.</dd>
+      <dt>Aceite</dt><dd>Vai para <code>/dossiery/base</code> — já é assinante.</dd>
+      <dt>Recusa</dt><dd>Vai para <code>/dossiery/plano7</code> — entrega o que ele comprou.</dd>
+      <dt>Detalhe</dt><dd>É o degrau que faltava entre R$19 e R$497. Sem ele, o salto de preço é grande demais.</dd>
+    </dl>
+  </div>
+
+  <h3>Grupo 4 · Área logada (10 módulos)</h3>
+  <p>
+    A navegação lateral mostra 10 módulos. <strong>Quatro estão prontos, seis são telas de
+    "Em construção"</strong> que descrevem honestamente o que farão.
+  </p>
+  <table>
+    <thead><tr><th class="m">Rota</th><th>Módulo</th><th>Estado</th><th>Acesso</th></tr></thead>
+    <tbody>
+      <tr><td class="m">/dossiery/base</td><td>Base (dashboard)</td><td class="pos">pronto</td><td>login</td></tr>
+      <tr><td class="m">/dossiery/coach</td><td>Coach — chat com IA</td><td class="pos">pronto</td><td>plano ativo</td></tr>
+      <tr><td class="m">/dossiery/analisar</td><td>Analisar — raio-x de conversa</td><td class="pos">pronto</td><td>plano ativo</td></tr>
+      <tr><td class="m">/dossiery/arsenal</td><td>Arsenal — índice dos produtos</td><td class="pos">pronto</td><td>login</td></tr>
+      <tr><td class="m">/dossiery/arena</td><td>Arena</td><td class="al">em construção</td><td>login</td></tr>
+      <tr><td class="m">/dossiery/conexoes</td><td>Conexões</td><td class="al">em construção</td><td>login</td></tr>
+      <tr><td class="m">/dossiery/campo</td><td>Campo</td><td class="neg">em construção</td><td>login</td></tr>
+      <tr><td class="m">/dossiery/academia</td><td>Academia</td><td class="al">em construção</td><td>login</td></tr>
+      <tr><td class="m">/dossiery/evolucao</td><td>Evolução</td><td class="al">em construção</td><td>login</td></tr>
+      <tr><td class="m">/dossiery/conta</td><td>Conta e privacidade</td><td class="neg">em construção</td><td>login</td></tr>
+    </tbody>
+  </table>
+
+  <div class="nota crit">
+    <div class="rot">Dois pontos que precisam de decisão</div>
+    <p>
+      <strong>Campo</strong> está listado como benefício na página de preços ("Raio-X, Coach e Campo
+      ilimitados") mas é uma tela em construção. Ou sai da copy, ou é construído antes de
+      vender. <strong>Conta</strong> deveria abrigar o painel LGPD (exportar e apagar dados) e a
+      gestão de plano — a API do portal de cobrança já existe e funciona, só não há tela
+      apontando para ela.
+    </p>
+  </div>
+
+  <h3>Grupo 5 · Entrega de conteúdo</h3>
+  <table>
+    <thead><tr><th class="m">Rota</th><th>Conteúdo</th><th class="num">Itens</th><th class="m">Exige</th></tr></thead>
+    <tbody>
+      <tr><td class="m">/dossiery/kit</td><td>Kit 50 Aberturas</td><td class="num">50</td><td class="m">kit_aberturas</td></tr>
+      <tr><td class="m">/dossiery/encontro</td><td>Protocolo Encontro</td><td class="num">34</td><td class="m">protocolo_encontro</td></tr>
+      <tr><td class="m">/dossiery/perfil</td><td>Perfil Magnético</td><td class="num">37</td><td class="m">perfil_magnetico</td></tr>
+      <tr><td class="m">/dossiery/recomeco</td><td>Protocolo Recomeço</td><td class="num">30</td><td class="m">recomeco</td></tr>
+      <tr><td class="m">/dossiery/plano7</td><td>Plano 7 Dias</td><td class="num">40</td><td class="m">plano_7d</td></tr>
+      <tr><td class="m">/dossiery/renovar</td><td>Renovação do acesso anual</td><td class="num">—</td><td class="m">login</td></tr>
+    </tbody>
+  </table>
+  <p>
+    Quem não tem o campo liberado <strong>não vê erro</strong>: vê uma tela de venda daquele
+    produto, pelo preço cheio do app. A página bloqueada é uma oportunidade de venda,
+    não um beco sem saída.
+  </p>
+</div>
+
+<!-- ─── 4. FLUXOS ─── -->
+<div class="sec">
+  <div class="eyebrow">Seção 4</div>
+  <h2>Os cinco fluxos de compra</h2>
+
+  <h3>Fluxo 1 · Compra de plano (com ou sem conta)</h3>
+  <ol>
+    <li>Visitante escolhe um plano em <code>/dossiery/precos</code> e marca ou desmarca o bump.</li>
+    <li>O front chama a API de checkout enviando <strong>apenas</strong> <code>{ tier, bump }</code>.</li>
+    <li>O servidor consulta quantas vagas já foram vendidas e escolhe o preço do degrau vigente.</li>
+    <li>Cria a sessão de checkout com os itens, habilitando cartão parcelado e PIX.</li>
+    <li>No cartão, guarda o meio de pagamento para uso futuro — é o que permite o 1 clique nas OTOs.</li>
+    <li>Sucesso redireciona para <code>/dossiery/entrando</code>, que cria a conta e abre a sessão.</li>
+    <li>Em paralelo, o webhook libera os acessos no banco.</li>
+  </ol>
+
+  <div class="nota">
+    <div class="rot">Regra de segurança</div>
+    <p>
+      O cliente <strong>nunca envia preço nem identificador de preço</strong>. Ele envia só qual
+      tier quer. Se o front pudesse mandar o preço, qualquer pessoa compraria o plano anual
+      por R$1 alterando a requisição.
+    </p>
+  </div>
+
+  <h3>Fluxo 2 · Upsell de 1 clique</h3>
+  <ol>
+    <li>Na página de OTO, o botão chama a API de upsell com <code>{ oferta, next }</code>.</li>
+    <li>O servidor verifica: a pessoa já tem esse produto? Se sim, responde sucesso sem cobrar.</li>
+    <li>Verifica a janela: se passaram mais de 60 minutos da compra, responde <strong>410</strong> com o destino de preço cheio.</li>
+    <li>Busca o cartão salvo e cobra direto, sem novo checkout.</li>
+    <li>Se não houver cartão salvo (comprou no PIX), devolve uma URL de checkout normal.</li>
+  </ol>
+  <table>
+    <thead><tr><th class="num">Código</th><th>Significa</th><th>O front faz</th></tr></thead>
+    <tbody>
+      <tr><td class="num">200 <code>{ok:true}</code></td><td>Cobrado no cartão salvo</td><td>Dispara pixel de compra e segue para o destino</td></tr>
+      <tr><td class="num">200 <code>{url}</code></td><td>Precisa de checkout</td><td>Redireciona para a URL</td></tr>
+      <tr><td class="num">401</td><td>Sem sessão</td><td>Manda para o login</td></tr>
+      <tr><td class="num">410</td><td>Janela expirou</td><td>Manda para a página de preço cheio</td></tr>
+      <tr><td class="num">503</td><td>Preço não configurado</td><td>Mostra erro e permite tentar de novo</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Fluxo 3 · Pagamento no PIX (assíncrono)</h3>
+  <p>
+    O PIX não confirma na hora. O comprador vê o QR, paga, e a confirmação chega depois
+    por um <strong>evento diferente</strong> do cartão. Esse é o erro de configuração mais comum e
+    mais caro: se o evento assíncrono não estiver escutado, <strong>toda compra no PIX fica paga
+    e sem acesso liberado</strong>.
+  </p>
+  <p>
+    Consequência de projeto: quem paga no PIX não tem cartão salvo, então as OTOs
+    detectam isso e caem no checkout normal em vez do 1 clique.
+  </p>
+
+  <h3>Fluxo 4 · Order bump</h3>
+  <p>
+    Item adicional marcado antes do checkout, que entra como segunda linha no mesmo
+    pagamento. Vale para Recruta e Operador; o Comandante já inclui o Kit. A página mostra
+    o resumo com plano, bump e total antes do botão.
+  </p>
+
+  <h3>Fluxo 5 · Renovação anual</h3>
+  <p>
+    O acesso anual é pagamento único com data de validade no banco — não é assinatura
+    recorrente. Aos <strong>330 dias</strong> (35 dias antes de vencer), uma rotina diária identifica
+    quem está na janela e oferece a renovação por R$597, abaixo do degrau vigente.
+  </p>
+  <div class="nota crit">
+    <div class="rot">Pendência</div>
+    <p>
+      A rotina existe e exige um segredo de autenticação, mas <strong>não há agendamento
+      configurado</strong>. Sem isso, o acesso expira em silêncio e a renovação nunca é oferecida.
+    </p>
+  </div>
+</div>
+
+<!-- ─── 5. REGRAS ─── -->
+<div class="sec">
+  <div class="eyebrow">Seção 5</div>
+  <h2>Regras de negócio que não são óbvias</h2>
+
+  <h3>Degraus de preço por vagas</h3>
+  <p>O preço do plano anual sobe conforme as vagas se esgotam. Quem decide é o servidor, contando vendas reais no banco.</p>
+  <table>
+    <thead><tr><th>Degrau</th><th class="num">Vagas</th><th class="num">À vista</th><th class="num">Parcelado</th></tr></thead>
+    <tbody>
+      <tr><td>Fundador</td><td class="num">100</td><td class="num">R$ 497</td><td class="num">12x R$ 45</td></tr>
+      <tr><td>Pioneiro</td><td class="num">200</td><td class="num">R$ 597</td><td class="num">12x R$ 53</td></tr>
+      <tr><td>Vanguarda</td><td class="num">200</td><td class="num">R$ 697</td><td class="num">12x R$ 62</td></tr>
+      <tr><td colspan="2"><strong>Esgotado</strong></td><td class="num" colspan="2">só o mensal de R$ 147</td></tr>
+    </tbody>
+  </table>
+  <p>
+    As parcelas foram calculadas para que o líquido do parcelado empate com o do PIX,
+    considerando taxa de cartão e custo de parcelamento. Não são o valor à vista dividido
+    por 12 — se fossem, cada venda parcelada perderia cerca de R$21.
+  </p>
+
+  <h3>Janela de 60 minutos</h3>
+  <p>
+    Os preços de OTO valem por 60 minutos a partir da compra. <strong>A escassez é real e
+    verificada no servidor</strong>: depois do prazo, a API recusa a cobrança e devolve o destino
+    de preço cheio. O contador na tela lê o mesmo prazo que o servidor usa para decidir.
+  </p>
+
+  <h3>Contador de vagas</h3>
+  <p>
+    Lido do banco, não fixo no código. Mostra quantas vagas restam no degrau atual e qual
+    será o próximo preço.
+  </p>
+
+  <h3>Garantia condicional</h3>
+  <p>
+    Devolução em dobro se a pessoa cumprir as 7 missões do Plano e, em 30 dias, nenhuma
+    conversa melhorar. Separado disso, o direito de arrependimento de 7 dias do CDC vale
+    sempre, sem pergunta. São duas coisas diferentes e a página precisa deixar claro.
+  </p>
+
+  <h3>Uso justo da IA</h3>
+  <p>
+    Coach e Raio-X são ilimitados para uso humano. Existe um teto de 300 chamadas por
+    recurso a cada 30 dias — cinco vezes o perfil mais pesado observado — para conter laço
+    automatizado e conta compartilhada. Quem encosta no teto recebe convite para falar com
+    o suporte, não bloqueio seco.
+  </p>
+
+  <h3>Prova social</h3>
+  <p>
+    A lista de depoimentos está <strong>vazia de propósito</strong> e o componente não renderiza nada
+    enquanto estiver assim. Depoimento inventado é infração ao CDC e motivo de bloqueio de
+    conta de anúncio. Cada prova só entra com autorização de uso registrada.
+  </p>
+</div>
+
+<!-- ══════════════ PARTE B ══════════════ -->
+<div class="parte">
+  <div class="rot">Parte B</div>
+  <h2>Configuração do sistema atual</h2>
+  <p>Específico do código Next.js que está no repositório. Pule esta parte se for reconstruir em outra plataforma.</p>
+</div>
+
+<!-- ─── 6. STRIPE ─── -->
+<div class="pg">
+  <div class="eyebrow">Seção 6</div>
+  <h2>Stripe</h2>
+
+  <h3>Criar produtos e preços</h3>
+  <p>Existe um script que cria os 7 produtos e 17 preços de uma vez. Ele é idempotente: rodar duas vezes não duplica nada, porque identifica cada preço por uma chave de busca.</p>
+  <pre>node scripts/setup-stripe.mjs</pre>
+  <p>Ao final ele imprime os identificadores de preço. Cada um vira uma variável de ambiente (seção 9).</p>
+
+  <h3>Métodos de pagamento</h3>
+  <p>Habilitar na conta Stripe Brasil, antes de testar:</p>
+  <ul>
+    <li><strong>Cartão de crédito</strong> com parcelamento em até 12x</li>
+    <li><strong>PIX</strong></li>
+  </ul>
+  <p>
+    O código <strong>não fixa</strong> a lista de métodos: deixa o Stripe oferecer os que estiverem
+    ativos na conta. Se o PIX não aparecer no checkout, o problema está na conta, não no código.
+  </p>
+
+  <h3>Cartão salvo para o 1 clique</h3>
+  <p>
+    No checkout de cartão, o código pede para guardar o meio de pagamento para uso
+    posterior. É isso que permite cobrar as OTOs sem novo checkout. O PIX não suporta
+    isso — daí o fluxo alternativo.
+  </p>
+</div>
+
+<!-- ─── 7. WEBHOOK ─── -->
+<div class="sec">
+  <div class="eyebrow">Seção 7</div>
+  <h2>Webhook</h2>
+  <p>
+    O webhook é o que transforma pagamento em acesso. <strong>Sem ele, o dinheiro entra e o
+    cliente não recebe nada.</strong>
+  </p>
+  <pre>URL:  https://SEU-DOMINIO/api/webhooks/stripe</pre>
+
+  <table>
+    <thead><tr><th class="m">Evento</th><th>Quando dispara</th><th>O que o sistema faz</th></tr></thead>
+    <tbody>
+      <tr><td class="m">checkout.session.completed</td><td>Pagamento no cartão confirmado</td><td>Cria o usuário se não existir, grava plano e tier, libera os campos comprados</td></tr>
+      <tr><td class="m">checkout.session.async_payment_succeeded</td><td><strong>PIX confirmado</strong></td><td>O mesmo do anterior</td></tr>
+      <tr><td class="m">customer.subscription.updated</td><td>Assinatura mensal alterada</td><td>Atualiza status e data de renovação</td></tr>
+      <tr><td class="m">customer.subscription.deleted</td><td>Assinatura cancelada</td><td>Marca como inativa</td></tr>
+    </tbody>
+  </table>
+
+  <div class="nota crit">
+    <div class="rot">O erro mais comum</div>
+    <p>
+      Esquecer o evento do PIX. Ele é <strong>separado</strong> do evento de cartão porque o
+      pagamento é assíncrono. Sem ele, toda venda no PIX fica paga no gateway e sem acesso
+      no produto — e o cliente reclama com razão.
+    </p>
+  </div>
+
+  <p>
+    O segredo de assinatura do webhook vira a variável <code>STRIPE_WEBHOOK_SECRET</code>. Ele
+    é o que garante que a requisição veio mesmo do Stripe, e não de alguém tentando
+    liberar acesso de graça.
+  </p>
+</div>
+
+<!-- ─── 8. BANCO ─── -->
+<div class="sec">
+  <div class="eyebrow">Seção 8</div>
+  <h2>Banco de dados</h2>
+  <p>Sete migrações, na ordem numérica. Executar no editor SQL do Supabase.</p>
+  <pre>0001_dossiery_schema.sql        0005_dossiery_esteira.sql
+0002_dossiery_billing.sql       0006_dossiery_guest_renovacao.sql
+0003_dossiery_kit.sql           0007_dossiery_uso_tier.sql
+0004_dossiery_funil.sql</pre>
+
+  <h3>Tabela principal — assinaturas</h3>
+  <table>
+    <thead><tr><th class="m">Coluna</th><th>Tipo</th><th>Para que serve</th></tr></thead>
+    <tbody>
+      <tr><td class="m">user_id</td><td>uuid</td><td>Dono da linha</td></tr>
+      <tr><td class="m">plano</td><td>texto</td><td>Se o acesso ao app está liberado</td></tr>
+      <tr><td class="m">tier</td><td>texto</td><td>O que a pessoa comprou: recruta, operador ou comandante</td></tr>
+      <tr><td class="m">status</td><td>texto</td><td>ativo, cancelado</td></tr>
+      <tr><td class="m">renova_em</td><td>data</td><td>Quando o acesso anual expira</td></tr>
+      <tr><td class="m">email</td><td>texto</td><td>Para o aviso de renovação</td></tr>
+      <tr><td class="m">kit_aberturas</td><td>booleano</td><td>Liberou o Kit</td></tr>
+      <tr><td class="m">protocolo_encontro</td><td>booleano</td><td>Liberou o Encontro</td></tr>
+      <tr><td class="m">perfil_magnetico</td><td>booleano</td><td>Liberou o Perfil</td></tr>
+      <tr><td class="m">recomeco</td><td>booleano</td><td>Liberou o Recomeço</td></tr>
+      <tr><td class="m">plano_7d</td><td>booleano</td><td>Liberou o Plano 7 Dias</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Outras tabelas</h3>
+  <ul>
+    <li><strong>leads</strong> — quem passou pelo quiz: e-mail, WhatsApp, resultado, consentimento</li>
+    <li><strong>uso</strong> — uma linha por chamada de IA, com tokens e cache. Base do custo real e do limite de uso justo</li>
+  </ul>
+
+  <div class="nota crit">
+    <div class="rot">A migração 0004 corrige uma falha de segurança</div>
+    <p>
+      A política antiga permitia que o usuário fizesse <strong>alteração na própria linha de
+      assinatura</strong> pela API pública do banco — ou seja, dar-se plano pago sozinho. A 0004
+      restringe a permissão a somente leitura. Escrita passa a ser exclusiva do servidor.
+      <strong>Não pule essa migração.</strong>
+    </p>
+  </div>
+</div>
+
+<!-- ─── 9. ENVS ─── -->
+<div class="sec">
+  <div class="eyebrow">Seção 9</div>
+  <h2>Variáveis de ambiente</h2>
+
+  <h4>Obrigatórias</h4>
+  <pre>NEXT_PUBLIC_SUPABASE_URL          endereço do banco
+NEXT_PUBLIC_SUPABASE_ANON_KEY     chave pública do banco
+SUPABASE_SERVICE_ROLE_KEY         chave de servidor — NUNCA no cliente
+ANTHROPIC_API_KEY                 IA do Coach e do Raio-X
+STRIPE_SECRET_KEY                 chave de servidor do gateway
+STRIPE_WEBHOOK_SECRET             assinatura do webhook</pre>
+
+  <h4>Os 17 preços (saem do script da seção 6)</h4>
+  <pre>STRIPE_PRICE_MENSAL               STRIPE_PRICE_ANUAL
+STRIPE_PRICE_ANUAL_T1             STRIPE_PRICE_ANUAL_T2
+STRIPE_PRICE_ANUAL_T3             STRIPE_PRICE_COMANDANTE
+STRIPE_PRICE_BUMP                 STRIPE_PRICE_PLANO7
+STRIPE_PRICE_ENCONTRO_OTO         STRIPE_PRICE_ENCONTRO_DOWN
+STRIPE_PRICE_ENCONTRO_APP         STRIPE_PRICE_PERFIL_OTO
+STRIPE_PRICE_PERFIL_APP           STRIPE_PRICE_RECOMECO_OTO
+STRIPE_PRICE_RECOMECO_APP         STRIPE_PRICE_OPERADOR_CREDITO
+STRIPE_PRICE_RENOVACAO</pre>
+
+  <h4>Rotina de renovação</h4>
+  <pre>DOSSIERY_CRON_SECRET              protege a rota da rotina diária</pre>
+
+  <h4>Rastreamento</h4>
+  <pre>NEXT_PUBLIC_META_PIXEL_ID         pixel no navegador
+META_CAPI_TOKEN                   eventos pelo servidor
+NEXT_PUBLIC_GA4_ID                analytics</pre>
+
+  <h4>Opcionais — perigosas</h4>
+  <pre>DOSSIERY_GATE=off                 desliga login e paywall
+DOSSIERY_PAYWALL=off              libera todo conteúdo pago
+DOSSIERY_COACH_MODEL              troca o modelo de IA</pre>
+
+  <div class="nota crit">
+    <div class="rot">Nunca em produção</div>
+    <p>
+      As duas primeiras existem para preview e demonstração. Se vazarem para o ambiente de
+      produção, <strong>o produto inteiro fica de graça</strong>: qualquer visitante acessa todo o
+      conteúdo pago sem pagar nada.
+    </p>
+  </div>
+</div>
+
+<!-- ─── 10. TESTE ─── -->
+<div class="sec">
+  <div class="eyebrow">Seção 10</div>
+  <h2>Roteiro de teste</h2>
+  <p>
+    Executar <strong>antes</strong> de qualquer investimento em tráfego. Enquanto essa sequência não
+    passar inteira, o funil não está pronto — nunca houve uma transação completa neste
+    sistema.
+  </p>
+
+  <h3>A · Compra como visitante, no cartão</h3>
+  <ol>
+    <li>Abrir a página de preços numa aba anônima, sem conta.</li>
+    <li>Escolher o Operador com o bump marcado. Conferir que o total mostrado bate com o do checkout.</li>
+    <li>Pagar no cartão de teste.</li>
+    <li>Confirmar que a conta foi criada e a sessão abriu sozinha, sem pedir cadastro.</li>
+    <li>Na OTO1, aceitar. Confirmar que cobrou em 1 clique, sem novo checkout.</li>
+    <li>Conferir no banco: plano, tier, kit e encontro liberados.</li>
+  </ol>
+
+  <h3>B · Recusa e downsell</h3>
+  <ol>
+    <li>Repetir do zero, mas recusar a OTO1.</li>
+    <li>Confirmar que o downsell de R$47 aparece.</li>
+    <li>Recusar de novo e confirmar que chega ao Perfil e depois ao bem-vindo.</li>
+  </ol>
+
+  <h3>C · PIX (caminho diferente)</h3>
+  <ol>
+    <li>Comprar o tripwire de R$19 pagando no PIX.</li>
+    <li>Confirmar que o acesso <strong>só</strong> libera depois da confirmação do pagamento.</li>
+    <li>Na OTO, confirmar que cai no checkout normal em vez do 1 clique — é o esperado, não há cartão salvo.</li>
+  </ol>
+
+  <h3>D · Expiração da janela</h3>
+  <ol>
+    <li>Comprar, e esperar mais de 60 minutos sem aceitar a OTO.</li>
+    <li>Tentar comprar pela OTO. Deve recusar e mandar para o preço cheio.</li>
+    <li>Confirmar que o preço cheio é o do app (R$147, não R$97).</li>
+  </ol>
+
+  <h3>E · Bloqueio de conteúdo</h3>
+  <ol>
+    <li>Com uma conta que não comprou o Kit, abrir a página do Kit.</li>
+    <li>Deve mostrar a tela de venda, não erro nem o conteúdo.</li>
+  </ol>
+
+  <h3>F · IA e medição</h3>
+  <ol>
+    <li>Conversar com o Coach.</li>
+    <li>Conferir que apareceu uma linha na tabela de uso, com tokens preenchidos.</li>
+    <li>Do segundo turno em diante, o campo de cache lido precisa ser maior que zero — é o que confirma que o custo está controlado.</li>
+  </ol>
+
+  <h3>G · Rastreamento</h3>
+  <ol>
+    <li>No gerenciador de eventos da Meta, confirmar que a compra aparece <strong>uma vez</strong>, não duas.</li>
+    <li>O evento do navegador e o do servidor precisam ser reconhecidos como o mesmo. Se contar dobrado, o retorno medido será fantasia.</li>
+  </ol>
+</div>
+
+<div class="pg" style="page-break-before:always">
+  <h2>Resumo para quem vai configurar</h2>
+  <p>Na ordem, sem pular:</p>
+  <ol>
+    <li>Rodar as 7 migrações no banco</li>
+    <li>Rodar o script que cria os 7 produtos e 17 preços</li>
+    <li>Preencher as variáveis de ambiente com os identificadores gerados</li>
+    <li>Cadastrar o webhook com os 4 eventos, incluindo o do PIX</li>
+    <li>Ativar PIX e parcelamento na conta do gateway</li>
+    <li>Preencher os dados da empresa nas páginas legais</li>
+    <li>Resolver a pendência do módulo Campo na página de preços</li>
+    <li>Agendar a rotina diária de renovação</li>
+    <li>Executar o roteiro de teste da seção 10, inteiro</li>
+  </ol>
+
+  <div class="nota">
+    <div class="rot">Em caso de dúvida</div>
+    <p>
+      Onde este documento e o código divergirem, o código manda. Os arquivos
+      complementares no repositório trazem o detalhamento: <code>DOSSIERY-LANCAMENTO.md</code>
+      com os pendentes, <code>DOSSIERY-PRECIFICACAO.md</code> com as decisões de preço, e
+      <code>DOSSIERY-ESTUDO-PRECIFICACAO.md</code> com a análise de margem e custo.
+    </p>
+  </div>
+</div>
