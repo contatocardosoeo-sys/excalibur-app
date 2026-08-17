@@ -8,6 +8,7 @@ import {
   priceIdBump,
   priceIdAnualDegrau,
   priceIdComandante,
+  priceIdOferta,
   stripeConfigurado,
   type Tier,
 } from '@/app/lib/dossiery/stripe'
@@ -34,12 +35,19 @@ export async function POST(request: NextRequest) {
 
   let tier: Tier = 'operador'
   let bump = false
+  let produto: 'plano7' | null = null
+  let emailQuiz: string | null = null
   try {
     const body = await request.json()
+    if (body?.produto === 'plano7') produto = 'plano7'
     if (body?.tier === 'recruta' || body?.tier === 'comandante') tier = body.tier
     // compat: chamadas antigas mandavam { ciclo }
     else if (body?.ciclo === 'mensal') tier = 'recruta'
     bump = body?.bump === true
+    // e-mail vindo do quiz: só pré-preenche o Stripe. O que vale pro acesso é
+    // o customer_details.email que a pessoa confirma na tela de pagamento.
+    if (typeof body?.email === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email))
+      emailQuiz = body.email
   } catch {
     /* corpo vazio → operador, sem bump */
   }
@@ -60,6 +68,45 @@ export async function POST(request: NextRequest) {
           .eq('user_id', user.id)
           .maybeSingle()
       : { data: null }
+
+    // ── Tripwire do quiz (R$19, convidado) ──
+    // O resultado do Raio-X vende o Plano 7 Dias direto. Conta ANTES do
+    // pagamento era exatamente a fricção que o guest checkout veio matar:
+    // aqui a pessoa paga primeiro e a conta nasce no webhook
+    // (metadata.tipo → plano_7d), igual aos planos. setup_future_usage
+    // guarda o cartão pro upgrade de 1 clique na OTO seguinte
+    // (/dossiery/oferta/operador).
+    if (produto === 'plano7') {
+      const price = priceIdOferta('plano7')
+      if (!price) {
+        return NextResponse.json({ error: 'Oferta indisponível no momento.' }, { status: 503 })
+      }
+      const clienteJa = assinatura?.stripe_customer_id
+      const session = await stripe.checkout.sessions.create({
+        mode: 'payment',
+        line_items: [{ price, quantity: 1 }],
+        success_url: `${origin}/dossiery/entrando?cs={CHECKOUT_SESSION_ID}&next=${encodeURIComponent(
+          '/dossiery/oferta/operador'
+        )}`,
+        cancel_url: `${origin}/dossiery/precos`,
+        ...(user ? { client_reference_id: user.id } : {}),
+        ...(clienteJa
+          ? { customer: clienteJa }
+          : user?.email || emailQuiz
+            ? { customer_email: user?.email || (emailQuiz as string) }
+            : {}),
+        metadata: { ...(user ? { user_id: user.id } : { guest: '1' }), tipo: 'plano7' },
+        payment_intent_data: {
+          metadata: { ...(user ? { user_id: user.id } : { guest: '1' }), tipo: 'plano7' },
+        },
+        payment_method_options: {
+          card: { setup_future_usage: 'off_session', installments: { enabled: true } },
+        },
+        ...(clienteJa ? {} : { customer_creation: 'always' as const }),
+        locale: 'pt-BR',
+      })
+      return NextResponse.json({ url: session.url })
+    }
 
     // Degrau REAL: o preço do anual sai do contador do banco, no servidor.
     // O cliente nunca escolhe o preço, só vê o que a faixa vigente oferece.

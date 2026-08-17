@@ -29,6 +29,7 @@ export default function RaioXClient() {
   const [zap, setZap] = useState('')
   const [consent, setConsent] = useState(false)
   const [enviando, setEnviando] = useState(false)
+  const [comprando, setComprando] = useState(false)
   const [erro, setErro] = useState<string | null>(null)
   const [som, setSom] = useState(true)
   const [placar, setPlacar] = useState(0)
@@ -529,12 +530,33 @@ export default function RaioXClient() {
                 O Plano 7 Dias mata seu {res.nome} em uma semana. Uma missão por dia, 40 passos,
                 menos de 30 minutos por dia.
               </p>
-              <Link
-                href="/dossiery/criar-conta?next=/dossiery/plano7"
-                className="mt-5 block w-full rounded-[4px] bg-primary text-primary-foreground font-semibold text-[15px] py-4 hover:opacity-90 transition"
+              {/* Compra direta, sem conta antes: o e-mail do quiz pré-preenche o
+                  Stripe e a conta nasce no webhook. Se a API falhar, cai na rota
+                  antiga (conta → plano7) — o clique nunca morre. */}
+              <button
+                onClick={async () => {
+                  if (comprando) return
+                  setComprando(true)
+                  window.fbq?.('track', 'InitiateCheckout', { value: 19, currency: 'BRL' })
+                  window.gtag?.('event', 'begin_checkout', { value: 19, currency: 'BRL' })
+                  try {
+                    const resp = await fetch('/api/dossiery/checkout', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ produto: 'plano7', email }),
+                    })
+                    const data = await resp.json().catch(() => null)
+                    if (!resp.ok || !data?.url) throw new Error(data?.error || `Erro ${resp.status}`)
+                    window.location.href = data.url
+                  } catch {
+                    window.location.href = '/dossiery/criar-conta?next=/dossiery/plano7'
+                  }
+                }}
+                disabled={comprando}
+                className="mt-5 block w-full rounded-[4px] bg-primary text-primary-foreground font-semibold text-[15px] py-4 hover:opacity-90 active:scale-[0.99] disabled:opacity-60 transition"
               >
-                Começar por R$19: Plano 7 Dias →
-              </Link>
+                {comprando ? 'Abrindo pagamento…' : 'Começar por R$19: Plano 7 Dias →'}
+              </button>
               <Link
                 href="/dossiery/precos"
                 className="mt-3 block text-[12.5px] text-muted-foreground underline underline-offset-4 hover:text-foreground transition"
