@@ -65,15 +65,17 @@ function CTA({
   children = 'Entrar no Protocolo →',
   sub,
   align = 'center',
+  href = '/dossiery/precos',
 }: {
   children?: React.ReactNode
   sub?: string
   align?: 'center' | 'md-left'
+  href?: string
 }) {
   return (
     <div className={`flex flex-col gap-2 ${align === 'md-left' ? 'items-center md:items-start' : 'items-center'}`}>
       <Link
-        href="/dossiery/precos"
+        href={href}
         className="rounded-[4px] bg-primary text-primary-foreground font-semibold text-[15px] px-8 py-4 hover:opacity-90 transition"
       >
         {children}
@@ -177,7 +179,11 @@ export default function DossierySalesPage() {
                 <b className="text-foreground">Operador</b>: o cara que ela responde na hora.
               </p>
               <div className="mt-7" id="cta-hero">
-                <CTA align="md-left" sub="Garantia de 7 dias · PIX ou cartão">
+                <CTA
+                  align="md-left"
+                  href="/dossiery/raio-x"
+                  sub="Teste de 2 minutos · gratuito · resultado na hora"
+                >
                   Quero sair do vácuo →
                 </CTA>
               </div>
