@@ -9,12 +9,18 @@ em `app/`, `middleware.ts` e `scripts/` em 17/08/2026.
 
 ## Infraestrutura
 
+> **ATENCAO — vale so pra linhagem do GitHub.** Producao NAO usa Supabase.
+> Roda PostgreSQL local no container `dossiery-postgres`, com migracoes
+> Drizzle na inicializacao. Confirmado por Enio em 17/08/2026. As variaveis
+> de Supabase abaixo existem no codigo desta branch, nao no ambiente de
+> producao. Ver `.brain/excaliburgit.md`, secao de decisao pendente.
+
 | Variavel | Uso | Obrigatoria |
 |---|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | URL do projeto Supabase | Sim |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Chave publica, client-side com RLS | Sim |
-| `SUPABASE_SERVICE_ROLE_KEY` | Chave admin, so server-side, bypassa RLS | Sim |
-| `NEXT_PUBLIC_APP_URL` | Origem usada em `success_url` e `cancel_url` do Stripe | Sim |
+| `NEXT_PUBLIC_SUPABASE_URL` | URL do projeto Supabase | So na linhagem GitHub |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Chave publica, client-side com RLS | So na linhagem GitHub |
+| `SUPABASE_SERVICE_ROLE_KEY` | Chave admin, so server-side, bypassa RLS | So na linhagem GitHub |
+| `NEXT_PUBLIC_APP_URL` | Origem usada em `success_url` e `cancel_url` do Stripe | Sim, nas duas |
 
 Projeto Supabase: `hluhlsnodndpskrkbjuw`. Compartilhado com o ExcaliburHQ.
 
@@ -89,3 +95,22 @@ Prompt caching esta ligado no Coach. Sem ele a margem do Operador cai de
 
 As duas existem so pra preview e desenvolvimento. Conferir que NAO estao
 setadas antes de qualquer deploy de producao.
+
+Estado em 17/08/2026, verificado por Enio no servidor: `DOSSIERY_GATE=on` e
+`DOSSIERY_PAYWALL=on`. Seguras.
+
+## Estado do Stripe em producao
+
+Verificado por Enio em 17/08/2026:
+
+- Ambiente: **test**
+- 17 precos configurados, validos e ativos
+- Webhook habilitado em `https://dossiery.com.br/api/webhooks/stripe`, com os
+  eventos necessarios cadastrados
+- Parcelamento habilitado no codigo
+- **PIX desligado** na configuracao do Stripe
+- **`charges_enabled=false`** — a conta ainda nao aceita cobranca real
+- Titularidade e CNPJ a conferir no painel
+
+`charges_enabled=false` e bloqueio duro de go-live: sem isso a conta nao
+processa pagamento nenhum em modo live, independente de codigo.
