@@ -131,7 +131,7 @@ export default function PrecosPage() {
               cancele quando quiser
             </div>
             <ul className="mt-5 space-y-2.5">
-              {['Raio-X, Coach e Campo ilimitados', 'Arsenal vendido à parte', 'Preço acompanha o reajuste'].map((b) => (
+              {['Raio-X e Coach ilimitados', 'Arsenal vendido à parte', 'Preço acompanha o reajuste'].map((b) => (
                 <li key={b} className="flex gap-2.5 text-[13px] text-muted-foreground leading-snug">
                   <span className="text-muted-foreground/60">·</span>
                   {b}
