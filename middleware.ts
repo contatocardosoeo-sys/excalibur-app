@@ -29,16 +29,29 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
+  // ============ API DO DOSSIERY ============
+  // Cada rota impõe a própria regra: coach, analisar, portal e upsell exigem
+  // usuário; renovacoes exige CRON_SECRET; lead e vagas são públicas de
+  // propósito (quiz e contador de vagas rodam antes de existir conta) e
+  // checkout aceita convidado. O middleware não pode barrar aqui — barrando,
+  // o POST do quiz vira redirect 307 pra "/" e o funil não captura ninguém.
+  if (pathname.startsWith('/api/dossiery/')) {
+    return supabaseResponse
+  }
+
   // ============ DOSSIERY (funil próprio, auth própria) ============
   if (pathname === '/dossiery' || pathname.startsWith('/dossiery/')) {
     // DOSSIERY_GATE=off → tudo aberto (preview/dev antes do go-live)
     const gateOff = process.env.DOSSIERY_GATE === 'off'
     const publicosDossiery = [
       '/dossiery',
+      '/dossiery/raio-x',   // topo do funil: o quiz roda antes de existir conta
       '/dossiery/precos',
       '/dossiery/entrar',
       '/dossiery/criar-conta',
+      '/dossiery/entrando',  // ponte do guest checkout: ele chega pago e sem sessão
       '/dossiery/bem-vindo',
+      '/dossiery/garantia',
       '/dossiery/termos',
       '/dossiery/privacidade',
     ]
