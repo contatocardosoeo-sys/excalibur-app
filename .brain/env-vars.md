@@ -76,9 +76,14 @@ Prompt caching esta ligado no Coach. Sem ele a margem do Operador cai de
 
 | Variavel | Uso |
 |---|---|
-| `NEXT_PUBLIC_META_PIXEL_ID` | Pixel do Meta, client-side |
-| `META_CAPI_TOKEN` | API de Conversoes, server-side |
+| `NEXT_PUBLIC_META_PIXEL_ID` | Pixel do Meta, client-side. Valor: `1395788599311346` (dataset "Dossiery", BM 2334590360023095, criado 18/08/2026 — ID de pixel e publico, por isso pode viver aqui) |
+| `META_CAPI_TOKEN` | API de Conversoes, server-side. SEGREDO — token gerado em Configuracoes do dataset > API de Conversoes; vive so no .env do servidor |
 | `NEXT_PUBLIC_GA4_ID` | Google Analytics 4 |
+
+Dedup: o server manda Lead e Purchase pela CAPI com event_id igual ao do
+pixel do navegador. Sem os DOIS lados no ar (ID + token), o Meta ou perde
+evento ou conta dobrado. Conferir na linhagem de producao (rastreio.config.ts)
+se a dedup por event_id sobreviveu a porta.
 
 ## Operacao
 
